@@ -1,0 +1,21 @@
+{
+  "targets": [
+    "swap",
+    "final"
+  ],
+  "passes": [
+    {
+      "name": "rbh:black_hole",
+      "intarget": "final",
+      "outtarget": "swap",
+      "auxtargets": [
+        { "name": "MainSampler", "id": "minecraft:main" }
+      ]
+    },
+    {
+      "name": "rbh:blit_hard",
+      "intarget": "swap",
+      "outtarget": "final"
+    }
+  ]
+}

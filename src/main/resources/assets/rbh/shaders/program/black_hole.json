@@ -1,0 +1,29 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "one",
+    "dstrgb": "zero"
+  },
+  "vertex": "sobel",
+  "fragment": "rbh:black_hole",
+  "attributes": [ "Position" ],
+  "samplers": [
+    { "name": "DiffuseSampler" },
+    { "name": "MainSampler" }
+  ],
+  "uniforms": [
+    { "name": "ProjMat",          "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "ModelViewMat",     "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "InverseProjection","type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "IViewRotMat",      "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "InSize",           "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "OutSize",          "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "GameTime",         "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "_FOV",             "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "HoleCenter",       "type": "float",     "count": 3,  "values": [ 0.0, 0.0, 0.0 ] },
+    { "name": "HoleScreenCenter", "type": "float",     "count": 2,  "values": [ 0.5, 0.5 ] },
+    { "name": "HoleRadius",       "type": "float",     "count": 1,  "values": [ 0.5 ] },
+    { "name": "Radius",           "type": "float",     "count": 1,  "values": [ 0.5 ] },
+    { "name": "DistFromCam",      "type": "float",     "count": 1,  "values": [ 5.0 ] }
+  ]
+}
