@@ -1,6 +1,7 @@
 package com.mod.rbh;
 
 import com.mod.rbh.entity.RBHEntityTypes;
+import com.mod.rbh.items.RBHCreativeModeTab;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -30,13 +31,10 @@ import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 import software.bernie.geckolib.GeckoLib;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(ReinforcedBlackHoles.MODID)
 public class ReinforcedBlackHoles
 {
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "rbh";
-    // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public ReinforcedBlackHoles(FMLJavaModLoadingContext context)
@@ -47,6 +45,7 @@ public class ReinforcedBlackHoles
 
         GeckoLib.initialize();
 
+        RBHCreativeModeTab.register(modEventBus);
         RBHEntityTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);

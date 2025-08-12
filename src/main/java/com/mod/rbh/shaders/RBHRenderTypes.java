@@ -16,11 +16,6 @@ public class RBHRenderTypes extends RenderType {
     protected static final ShaderStateShard RENDERTYPE_BLACK_HOLE_SHADER =
             new ShaderStateShard(RBInternalShaders::getRenderTypeBlackHole);
 
-    protected static final OutputStateShard BLACK_HOLE_OUTPUT;
-
-    static {
-        BLACK_HOLE_OUTPUT = new OutputStateShard("black_hole_target", () -> {}, () -> {});
-    }
 
     public RBHRenderTypes(String pName, VertexFormat pFormat, VertexFormat.Mode pMode, int pBufferSize, boolean pAffectsCrumbling, boolean pSortOnUpload, Runnable pSetupState, Runnable pClearState) {
         super(pName, pFormat, pMode, pBufferSize, pAffectsCrumbling, pSortOnUpload, pSetupState, pClearState);

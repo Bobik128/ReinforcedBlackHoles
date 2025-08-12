@@ -27,7 +27,7 @@ public class BlackHole extends Entity {
 
     @OnlyIn(Dist.CLIENT) public RenderTarget finalTarget;
     @OnlyIn(Dist.CLIENT) public RenderTarget swapTarget;
-    @OnlyIn(Dist.CLIENT) public PostPass holePass;
+    @OnlyIn(Dist.CLIENT) public BlitPostPass holePass;
     @OnlyIn(Dist.CLIENT) public PostEffectRegistry.HoleEffectInstance effectInstance;
 
     public BlackHole(Vec3 pos, Level level) {
