@@ -2,6 +2,8 @@ package com.mod.rbh;
 
 import com.mod.rbh.entity.RBHEntityTypes;
 import com.mod.rbh.items.RBHCreativeModeTab;
+import com.mod.rbh.items.RBHItems;
+import com.mod.rbh.network.RBHNetwork;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -20,6 +22,7 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -35,35 +38,32 @@ import software.bernie.geckolib.GeckoLib;
 public class ReinforcedBlackHoles
 {
     public static final String MODID = "rbh";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public ReinforcedBlackHoles(FMLJavaModLoadingContext context)
     {
         IEventBus modEventBus = context.getModEventBus();
+        IEventBus forgeBus = MinecraftForge.EVENT_BUS;
 
         modEventBus.addListener(this::commonSetup);
 
         GeckoLib.initialize();
 
+        RBHItems.register(modEventBus);
         RBHCreativeModeTab.register(modEventBus);
         RBHEntityTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
         context.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC);
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> RBHClientForge.init(modEventBus, forgeBus));
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (CommonConfig.logDirtBlock)
-            LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
-
-        LOGGER.info(CommonConfig.magicNumberIntroduction + CommonConfig.magicNumber);
-
-        CommonConfig.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            RBHNetwork.init();
+        });
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -76,14 +76,10 @@ public class ReinforcedBlackHoles
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
+    public static class ClientModEvents {
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            RBHClient.onClientSetup();
         }
     }
 }

@@ -18,7 +18,7 @@ public class RBHCreativeModeTab {
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.DRAGON_EGG))
                     .title(Component.translatable("rbh.creativetab.tab"))
                     .displayItems((pParameters, pOutput) -> {
-                        pOutput.accept(Items.DRAGON_EGG);
+                        pOutput.accept(RBHItems.SINGULARITY_RIFLE.get());
                     })
                     .build());
 
