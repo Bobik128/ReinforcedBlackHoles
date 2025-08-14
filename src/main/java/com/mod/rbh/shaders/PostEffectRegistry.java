@@ -4,6 +4,7 @@ import com.google.gson.JsonSyntaxException;
 import com.mod.rbh.api.IPostChain;
 import com.mod.rbh.api.IPostPass;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -273,6 +274,23 @@ public class PostEffectRegistry {
             }
 
             passes.get(0).outTarget.resize(pWidth, pHeight, Minecraft.ON_OSX);
+        }
+
+        public static HoleEffectInstance createEffectInstance() {
+            Window window = Minecraft.getInstance().getWindow();
+            RenderTarget finalTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
+            RenderTarget swapTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
+            BlitPostPass holePass = null;
+            try {
+                holePass = new BlitPostPass(Minecraft.getInstance().getResourceManager(), "rbh:black_hole", finalTarget, swapTarget);
+            } catch (IOException e) {
+                LOGGER.warn(e.toString());
+            }
+
+            if (holePass != null) {
+                holePass.addAuxAsset("MainSampler", Minecraft.getInstance().getMainRenderTarget()::getColorTextureId, window.getWidth(), window.getHeight());
+            }
+            return new PostEffectRegistry.HoleEffectInstance(new ArrayList<>(List.of(holePass)), null, finalTarget, 0.0f);
         }
     }
     private static class PostEffect {

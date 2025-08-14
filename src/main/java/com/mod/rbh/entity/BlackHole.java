@@ -25,9 +25,6 @@ public class BlackHole extends Entity {
     public static final int RENDER_DISTANCE = 120;
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    @OnlyIn(Dist.CLIENT) public RenderTarget finalTarget;
-    @OnlyIn(Dist.CLIENT) public RenderTarget swapTarget;
-    @OnlyIn(Dist.CLIENT) public BlitPostPass holePass;
     @OnlyIn(Dist.CLIENT) public PostEffectRegistry.HoleEffectInstance effectInstance;
 
     public BlackHole(Vec3 pos, Level level) {
@@ -43,20 +40,7 @@ public class BlackHole extends Entity {
 
     @OnlyIn(Dist.CLIENT)
     private void clientInit() {
-        Window window = Minecraft.getInstance().getWindow();
-        finalTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
-        swapTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
-
-        try {
-            holePass = new BlitPostPass(Minecraft.getInstance().getResourceManager(), "rbh:black_hole", finalTarget, swapTarget);
-        } catch (IOException e) {
-            LOGGER.warn(e.toString());
-        }
-
-        if (holePass != null) {
-            holePass.addAuxAsset("MainSampler", Minecraft.getInstance().getMainRenderTarget()::getColorTextureId, window.getWidth(), window.getHeight());
-        }
-        effectInstance = new PostEffectRegistry.HoleEffectInstance(new ArrayList<>(List.of(holePass)), null, finalTarget, 0.0f);
+        effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
     }
 
     @Override

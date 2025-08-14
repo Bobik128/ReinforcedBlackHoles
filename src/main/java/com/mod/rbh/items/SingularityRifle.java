@@ -7,18 +7,24 @@ import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.FirearmMode;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -35,11 +41,13 @@ import java.util.stream.Collectors;
 public class SingularityRifle extends Item implements GeoItem, FovModifyingItem, HoldAttackKeyInteraction {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    private FirearmMode mode;
+    public FirearmMode mode;
 
     public SingularityRifle(Properties pProperties) {
         super(pProperties);
-        mode = new FirearmMode(10, 10, null, null);
+        mode = new FirearmMode(10, 10, null, null,
+                10, 5, null, null
+                );
     }
 
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
@@ -57,8 +65,42 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     }
 
     @Override
+    public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
+        return false;
+    }
+
+    private boolean equipedLastTick = false;
+    @Override
+    public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(itemStack, level, entity, slotId, isSelected);
+        if (!isSelected) {
+            if (equipedLastTick) mode.unequip(itemStack, (LivingEntity) entity);
+            FirearmDataUtils.setHoldingAttackKey(itemStack, false);
+        } else if (!equipedLastTick) mode.equip(itemStack, (LivingEntity) entity);
+
+        if (entity instanceof LivingEntity living)
+            this.mode.onTick(itemStack, living, isSelected);
+
+        equipedLastTick = isSelected;
+    }
+
+    public boolean isEquiped() {
+        return equipedLastTick;
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
 
+    }
+
+    @Override
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+        return false; // Not a tool
+    }
+
+    @Override
+    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
+        return isAiming(stack, player); // Cancel hit if aiming
     }
 
     @Override
@@ -67,8 +109,33 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     }
 
     @Override
-    public float getFov(ItemStack itemStack, Player player, float currentFovModifier, float partialTicks) {
-        return 50;
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged;
+    }
+
+    @Override
+    public float getFov(ItemStack stack, Player player, float currentFovModifier, float partialTicks) {
+        boolean isAiming = player.isUsingItem();
+        float zoomIn = 0.5f; // TODO configurable by attachments, etc
+
+        int denom = mode.isAiming(stack, player) ? mode.aimTime() : mode.unaimTime();
+        float aimingTime = (float) denom - mode.getAimingTime(stack, player);
+        float frac = denom > 0 ? aimingTime / (float) denom : 1;
+        float frac1 = denom > 0 ? partialTicks / (float) denom : 0;
+        float d = isAiming ? frac + frac1 : 1 - frac - frac1;
+        d = Mth.clamp(d, 0f, 1f);
+        float d1 = d * d * d;
+        return Mth.lerp(d1, 1f, zoomIn) * currentFovModifier;
+    }
+
+    @Override
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+        return true;
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.CUSTOM;
     }
 
     @Nullable public Action getCurrentAction(ItemStack itemStack) { return FirearmDataUtils.getAction(itemStack); }
@@ -102,7 +169,7 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     }
 
     @Override
-    public ItemStack finishUsingItem(ItemStack itemStack, Level level, LivingEntity entity) {
+    public @NotNull ItemStack finishUsingItem(ItemStack itemStack, Level level, LivingEntity entity) {
         this.stopAiming(itemStack, entity);
         return super.finishUsingItem(itemStack, level, entity);
     }
@@ -120,6 +187,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
         return mode.isAiming(itemStack, entity);
     }
+
+    @Override public int getUseDuration(@NotNull ItemStack itemStack) { return 72000; }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

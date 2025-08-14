@@ -9,9 +9,11 @@
   "client": [
     "client.GameRendererMixin",
     "client.GuiMixin",
+    "client.ItemInHandRendererMixin",
     "client.LevelRendererMixin",
     "client.MinecraftMixin",
     "client.MultiPlayerGameModeMixin",
+    "client.PlayerRendererMixin",
     "client.PostChainMixin",
     "client.PostPassMixin",
     "client.ShaderInstanceMixin"

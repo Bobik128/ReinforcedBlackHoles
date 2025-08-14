@@ -3,20 +3,21 @@ package com.mod.rbh;
 import com.mod.rbh.entity.RBHEntityTypes;
 import com.mod.rbh.items.RBHCreativeModeTab;
 import com.mod.rbh.items.RBHItems;
+import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.network.RBHNetwork;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -81,5 +82,21 @@ public class ReinforcedBlackHoles
         public static void onClientSetup(FMLClientSetupEvent event) {
             RBHClient.onClientSetup();
         }
+
+        @SubscribeEvent
+        public void onRenderPlayer(RenderLivingEvent.Pre<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> event) {
+            AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
+            ItemStack main = player.getMainHandItem();
+
+            if (main.getItem() instanceof SingularityRifle) {
+                PlayerModel<AbstractClientPlayer> model = event.getRenderer().getModel();
+
+                model.rightArm.xRot = -90.0F;
+                model.leftArm.xRot = -90.0F;
+                model.rightArm.yRot = -20.0F;
+                model.leftArm.yRot = 20.0F;
+            }
+        }
+
     }
 }

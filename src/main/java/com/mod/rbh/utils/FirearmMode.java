@@ -21,25 +21,35 @@ import java.util.stream.Collectors;
 public class FirearmMode {
 
     // Aiming
-    protected final int aimTime;
-    protected final int unaimTime;
+    public final int aimTime;
+    public final int unaimTime;
     @Nullable
     protected final SoundEvent aimSound;
     @Nullable protected final SoundEvent unaimSound;
 
-    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound) {
+    // Equip
+    public final int equipTime;
+    public final int unequipTime;
+    @Nullable
+    protected final SoundEvent equipSound;
+    @Nullable protected final SoundEvent unequipSound;
+
+    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound) {
         this.aimTime = aimTime;
         this.unaimTime = unaimTime;
         this.aimSound = aimSound;
         this.unaimSound = unaimSound;
-    }
-    
-    public int getAimingTime(ItemStack itemStack, LivingEntity entity) {
-        return FirearmDataUtils.getAimingTime(itemStack);
+        this.equipTime = equipTime;
+        this.unequipTime = unequipTime;
+        this.equipSound = equipSound;
+        this.unequipSound = unequipSound;
     }
 
-    public void setAimingTime(ItemStack itemStack, LivingEntity entity, int time) {
-        FirearmDataUtils.setAimingTime(itemStack, time);
+    public boolean canAim(ItemStack itemStack, LivingEntity entity) {
+        SingularityRifle.Action action = FirearmDataUtils.getAction(itemStack);
+        if (action != null && !action.canAim())
+            return false;
+        return true;
     }
 
     public void startAiming(ItemStack itemStack, LivingEntity entity) {
@@ -50,15 +60,6 @@ public class FirearmMode {
         this.setAimingTime(itemStack, entity, Mth.ceil(this.aimTime * frac));
         if (this.aimSound != null)
             entity.level().playSound(entity, entity.blockPosition(), this.aimSound, SoundSource.NEUTRAL, 1f, 1f);
-    }
-    
-    public boolean canAim(ItemStack itemStack, LivingEntity entity) {
-        SingularityRifle.Action action = FirearmDataUtils.getAction(itemStack);
-        return action == null || action.canAim();
-    }
-    
-    public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
-        return entity instanceof Player ? entity.isUsingItem() : FirearmDataUtils.isAiming(itemStack);
     }
 
     public void stopAiming(ItemStack itemStack, LivingEntity entity) {
@@ -72,9 +73,72 @@ public class FirearmMode {
             entity.level().playSound(entity, entity.blockPosition(), this.unaimSound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
+    public void equip(ItemStack itemStack, LivingEntity entity) {
+        int currentUnaimingTime = this.getEquipTime(itemStack, entity);
+        float frac = this.unequipTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.unequipTime;
+        frac = 1f - frac;
+        this.setEquipTime(itemStack, entity, Mth.ceil(this.equipTime * frac));
+        if (this.equipSound != null)
+            entity.level().playSound(entity, entity.blockPosition(), this.equipSound, SoundSource.NEUTRAL, 1f, 1f);
+    }
+
+    public void unequip(ItemStack itemStack, LivingEntity entity) {
+        int currentAimingTime = this.getEquipTime(itemStack, entity);;
+        float frac = this.equipTime == 0 ? 0 : (float) currentAimingTime / (float) this.equipTime;
+        frac = 1f - frac;
+        this.setEquipTime(itemStack, entity, Mth.ceil(this.unequipTime * frac));
+        if (this.unequipSound != null)
+            entity.level().playSound(entity, entity.blockPosition(), this.unequipSound, SoundSource.NEUTRAL, 1f, 1f);
+    }
+
+    public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
+        return entity instanceof Player ? entity.isUsingItem() : FirearmDataUtils.isAiming(itemStack);
+    }
+
+    public int getAimingTime(ItemStack itemStack, LivingEntity entity) {
+        return FirearmDataUtils.getAimingTime(itemStack);
+    }
+
+    public void setAimingTime(ItemStack itemStack, LivingEntity entity, int time) {
+        FirearmDataUtils.setAimingTime(itemStack, time);
+    }
+
+    public int getEquipTime(ItemStack itemStack, LivingEntity entity) {
+        return FirearmDataUtils.getEQTime(itemStack);
+    }
+
+    public void setEquipTime(ItemStack itemStack, LivingEntity entity, int time) {
+        FirearmDataUtils.setEQTime(itemStack, time);
+    }
+
+    public int aimTime() { return this.aimTime; }
+
+    public int unaimTime() { return this.unaimTime; }
+
+
+    public int equipTime() { return this.equipTime; }
+
+    public int unequipTime() { return this.unequipTime; }
+
     public void tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhaseType phaseType,
                                        boolean onInput, boolean firstReload) {
 
+    }
+
+    public void onTick(ItemStack itemStack, LivingEntity entity, boolean isSelected) {
+        if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
+            this.stopAiming(itemStack, entity);
+        }
+        int aimingTime = this.getAimingTime(itemStack, entity);
+        if (aimingTime > 0) {
+            --aimingTime;
+            this.setAimingTime(itemStack, entity, aimingTime);
+        }
+        int equipTime = this.getEquipTime(itemStack, entity);
+        if (equipTime > 0) {
+            --equipTime;
+            this.setEquipTime(itemStack, entity, equipTime);
+        }
     }
 
     public enum ReloadPhaseType implements StringRepresentable {

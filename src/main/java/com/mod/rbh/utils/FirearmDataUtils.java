@@ -397,6 +397,30 @@ public class FirearmDataUtils {
         return itemStack.getOrCreateTag().getInt("AimingTime");
     }
 
+    public static void setEQTime(ItemStack itemStack, int time) {
+        itemStack.getOrCreateTag().putInt("EQTime", time);
+    }
+
+    public static int getEQTime(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().getInt("EQTime");
+    }
+
+    public static void setChargeLevel(ItemStack itemStack, int time) {
+        itemStack.getOrCreateTag().putInt("ChargeLevel", time);
+    }
+
+    public static int getChargeLevel(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().getInt("ChargeLevel");
+    }
+
+    public static void setStoredChargeLevel(ItemStack itemStack, int time) {
+        itemStack.getOrCreateTag().putInt("StoredChargeLevel", time);
+    }
+
+    public static int getStoredChargeLevel(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().getInt("StoredChargeLevel");
+    }
+
     private FirearmDataUtils() {
     }
 
