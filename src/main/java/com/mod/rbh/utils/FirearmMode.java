@@ -1,9 +1,6 @@
 package com.mod.rbh.utils;
 
 import com.mod.rbh.items.SingularityRifle;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -13,9 +10,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class FirearmMode {
@@ -139,6 +137,11 @@ public class FirearmMode {
             --equipTime;
             this.setEquipTime(itemStack, entity, equipTime);
         }
+
+        if (isSelected && !FirearmDataUtils.isEquipped(itemStack)) equip(itemStack, entity);
+        if (!isSelected && FirearmDataUtils.isEquipped(itemStack)) unequip(itemStack, entity);
+
+        FirearmDataUtils.setEquipped(itemStack, isSelected);
     }
 
     public enum ReloadPhaseType implements StringRepresentable {

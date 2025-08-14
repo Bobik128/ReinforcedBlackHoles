@@ -1,7 +1,12 @@
 package com.mod.rbh;
 
-import net.minecraftforge.client.event.*;
+import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
+import net.minecraftforge.client.event.ComputeFovModifierEvent;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -11,6 +16,7 @@ public class RBHClientForge {
         modBus.addListener(RBHClientForge::onClientSetup);
         modBus.addListener(RBHClientForge::onRegisterKeyMappings);
 
+        forgeBus.addListener(RBHClientForge::onClientTick);
         forgeBus.addListener(RBHClientForge::onMouseInput);
         forgeBus.addListener(RBHClientForge::onKeyInput);
         forgeBus.addListener(RBHClientForge::onComputeFov);
@@ -42,5 +48,9 @@ public class RBHClientForge {
         if (event.getOverlay().overlay() == VanillaGuiOverlay.HOTBAR.type().overlay()) {
         }
         // TODO crosshair
+    }
+
+    private static void onClientTick(TickEvent.ClientTickEvent event) {
+        RifleHoleEffectInstanceHolder.clientTick();
     }
 }

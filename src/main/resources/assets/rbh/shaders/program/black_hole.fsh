@@ -62,25 +62,29 @@ void main() {
             fragColor = vec4(HoleColor.rgb * fresnel, 1.0);
         } else {
             vec4 hit2 = raycast(vec3(0.0), rd, HoleCenter, Radius2 + 0.01);
-            vec3 hitPos = hit2.yzw;
-            vec3 N = normalize(hitPos - HoleCenter);// view-space normal
-            vec3 V = rd;                // view-space camera-to-hit
+            if (hit2.x == 1.0) {
+                vec3 hitPos = hit2.yzw;
+                vec3 N = normalize(hitPos - HoleCenter);// view-space normal
+                vec3 V = rd;// view-space camera-to-hit
 
-            if (dot(V, N) < 0.0) N = -N; // inside-sphere flip
+                if (dot(V, N) < 0.0) N = -N;// inside-sphere flip
 
-            float fresnel = pow(dot(V, N), 1.0);
-            float linearFresnel = 1.0 - acos(fresnel);
+                float fresnel = pow(dot(V, N), 1.0);
+                float linearFresnel = 1.0 - acos(fresnel);
 
-            linearFresnel *= 1.0 + pow(HoleRadius / Radius, 1.1);
+                linearFresnel *= 1.0 + pow(HoleRadius / Radius, 1.1);
 
-            float k = 5.0;
-            float expFresnel = (exp(k*linearFresnel)-1.0)/(exp(k)-1.0);
+                float k = 5.0;
+                float expFresnel = (exp(k*linearFresnel)-1.0)/(exp(k)-1.0);
 
-            vec2 dirVec = normalize(texCoord - HoleScreenCenter) * 0.4 * EffectFraction * expFresnel;
+                vec2 dirVec = normalize(texCoord - HoleScreenCenter) * 0.4 * EffectFraction * expFresnel;
 
-            vec2 newCoord = vec2(dirVec + texCoord);
-            newCoord = clamp(newCoord, 0.0, 1.0);
-            fragColor = texture(MainSampler, newCoord);
+                vec2 newCoord = vec2(dirVec + texCoord);
+                newCoord = clamp(newCoord, 0.0, 1.0);
+                fragColor = texture(MainSampler, newCoord);
+            } else {
+                fragColor = vec4(0.0);
+            }
         }
     } else {
         fragColor = vec4(0.0);

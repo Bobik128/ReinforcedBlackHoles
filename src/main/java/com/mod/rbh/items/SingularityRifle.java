@@ -3,10 +3,10 @@ package com.mod.rbh.items;
 import com.mod.rbh.api.FovModifyingItem;
 import com.mod.rbh.api.HoldAttackKeyInteraction;
 import com.mod.rbh.items.renderer.SingularityRifleRenderer;
+import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.FirearmMode;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,12 +42,14 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public FirearmMode mode;
+    public final PostEffectRegistry.HoleEffectInstance effectInstance;
 
     public SingularityRifle(Properties pProperties) {
         super(pProperties);
         mode = new FirearmMode(10, 10, null, null,
                 10, 5, null, null
                 );
+        effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
     }
 
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
@@ -69,23 +71,19 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
         return false;
     }
 
-    private boolean equipedLastTick = false;
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(itemStack, level, entity, slotId, isSelected);
         if (!isSelected) {
-            if (equipedLastTick) mode.unequip(itemStack, (LivingEntity) entity);
             FirearmDataUtils.setHoldingAttackKey(itemStack, false);
-        } else if (!equipedLastTick) mode.equip(itemStack, (LivingEntity) entity);
+        }
 
         if (entity instanceof LivingEntity living)
             this.mode.onTick(itemStack, living, isSelected);
-
-        equipedLastTick = isSelected;
     }
 
-    public boolean isEquiped() {
-        return equipedLastTick;
+    public boolean isEquiped(ItemStack stack, LivingEntity entity) {
+        return FirearmDataUtils.isEquipped(stack);
     }
 
     @Override

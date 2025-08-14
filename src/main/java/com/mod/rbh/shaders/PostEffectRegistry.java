@@ -178,7 +178,7 @@ public class PostEffectRegistry {
 
 
     public static class MutablePostEffect extends PostEffect {
-        protected final Set<HoleEffectInstance> holes = new HashSet<>();
+        protected final Map<HoleEffectInstance, Integer> holes = new HashMap<>();
 
         public MutablePostEffect(PostChain postChain, boolean enabled) {
             super(postChain, null, enabled);
@@ -204,17 +204,18 @@ public class PostEffectRegistry {
         @Override
         public void resize(int x, int y) {
             super.resize(x, y);
-            for (HoleEffectInstance hole : holes) {
+            for (HoleEffectInstance hole : holes.keySet()) {
                 hole.resize(x, y);
             }
         }
 
+        private final List<HoleEffectInstance> toRemove = new ArrayList<>();
         public void process() {
             Map<HoleEffectInstance, Integer> resolvedPasses = new HashMap<>();
             List<PostPass> passes = IPostChain.fromPostChain(this.postChain).getPostPasses();
             passes.clear();
             AtomicInteger counter = new AtomicInteger();
-            holes.stream()
+            holes.keySet().stream()
                     .sorted((a, b) -> Float.compare(b.dist, a.dist)) // furthest first
                     .forEach(entry -> {
                         int position = counter.getAndIncrement();
@@ -222,10 +223,23 @@ public class PostEffectRegistry {
                         passes.addAll(entry.passes);
                         resolvedPasses.put(entry, entry.passes.size() * position);
                     });
+
+
+            for (Map.Entry<HoleEffectInstance, Integer> entry : holes.entrySet()) {
+                if (entry.getValue() <= 0) {
+                    toRemove.add(entry.getKey());
+                }
+            }
+            for (HoleEffectInstance hole : toRemove) {
+                holes.remove(hole);
+            }
+            toRemove.clear();
+
+            holes.replaceAll((key, value) -> value - 1);
         }
 
         public void wipe() {
-            for (HoleEffectInstance hole : holes) {
+            for (HoleEffectInstance hole : holes.keySet()) {
                 hole.passes.get(0).inTarget.clear(Minecraft.ON_OSX);
                 hole.passes.get(0).outTarget.clear(Minecraft.ON_OSX);
             }
@@ -239,7 +253,7 @@ public class PostEffectRegistry {
             } else {
                 IPostPass.fromPostPass(hole.passes.get(0)).toRunOnProcess(hole.uniformSetter);
             }
-            holes.add(hole);
+            holes.put(hole, 2);
         }
     }
 
@@ -290,7 +304,10 @@ public class PostEffectRegistry {
             if (holePass != null) {
                 holePass.addAuxAsset("MainSampler", Minecraft.getInstance().getMainRenderTarget()::getColorTextureId, window.getWidth(), window.getHeight());
             }
-            return new PostEffectRegistry.HoleEffectInstance(new ArrayList<>(List.of(holePass)), null, finalTarget, 0.0f);
+            List<PostPass> passes = new ArrayList<>();
+            if (holePass != null)
+                passes.add(holePass);
+            return new PostEffectRegistry.HoleEffectInstance(passes, null, finalTarget, 0.0f);
         }
     }
     private static class PostEffect {

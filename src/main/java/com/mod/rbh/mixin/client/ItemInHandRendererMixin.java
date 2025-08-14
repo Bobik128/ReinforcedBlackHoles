@@ -4,7 +4,6 @@ import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.utils.FirearmMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,8 +22,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Map;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
@@ -117,7 +114,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Unique
     private float reinforcedBlackHoles$getEquipProgress(AbstractClientPlayer player, ItemStack stack, SingularityRifle rifle, float partialTicks) {
-        boolean isEquiped = rifle.isEquiped();
+        boolean isEquiped = rifle.isEquiped(stack, player);
         FirearmMode mode = rifle.mode;
 
         int denom = isEquiped ? mode.equipTime() : mode.unequipTime();

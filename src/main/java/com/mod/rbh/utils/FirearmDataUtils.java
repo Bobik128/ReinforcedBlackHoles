@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
+
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -373,6 +374,20 @@ public class FirearmDataUtils {
 
     public static boolean isHoldingAttackKey(ItemStack itemStack) {
         return itemStack.getOrCreateTag().contains("HoldingAttackKey");
+    }
+
+    // Equipped methods
+
+    public static void setEquipped(ItemStack itemStack, boolean holdingAttackKey) {
+        if (holdingAttackKey) {
+            itemStack.getOrCreateTag().putBoolean("equippedLastTick", true);
+        } else {
+            itemStack.getOrCreateTag().remove("equippedLastTick");
+        }
+    }
+
+    public static boolean isEquipped(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().contains("equippedLastTick");
     }
 
     // Aiming methods

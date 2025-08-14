@@ -10,7 +10,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.PostChain;
+import net.minecraft.client.renderer.PostPass;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -84,7 +86,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     public static void renderBlackHole(PoseStack poseStack, PostEffectRegistry.HoleEffectInstance effectInstance, MultiBufferSource buffer, int pPackedLight) {
         PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
-        if (chain == null) return;
+        if (chain == null || effectInstance.passes.isEmpty()) return;
 
         PostPass holePostPass = effectInstance.passes.get(0);
         RenderTarget finalTarget = holePostPass.inTarget;
@@ -94,14 +96,12 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
 
-        Minecraft mc = Minecraft.getInstance();
-
         poseStack.pushPose();
 
-        float radius = 1.8f;
-        float holeRadius = 0.45f;
-        int longBands = 16;
-        int latBands = 16;
+        float radius = 0.3f;
+        float holeRadius = 0.15f;
+        int longBands = 10;
+        int latBands = 10;
         int color = 0xFFFFFF00;
 
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
