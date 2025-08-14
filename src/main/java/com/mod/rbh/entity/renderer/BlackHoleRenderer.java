@@ -2,26 +2,19 @@ package com.mod.rbh.entity.renderer;
 
 import com.mod.rbh.api.IGameRenderer;
 import com.mod.rbh.entity.BlackHole;
-import com.mod.rbh.shaders.BlitPostPass;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.PostPass;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.slf4j.Logger;
@@ -38,58 +31,10 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     @Override
     public void render(@NotNull BlackHole entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
-        PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
-        if (chain == null) return;
-
-        Minecraft mc = Minecraft.getInstance();
-
-        poseStack.pushPose();
-
-        float radius = 1.8f;
-        float holeRadius = 0.45f;
-        int longBands = 16;
-        int latBands = 16;
-        int color = 0xFFFFFF00;
-
-        PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
-
-        Window window = Minecraft.getInstance().getWindow();
-        if (window.getHeight() != entity.finalTarget.height || window.getWidth() != entity.finalTarget.width) {
-            entity.finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-            entity.swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-        }
-
-        entity.holePass.outTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
-
-        Camera camera = mc.gameRenderer.getMainCamera();
-        Vector2f screenPos = getScreenSpace(entity.position(), camera);
-        float distFromCam = mc.gameRenderer.getMainCamera().getPosition().toVector3f().distance(entity.position().toVector3f());
-
-        Matrix4f projection = RenderSystem.getProjectionMatrix();
-        Matrix4f inverseProj = new Matrix4f(projection).invert();
-
-        Matrix4f viewMatrix = new Matrix4f();
-        viewMatrix.rotation(new Quaternionf(camera.rotation()).invert());
-        viewMatrix.translate(
-                (float) -camera.getPosition().x,
-                (float) -camera.getPosition().y,
-                (float) -camera.getPosition().z
-        );
-
-        Vector3f camRel = new Vector3f((float) entity.position().x, (float) entity.position().y, (float) entity.position().z);
-        camRel.mulPosition(viewMatrix);
-
-        entity.effectInstance.uniformSetter = (pass) -> uniformSetter(pass, inverseProj, camRel, screenPos, radius, holeRadius, distFromCam, color);
-
-        entity.effectInstance.dist = (float) mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(entity.position());
-        VertexConsumer consumer = buffer.getBuffer(RBHRenderTypes.getBlackHole(NETHERITE, entity.finalTarget));
-        SphereMesh.render(poseStack, consumer, radius, latBands, longBands, pPackedLight, OverlayTexture.NO_OVERLAY);
-        poseStack.popPose();
-
-        PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(entity.effectInstance);
+        renderBlackHole(poseStack, entity.effectInstance, buffer, pPackedLight);
     }
 
-    private static void uniformSetter(PostPass pass, Matrix4f inverseProj, Vector3f camRel, Vector2f screenPos,
+    private static void uniformSetter(PostPass pass, Matrix4f inverseProj, Vector3fc camRel, Vector2f screenPos,
                                float radius, float holeRadius, float distFromCam, int color) {
 
         // Extract RGBA from int color
@@ -105,7 +50,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         // Set uniforms
         pass.getEffect().safeGetUniform("InverseProjection").set(inverseProj);
-        pass.getEffect().safeGetUniform("HoleCenter").set(camRel.x, -camRel.y, camRel.z);
+        pass.getEffect().safeGetUniform("HoleCenter").set(camRel.x(), camRel.y(), camRel.z());
         pass.getEffect().safeGetUniform("HoleScreenCenter").set(screenPos.x, screenPos.y);
         pass.getEffect().safeGetUniform("HoleColor").set(r, g, b, a);
         pass.getEffect().safeGetUniform("HoleRadius").set(holeRadius);
@@ -116,24 +61,14 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         pass.getEffect().safeGetUniform("ExpScale").set(expScale);
     }
 
-    public static Vector2f getScreenSpace(Vec3 worldPos, Camera camera) {
-        Matrix4f viewMatrixLocal = new Matrix4f();
-        Matrix4f projMatrixLocal = new Matrix4f(RenderSystem.getProjectionMatrix());
-
-        new Quaternionf(camera.rotation()).invert().get(viewMatrixLocal);
-
-        return worldToScreenNorm(worldPos, camera, viewMatrixLocal, projMatrixLocal);
-    }
-
-    private static Vector2f worldToScreenNorm(Vec3 worldPos, Camera camera, Matrix4f viewMatrix, Matrix4f projMatrix) {
+    private static Vector2f getScreenSpace(Vector3fc camRelPos, Matrix4f projMatrix) {
         Vector4f pos4 = new Vector4f(
-                (float)(worldPos.x - camera.getPosition().x),
-                (float)(worldPos.y - camera.getPosition().y),
-                (float)(worldPos.z - camera.getPosition().z),
+                camRelPos.x(),
+                camRelPos.y(),
+                camRelPos.z(),
                 1.0f
         );
 
-        pos4.mul(viewMatrix);
         pos4.mul(projMatrix);
 
         // If behind camera, still produce coords but they will be flipped
@@ -142,19 +77,22 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         // Normalize to 0–1
         float normX = ndcX * 0.5f + 0.5f;
-        float normY = 1.0f - (ndcY * 0.5f + 0.5f);
+        float normY = (ndcY * 0.5f + 0.5f);
 
         return new Vector2f(normX, normY);
     }
 
-    public static void renderBlackHole(PoseStack poseStack, PostEffectRegistry.HoleEffectInstance effectInstance, Vec3 worldPosition, MultiBufferSource buffer, int pPackedLight) {
+    public static void renderBlackHole(PoseStack poseStack, PostEffectRegistry.HoleEffectInstance effectInstance, MultiBufferSource buffer, int pPackedLight) {
         PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
+        if (chain == null) return;
 
         PostPass holePostPass = effectInstance.passes.get(0);
         RenderTarget finalTarget = holePostPass.inTarget;
         RenderTarget swapTarget = holePostPass.outTarget;
 
-        if (chain == null) return;
+        Matrix4f preBobProjection = Minecraft.getInstance().gameRenderer.getProjectionMatrix(IGameRenderer.get().getFovPublic());
+
+        Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
 
         Minecraft mc = Minecraft.getInstance();
 
@@ -176,27 +114,14 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         swapTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
 
-        Camera camera = mc.gameRenderer.getMainCamera();
-        Vector2f screenPos = getScreenSpace(worldPosition, camera);
-        float distFromCam = mc.gameRenderer.getMainCamera().getPosition().toVector3f().distance(worldPosition.toVector3f());
+        Vector2f screenPos = getScreenSpace(cameraRelativePos, preBobProjection);
+        float distFromCam = cameraRelativePos.length();
 
-        Matrix4f projection = RenderSystem.getProjectionMatrix();
-        Matrix4f inverseProj = new Matrix4f(projection).invert();
+        Matrix4f inverseProj = new Matrix4f(preBobProjection).invert();
 
-        Matrix4f viewMatrix = new Matrix4f();
-        viewMatrix.rotation(new Quaternionf(camera.rotation()).invert());
-        viewMatrix.translate(
-                (float) -camera.getPosition().x,
-                (float) -camera.getPosition().y,
-                (float) -camera.getPosition().z
-        );
+        effectInstance.uniformSetter = (pass) -> uniformSetter(pass, inverseProj, cameraRelativePos, screenPos, radius, holeRadius, distFromCam, color);
 
-        Vector3f camRel = new Vector3f((float) worldPosition.x, (float) worldPosition.y, (float) worldPosition.z);
-        camRel.mulPosition(viewMatrix);
-
-        effectInstance.uniformSetter = (pass) -> uniformSetter(pass, inverseProj, camRel, screenPos, radius, holeRadius, distFromCam, color);
-
-        effectInstance.dist = (float) mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(worldPosition);
+        effectInstance.dist = distFromCam;
         VertexConsumer consumer = buffer.getBuffer(RBHRenderTypes.getBlackHole(NETHERITE, finalTarget));
         SphereMesh.render(poseStack, consumer, radius, latBands, longBands, pPackedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();

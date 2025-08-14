@@ -30,7 +30,7 @@ vec4 raycast(vec3 ro, vec3 rd, vec3 sphereOrigin, float radius2) {
     float t = t0;
     if (t < 0.0) t = t1; // inside sphere case
     if (t < 0.0) return vec4(0.0); // both behind
-    vec3 hitPos = ro - rd * t;
+    vec3 hitPos = ro + rd * t;
     return vec4(1.0, hitPos);
 }
 
@@ -48,7 +48,7 @@ void main() {
         vec3 rd = normalize(viewPos4.xyz); // camera -> pixel ray
 
         // Raycast in view space
-        vec4 hit = raycast(vec3(0.0), rd, -HoleCenter, HoleRadius2);
+        vec4 hit = raycast(vec3(0.0), rd, HoleCenter, HoleRadius2);
 
         if (hit.x == 1.0) {
             vec3 hitPos = hit.yzw;                  // view-space hit
@@ -61,7 +61,7 @@ void main() {
 
             fragColor = vec4(HoleColor.rgb * fresnel, 1.0);
         } else {
-            vec4 hit2 = raycast(vec3(0.0), rd, -HoleCenter, Radius2 + 0.01);
+            vec4 hit2 = raycast(vec3(0.0), rd, HoleCenter, Radius2 + 0.01);
             vec3 hitPos = hit2.yzw;
             vec3 N = normalize(hitPos - HoleCenter);// view-space normal
             vec3 V = rd;                // view-space camera-to-hit
