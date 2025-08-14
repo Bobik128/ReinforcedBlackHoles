@@ -1,8 +1,11 @@
 package com.mod.rbh.items.renderer;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.entity.renderer.SphereMesh;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.cache.object.GeoBone;
+import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.model.DefaultedItemGeoModel;
 
