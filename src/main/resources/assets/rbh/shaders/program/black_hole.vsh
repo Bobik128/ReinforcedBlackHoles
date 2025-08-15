@@ -3,7 +3,6 @@
 in vec4 Position; // full-screen quad positions
 uniform mat4 ProjMat;
 uniform mat4 InverseProjection;
-uniform vec2 InSize;
 uniform vec2 OutSize;
 
 out vec2 texCoord;

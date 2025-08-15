@@ -51,7 +51,9 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                 poseStack.translate(0, 0.3125f, -0.421f);
                 poseStack.translate(bone.getPosX()/16, bone.getPosY()/16, bone.getPosZ()/16);
 //                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
-                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, 0.08f, 0.03f);
+                PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getEffect(currentItemStack);
+                if (holeEffectInstance != null)
+                    BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, 0.08f, 0.03f);
                 poseStack.popPose();
 
             }

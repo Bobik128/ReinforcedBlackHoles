@@ -87,7 +87,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     public static void renderBlackHole(
             PoseStack poseStack,
-            PostEffectRegistry.HoleEffectInstance effectInstance,
+            @NotNull PostEffectRegistry.HoleEffectInstance effectInstance,
             PostEffectRegistry.RenderPhase phase,
             int pPackedLight,
             float effectRadius,

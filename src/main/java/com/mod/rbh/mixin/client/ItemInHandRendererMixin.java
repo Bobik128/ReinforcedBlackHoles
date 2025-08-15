@@ -29,9 +29,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
 
-    private final Vec3 unequipedPos = new Vec3(0.56F, -1.2F, -0.1F);
-    private final Vec3 equipedPos = new Vec3(0.45F, -0.52F, -0.9F);
-    private final Vec3 aimingPos = new Vec3(0f, -0.5F, -0.5F);
+    @Unique
+    private static final Vec3 reinforcedBlackHoles$unequipedPos = new Vec3(0.56F, -1.2F, -0.1F);
+    @Unique
+    private static final Vec3 reinforcedBlackHoles$equipedPos = new Vec3(0.45F, -0.52F, -0.9F);
+    @Unique
+    private static final Vec3 reinforcedBlackHoles$aimingPos = new Vec3(0f, -0.5F, -0.5F);
 
     @Shadow
     protected abstract void applyItemArmTransform(PoseStack pPoseStack, HumanoidArm pHand, float pEquippedProg);
@@ -60,7 +63,6 @@ public abstract class ItemInHandRendererMixin {
                                      CallbackInfo ci) {
 
         if (stack.getItem() instanceof SingularityRifle rifle) {
-            boolean isAiming = rifle.isAiming(stack, player);
             poseStack.pushPose();
 
             boolean rightHand = (hand == InteractionHand.MAIN_HAND) == (player.getMainArm() == HumanoidArm.RIGHT);
@@ -70,8 +72,8 @@ public abstract class ItemInHandRendererMixin {
 
             float k = rightHand ? 1 : -1;
             float xRot = 0f;
-            Vec3 finalPos = equipedPos.lerp(aimingPos, progress);
-            finalPos = finalPos.lerp(unequipedPos, equipProgress);
+            Vec3 finalPos = reinforcedBlackHoles$equipedPos.lerp(reinforcedBlackHoles$aimingPos, progress);
+            finalPos = finalPos.lerp(reinforcedBlackHoles$unequipedPos, equipProgress);
             xRot = Mth.lerp(equipProgress, 0f, 80f);
 
             poseStack.translate(k * finalPos.x, finalPos.y, finalPos.z);

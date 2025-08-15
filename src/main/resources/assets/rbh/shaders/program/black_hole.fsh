@@ -15,7 +15,6 @@ uniform mat4 InverseProjection;
 uniform float HoleRadius2; // HoleRadius^2 (precomputed)
 uniform float Radius2;     // Radius^2 (precomputed)
 uniform float EffectFraction; // precomputed Radius / (tan(fov/2)*DistFromCam)
-uniform float ExpScale;    // 1.0 / (exp(k)-1.0) (precomputed)
 
 out vec4 fragColor;
 

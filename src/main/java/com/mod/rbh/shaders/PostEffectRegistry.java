@@ -1,6 +1,7 @@
 package com.mod.rbh.shaders;
 
 import com.google.gson.JsonSyntaxException;
+import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.api.IPostChain;
 import com.mod.rbh.api.IPostPass;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -235,7 +236,7 @@ public class PostEffectRegistry {
 
         private final List<HoleEffectInstance> toRemove = new ArrayList<>();
         public void process(RenderPhase phase) {
-            Map<HoleEffectInstance, Integer> resolvedPasses = new HashMap<>();
+            Map<HoleEffectInstance, Integer> resolvedPasses = new WeakHashMap<>();
             List<PostPass> passes = IPostChain.fromPostChain(this.postChain).getPostPasses();
             passes.clear();
             AtomicInteger counter = new AtomicInteger();
@@ -274,6 +275,10 @@ public class PostEffectRegistry {
         }
 
         public void updateHole(HoleEffectInstance hole) {
+            if (holes.size() > 80) {
+                ReinforcedBlackHoles.LOGGER.warn("Too many black hole effects registered, skipping!");
+                return;
+            }
             Window window = Minecraft.getInstance().getWindow();
             hole.resize(window.getWidth(), window.getHeight());
             if (hole.passes.get(0) instanceof IPostPass pp) {

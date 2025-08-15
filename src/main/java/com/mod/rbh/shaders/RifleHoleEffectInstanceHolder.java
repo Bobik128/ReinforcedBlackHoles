@@ -1,16 +1,15 @@
 package com.mod.rbh.shaders;
 
 import com.ibm.icu.impl.Pair;
+import com.mod.rbh.ReinforcedBlackHoles;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class RifleHoleEffectInstanceHolder {
-    private static Map<ItemStack, PostEffectRegistry.HoleEffectInstance> effects = new HashMap<>();
-    private static Map<ItemStack, Integer> timers = new HashMap<>();
+    private static Map<ItemStack, PostEffectRegistry.HoleEffectInstance> effects = new WeakHashMap<>();
+    private static Map<ItemStack, Integer> timers = new WeakHashMap<>();
 
     private static final List<ItemStack> toRemove = new ArrayList<>();// caching it for effectivity
     public static void clientTick() {
@@ -30,8 +29,12 @@ public class RifleHoleEffectInstanceHolder {
         toRemove.clear();
     }
 
-    public static PostEffectRegistry.HoleEffectInstance getEffect(ItemStack item) {
-        timers.put(item, 20);
-        return effects.computeIfAbsent(item, (itemStack) -> PostEffectRegistry.HoleEffectInstance.createEffectInstance());
+    public static @Nullable PostEffectRegistry.HoleEffectInstance getEffect(ItemStack item) {
+        if (effects.size() < 80) {
+            timers.put(item, 30);
+            return effects.computeIfAbsent(item, (itemStack) -> PostEffectRegistry.HoleEffectInstance.createEffectInstance());
+        }
+        ReinforcedBlackHoles.LOGGER.warn("Too many rifle effects registered, skipping!");
+        return null;
     }
 }
