@@ -1551,7 +1551,7 @@
 				{
 					"name": "plasmaBattery",
 					"parent": "rifle",
-					"pivot": [-0.00042, 4.94864, -2.31423],
+					"pivot": [-0.00376, 4.94863, 1.22287],
 					"cubes": [
 						{
 							"origin": [-0.74176, 3.33547, 0.67778],
@@ -3121,12 +3121,17 @@
 					]
 				},
 				{
-					"name": "blackHoleLocator",
+					"name": "blackHoleLocatorPre",
 					"parent": "rifle",
-					"pivot": [-0.00209, 4.93737, -6.69568],
+					"pivot": [-0.00209, 5.03737, -6.79568]
+				},
+				{
+					"name": "blackHoleLocator",
+					"parent": "blackHoleLocatorPre",
+					"pivot": [-0.00209, 5.03737, -6.79568],
 					"cubes": [
 						{
-							"origin": [-0.00209, 4.93737, -6.69568],
+							"origin": [-0.00209, 5.03737, -6.79568],
 							"size": [0, 0, 0],
 							"uv": {
 								"north": {"uv": [0, 0], "uv_size": [0, 0]},

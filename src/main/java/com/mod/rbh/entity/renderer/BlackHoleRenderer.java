@@ -6,19 +6,20 @@ import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.PostPass;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 
 import java.lang.Math;
@@ -84,7 +85,12 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         return new Vector2f(normX, normY);
     }
 
-    public static void renderBlackHole(PoseStack poseStack, PostEffectRegistry.HoleEffectInstance effectInstance, MultiBufferSource buffer, int pPackedLight) {
+    public static void renderBlackHole(
+            PoseStack poseStack,
+            PostEffectRegistry.HoleEffectInstance effectInstance,
+            MultiBufferSource buffer,
+            int pPackedLight
+    ) {
         PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         if (chain == null || effectInstance.passes.isEmpty()) return;
 
@@ -92,42 +98,51 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         RenderTarget finalTarget = holePostPass.inTarget;
         RenderTarget swapTarget = holePostPass.outTarget;
 
-        Matrix4f preBobProjection = Minecraft.getInstance().gameRenderer.getProjectionMatrix(IGameRenderer.get().getFovPublic());
+        // ===== Save GL state =====
+        RenderTarget mainTarget = Minecraft.getInstance().getMainRenderTarget();
 
-        Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
-
-        poseStack.pushPose();
-
-        float radius = 0.3f;
-        float holeRadius = 0.15f;
-        int longBands = 10;
-        int latBands = 10;
-        int color = 0xFFFFFF00;
-
-        PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
-
+        // ===== Ensure correct target sizes (should be done on resize, not here) =====
         Window window = Minecraft.getInstance().getWindow();
-        if (window.getHeight() != finalTarget.height || window.getWidth() != finalTarget.width) {
+        if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
             finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
             swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
         }
 
-        swapTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+        // ===== Prepare post-effect uniforms =====
+        Matrix4f preBobProjection = Minecraft.getInstance().gameRenderer.getProjectionMatrix(
+                IGameRenderer.get().getFovPublic()
+        );
 
+        Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
         Vector2f screenPos = getScreenSpace(cameraRelativePos, preBobProjection);
         float distFromCam = cameraRelativePos.length();
-
         Matrix4f inverseProj = new Matrix4f(preBobProjection).invert();
 
-        effectInstance.uniformSetter = (pass) -> uniformSetter(pass, inverseProj, cameraRelativePos, screenPos, radius, holeRadius, distFromCam, color);
-
+        effectInstance.uniformSetter = (pass) ->
+                uniformSetter(pass, inverseProj, cameraRelativePos, screenPos,
+                        0.08f, 0.03f, distFromCam, 0xFFFFFF00);
         effectInstance.dist = distFromCam;
-        VertexConsumer consumer = buffer.getBuffer(RBHRenderTypes.getBlackHole(NETHERITE, finalTarget));
-        SphereMesh.render(poseStack, consumer, radius, latBands, longBands, pPackedLight, OverlayTexture.NO_OVERLAY);
-        poseStack.popPose();
 
+        // ===== Render black hole sphere into main scene =====
+        BufferBuilder localBB = new BufferBuilder(256 * 1024);                  // dedicated, not the global Tesselator
+        MultiBufferSource.BufferSource localBuf = MultiBufferSource.immediate(localBB);
+
+        RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);    // this one binds your finalTarget
+        VertexConsumer vc = localBuf.getBuffer(rt);
+
+        SphereMesh.render(poseStack, vc, 0.3f, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY);
+
+// Flush ONLY our stuff; this unbinds your RT and restores GL state for later draws
+        localBuf.endBatch();
+
+        // ===== Apply post effect without breaking rest of pipeline =====
+        PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
+
+        // ===== Restore framebuffer & viewport =====
+        mainTarget.bindWrite(true);
     }
+
 
     @Override
     public ResourceLocation getTextureLocation(BlackHole pEntity) {
