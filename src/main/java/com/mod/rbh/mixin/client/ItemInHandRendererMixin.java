@@ -1,10 +1,13 @@
 package com.mod.rbh.mixin.client;
 
 import com.mod.rbh.items.SingularityRifle;
+import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.utils.FirearmMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -124,5 +127,14 @@ public abstract class ItemInHandRendererMixin {
         float d = isEquiped ? frac + frac1 : 1 - frac - frac1;
         d = Mth.clamp(d, 0f, 1f);
         return 1.0f - d * d;
+    }
+
+    @Inject(method = "renderHandsWithItems",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
+                    shift = At.Shift.BEFORE))
+    private void beforeEndBatch(float pPartialTicks, PoseStack pPoseStack, MultiBufferSource.BufferSource pBuffer, LocalPlayer pPlayerEntity, int pCombinedLight, CallbackInfo ci) {
+//        PostEffectRegistry.copyWholeArmDepth(Minecraft.getInstance().getMainRenderTarget());
+        PostEffectRegistry.processEffects(Minecraft.getInstance().getMainRenderTarget(), pPartialTicks, PostEffectRegistry.RenderPhase.AFTER_ARM);
     }
 }

@@ -3,12 +3,14 @@ package com.mod.rbh.shaders;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 public class RBHRenderTypes extends RenderType {
     public static final ResourceLocation BLACK_HOLE_POST_SHADER = ResourceLocation.parse("rbh:shaders/post/black_hole.json");
@@ -31,7 +33,11 @@ public class RBHRenderTypes extends RenderType {
                 .setOutputState(new OutputStateShard("black_hole_target",
                         () -> {
                             if (renderTarget != null) {
-                                renderTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+//                                if (Minecraft.getInstance().levelRenderer.getItemEntityTarget() != null) {
+//                                    renderTarget.copyDepthFrom(Minecraft.getInstance().levelRenderer.getItemEntityTarget());
+//                                } else {
+                                    renderTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+//                                }
                                 renderTarget.bindWrite(false);
                             }
                         },

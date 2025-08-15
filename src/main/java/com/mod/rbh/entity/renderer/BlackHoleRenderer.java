@@ -34,7 +34,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     @Override
     public void render(@NotNull BlackHole entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
-        renderBlackHole(poseStack, entity.effectInstance, buffer, pPackedLight);
+        renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, 0.3f, 0.15f);
     }
 
     private static void uniformSetter(PostPass pass, Matrix4f inverseProj, Vector3fc camRel, Vector2f screenPos,
@@ -88,8 +88,10 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
     public static void renderBlackHole(
             PoseStack poseStack,
             PostEffectRegistry.HoleEffectInstance effectInstance,
-            MultiBufferSource buffer,
-            int pPackedLight
+            PostEffectRegistry.RenderPhase phase,
+            int pPackedLight,
+            float effectRadius,
+            float holeRadius
     ) {
         PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         if (chain == null || effectInstance.passes.isEmpty()) return;
@@ -109,33 +111,46 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         }
 
         // ===== Prepare post-effect uniforms =====
+
+        Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
+
+        PoseStack rawPoseStack = new PoseStack();
+        rawPoseStack.mulPoseMatrix(poseStack.last().pose());
+
+        // ===== Apply post effect without breaking rest of pipeline =====
+        effectInstance.renderPhase = phase;
+
         Matrix4f preBobProjection = Minecraft.getInstance().gameRenderer.getProjectionMatrix(
                 IGameRenderer.get().getFovPublic()
         );
 
-        Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
         Vector2f screenPos = getScreenSpace(cameraRelativePos, preBobProjection);
         float distFromCam = cameraRelativePos.length();
         Matrix4f inverseProj = new Matrix4f(preBobProjection).invert();
 
+        effectInstance.setRenderFunc(() -> {
+            effectInstance.dist = distFromCam;
+
+            // ===== Render black hole sphere into main scene =====
+            BufferBuilder localBB = new BufferBuilder(256 * 1024);                  // dedicated, not the global Tesselator
+            MultiBufferSource.BufferSource localBuf = MultiBufferSource.immediate(localBB);
+
+            RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);    // this one binds your finalTarget
+            VertexConsumer vc = localBuf.getBuffer(rt);
+
+            SphereMesh.render(rawPoseStack, vc, effectRadius, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY);
+
+            SphereMesh.render(rawPoseStack, vc, holeRadius, 8, 8, pPackedLight, OverlayTexture.NO_OVERLAY);
+
+            // Flush ONLY our stuff; this unbinds your RT and restores GL state for later draws
+            localBuf.endBatch();
+            mainTarget.bindWrite(true);
+        });
+
         effectInstance.uniformSetter = (pass) ->
                 uniformSetter(pass, inverseProj, cameraRelativePos, screenPos,
-                        0.08f, 0.03f, distFromCam, 0xFFFFFF00);
-        effectInstance.dist = distFromCam;
+                        effectRadius, holeRadius, distFromCam, 0xFFFFFF00);
 
-        // ===== Render black hole sphere into main scene =====
-        BufferBuilder localBB = new BufferBuilder(256 * 1024);                  // dedicated, not the global Tesselator
-        MultiBufferSource.BufferSource localBuf = MultiBufferSource.immediate(localBB);
-
-        RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);    // this one binds your finalTarget
-        VertexConsumer vc = localBuf.getBuffer(rt);
-
-        SphereMesh.render(poseStack, vc, 0.3f, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY);
-
-// Flush ONLY our stuff; this unbinds your RT and restores GL state for later draws
-        localBuf.endBatch();
-
-        // ===== Apply post effect without breaking rest of pipeline =====
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
 

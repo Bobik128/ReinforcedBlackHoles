@@ -30,7 +30,6 @@ public class GameRendererMixin implements IGameRenderer {
 
     @Inject(method = "renderLevel", at = @At("TAIL"))
     private void renderLevel(float pPartialTicks, long pFinishTimeNano, PoseStack pMatrixStack, CallbackInfo ci) {
-        PostEffectRegistry.processEffects(Minecraft.getInstance().getMainRenderTarget(), pPartialTicks);
         PostEffectRegistry.blitEffects();
     }
 }

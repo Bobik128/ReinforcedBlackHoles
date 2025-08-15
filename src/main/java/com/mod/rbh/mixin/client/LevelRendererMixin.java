@@ -43,6 +43,9 @@ public class LevelRendererMixin {
 
     @Inject(method = {"Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V"}, remap = true, at = {@At("TAIL")})
     private void reinforced_renderLevel_end(PoseStack poseStack, float f, long l, boolean b, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f matrix4f, CallbackInfo ci) {
+//        PostEffectRegistry.processEffects(Minecraft.getInstance().getMainRenderTarget(), minecraft.getPartialTick());
+//        PostEffectRegistry.blitEffects();
 
+        PostEffectRegistry.processEffects(Minecraft.getInstance().getMainRenderTarget(), minecraft.getPartialTick(), PostEffectRegistry.RenderPhase.AFTER_LEVEL);
     }
 }

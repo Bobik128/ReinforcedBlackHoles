@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.slf4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -152,25 +153,48 @@ public class PostEffectRegistry {
                 mainTarget.bindWrite(false);
             }
         }
-        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
-            if (postEffect.isEnabled() && postEffect.postChain != null) {
-                postEffect.wipe();
-                mainTarget.bindWrite(false);
-            }
-        }
+//        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
+//            if (postEffect.isEnabled() && postEffect.postChain != null) {
+//                postEffect.wipe();
+//                mainTarget.bindWrite(false);
+//            }
+//        }
     }
 
-    public static void processEffects(RenderTarget mainTarget, float f) {
-        for (PostEffect postEffect : postEffects.values()) {
-            if (postEffect.isEnabled() && postEffect.postChain != null) {
-                postEffect.postChain.process(Minecraft.getInstance().getFrameTime());
-                mainTarget.bindWrite(false);
+    public static void copyWholeLevelDepth(RenderTarget main) {
+//        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
+//            for (HoleEffectInstance effectInstance : postEffect.holes.keySet()) {
+//                if (effectInstance.copyPhase == DepthCopyPhase.AFTER_LEVEL && !effectInstance.passes.isEmpty()) {
+//                    effectInstance.passes.get(0).inTarget.copyDepthFrom(main);
+//                }
+//            }
+//        }
+    }
+
+    public static void copyWholeArmDepth(RenderTarget main) {
+//        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
+//            for (HoleEffectInstance effectInstance : postEffect.holes.keySet()) {
+//                if (effectInstance.copyPhase == DepthCopyPhase.AFTER_ARM && !effectInstance.passes.isEmpty()) {
+//                    effectInstance.passes.get(0).inTarget.copyDepthFrom(main);
+//                }
+//            }
+//        }
+    }
+
+    public static void processEffects(RenderTarget mainTarget, float f, RenderPhase phase) {
+        if (phase == RenderPhase.AFTER_LEVEL) {
+            for (PostEffect postEffect : postEffects.values()) {
+                if (postEffect.isEnabled() && postEffect.postChain != null) {
+                    postEffect.postChain.process(Minecraft.getInstance().getFrameTime());
+                    mainTarget.bindWrite(false);
+                }
             }
         }
         for (MutablePostEffect postEffect : mutablePostEffects.values()) {
             if (postEffect.isEnabled() && postEffect.postChain != null) {
-                postEffect.process();
-                postEffect.postChain.process(Minecraft.getInstance().getFrameTime());
+                postEffect.process(phase);
+                if (!IPostChain.fromPostChain(postEffect.postChain).getPostPasses().isEmpty())
+                    postEffect.postChain.process(Minecraft.getInstance().getFrameTime());
                 mainTarget.bindWrite(false);
             }
         }
@@ -210,7 +234,7 @@ public class PostEffectRegistry {
         }
 
         private final List<HoleEffectInstance> toRemove = new ArrayList<>();
-        public void process() {
+        public void process(RenderPhase phase) {
             Map<HoleEffectInstance, Integer> resolvedPasses = new HashMap<>();
             List<PostPass> passes = IPostChain.fromPostChain(this.postChain).getPostPasses();
             passes.clear();
@@ -218,10 +242,14 @@ public class PostEffectRegistry {
             holes.keySet().stream()
                     .sorted((a, b) -> Float.compare(b.dist, a.dist)) // furthest first
                     .forEach(entry -> {
-                        int position = counter.getAndIncrement();
+                        if (entry.renderPhase == phase) {
+                            int position = counter.getAndIncrement();
 
-                        passes.addAll(entry.passes);
-                        resolvedPasses.put(entry, entry.passes.size() * position);
+                            entry.render();
+
+                            passes.addAll(entry.passes);
+                            resolvedPasses.put(entry, entry.passes.size() * position);
+                        }
                     });
 
 
@@ -253,7 +281,7 @@ public class PostEffectRegistry {
             } else {
                 IPostPass.fromPostPass(hole.passes.get(0)).toRunOnProcess(hole.uniformSetter);
             }
-            holes.put(hole, 2);
+            holes.put(hole, 4);
         }
     }
 
@@ -262,6 +290,8 @@ public class PostEffectRegistry {
         public Consumer<PostPass> uniformSetter;
         public RenderTarget main;
         public float dist;
+        public RenderPhase renderPhase;
+        private @Nullable Runnable renderFunc = () -> {};
 
         private Matrix4f shaderOrthoMatrix;
         private int screenWidth;
@@ -272,6 +302,18 @@ public class PostEffectRegistry {
             this.uniformSetter = uniformSetter;
             this.main = main;
             this.dist = dist;
+            this.renderPhase = RenderPhase.AFTER_LEVEL;
+        }
+
+        public void setRenderFunc(Runnable func) {
+            renderFunc = func;
+        }
+
+        public void render() {
+            if (renderFunc != null) {
+                renderFunc.run();
+                renderFunc = null;
+            }
         }
 
         private void updateOrthoMatrix() {
@@ -348,5 +390,10 @@ public class PostEffectRegistry {
             if (this.postChain != null)
                 this.postChain.resize(x, y);
         }
+    }
+
+    public enum RenderPhase {
+        AFTER_LEVEL,
+        AFTER_ARM
     }
 }

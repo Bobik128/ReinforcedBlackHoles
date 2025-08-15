@@ -3,6 +3,8 @@ package com.mod.rbh.items.renderer;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.entity.renderer.SphereMesh;
 import com.mod.rbh.items.SingularityRifle;
+import com.mod.rbh.shaders.PostEffectRegistry;
+import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -27,8 +29,14 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
     }
 
     @Override
+    public RenderType getRenderType(SingularityRifle animatable, ResourceLocation texture, @Nullable MultiBufferSource bufferSource, float partialTick) {
+        return RenderType.entitySolid(texture);
+    }
+
+        @Override
     public void renderRecursively(PoseStack poseStack, SingularityRifle animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        if (bone.getName().equals("blackHoleLocator")) {
+        super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        if (bone.getName().equals("blackHoleLocatorPre")) {
             if (
                     renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                             || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
@@ -36,17 +44,50 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                             || renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
                             || renderPerspective == ItemDisplayContext.GROUND
             ) {
+                boolean isFirstPerson = renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                        || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
+
                 poseStack.pushPose();
-                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
-//                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), bufferSource, packedLight);
+                poseStack.translate(0, 0.3125f, -0.421f);
+                poseStack.translate(bone.getPosX()/16, bone.getPosY()/16, bone.getPosZ()/16);
+//                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
+                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, 0.08f, 0.03f);
                 poseStack.popPose();
+
             }
         }
-        super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
     }
 //
 //    @Override
+//    public void postRender(PoseStack poseStack, SingularityRifle animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+//        if (
+//                renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+//                || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+//                || renderPerspective == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+//                || renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
+//                || renderPerspective == ItemDisplayContext.GROUND
+//        ) {
+//
+//            Optional<GeoBone> coreBone = this.getGeoModel().getBone("blackHoleLocatorPre");
+//            Optional<GeoBone> mainCoreBone = this.getGeoModel().getBone("rifle");
+//            if (coreBone.isPresent() && mainCoreBone.isPresent()) {
+//                boolean isFirstPerson = renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+//                        || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
+//
+//                GeoBone bone = coreBone.get();
+//                GeoBone mainBone = mainCoreBone.get();poseStack.pushPose();
+////                poseStack.translate(0, 0.3125f, -0.421f);
+////                poseStack.translate((bone.getPosX() + mainBone.getPosX())/16, (bone.getPosY() + mainBone.getPosY())/16, (bone.getPosZ() + mainBone.getPosZ())/16);
+////                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
+//                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight);
+//                poseStack.popPose();
+//            }
+//        }
+//    }
+
+    //    @Override
 //    public void renderByItem(ItemStack stack, ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+//        super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);
 //        if (
 //                transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
 //                || transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
@@ -55,21 +96,17 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 //                || transformType == ItemDisplayContext.GROUND
 //        ) {
 //
-//            Optional<GeoBone> coreBone = this.getGeoModel().getBone("blackHoleLocator");
+//            Optional<GeoBone> coreBone = this.getGeoModel().getBone("blackHoleLocatorPre");
 //            Optional<GeoBone> mainCoreBone = this.getGeoModel().getBone("rifle");
 //            if (coreBone.isPresent() && mainCoreBone.isPresent()) {
 //                GeoBone bone = coreBone.get();
-//                GeoBone mainBone = mainCoreBone.get();
-//                poseStack.pushPose();
-//
-//                RenderUtils.prepMatrixForBone(poseStack, mainBone);
-//                RenderUtils.prepMatrixForBone(poseStack, bone);
-//
-//                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(stack), bufferSource, packedLight);
-//
+//                GeoBone mainBone = mainCoreBone.get();poseStack.pushPose();
+////                poseStack.translate(0, 0.3125f, -0.421f);
+////                poseStack.translate((bone.getPosX() + mainBone.getPosX())/16, (bone.getPosY() + mainBone.getPosY())/16, (bone.getPosZ() + mainBone.getPosZ())/16);
+////                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
+//                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), bufferSource, packedLight);
 //                poseStack.popPose();
 //            }
 //        }
-//        super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);
 //    }
 }
