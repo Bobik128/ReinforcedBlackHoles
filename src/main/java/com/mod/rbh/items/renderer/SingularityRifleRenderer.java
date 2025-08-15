@@ -30,7 +30,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
     @Override
     public RenderType getRenderType(SingularityRifle animatable, ResourceLocation texture, @Nullable MultiBufferSource bufferSource, float partialTick) {
-        return RenderType.entitySolid(texture);
+        return RenderType.entityTranslucentCull(texture);
     }
 
         @Override
@@ -56,57 +56,9 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
             }
         }
-    }
-//
-//    @Override
-//    public void postRender(PoseStack poseStack, SingularityRifle animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-//        if (
-//                renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
-//                || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-//                || renderPerspective == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
-//                || renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
-//                || renderPerspective == ItemDisplayContext.GROUND
-//        ) {
-//
-//            Optional<GeoBone> coreBone = this.getGeoModel().getBone("blackHoleLocatorPre");
-//            Optional<GeoBone> mainCoreBone = this.getGeoModel().getBone("rifle");
-//            if (coreBone.isPresent() && mainCoreBone.isPresent()) {
-//                boolean isFirstPerson = renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
-//                        || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
-//
-//                GeoBone bone = coreBone.get();
-//                GeoBone mainBone = mainCoreBone.get();poseStack.pushPose();
-////                poseStack.translate(0, 0.3125f, -0.421f);
-////                poseStack.translate((bone.getPosX() + mainBone.getPosX())/16, (bone.getPosY() + mainBone.getPosY())/16, (bone.getPosZ() + mainBone.getPosZ())/16);
-////                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
-//                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight);
-//                poseStack.popPose();
-//            }
-//        }
-//    }
 
-    //    @Override
-//    public void renderByItem(ItemStack stack, ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-//        super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);
-//        if (
-//                transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
-//                || transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-//                || transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
-//                || transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
-//                || transformType == ItemDisplayContext.GROUND
-//        ) {
-//
-//            Optional<GeoBone> coreBone = this.getGeoModel().getBone("blackHoleLocatorPre");
-//            Optional<GeoBone> mainCoreBone = this.getGeoModel().getBone("rifle");
-//            if (coreBone.isPresent() && mainCoreBone.isPresent()) {
-//                GeoBone bone = coreBone.get();
-//                GeoBone mainBone = mainCoreBone.get();poseStack.pushPose();
-////                poseStack.translate(0, 0.3125f, -0.421f);
-////                poseStack.translate((bone.getPosX() + mainBone.getPosX())/16, (bone.getPosY() + mainBone.getPosY())/16, (bone.getPosZ() + mainBone.getPosZ())/16);
-////                SphereMesh.render(poseStack, buffer, 0.1f, 10, 10, packedLight, packedOverlay);
-//                BlackHoleRenderer.renderBlackHole(poseStack, RifleHoleEffectInstanceHolder.getEffect(currentItemStack), bufferSource, packedLight);
-//                poseStack.popPose();
-//            }
-//        }
-//    }
+        if (bone.getName().toUpperCase().endsWith("_EMISSIVE")) {
+            //TODO emmisive textures handling
+        }
+    }
 }
