@@ -21,6 +21,7 @@ public class RBHClientForge {
         forgeBus.addListener(RBHClientForge::onKeyInput);
         forgeBus.addListener(RBHClientForge::onComputeFov);
         forgeBus.addListener(RBHClientForge::onRenderGuiOverlay);
+        forgeBus.addListener(RifleHoleEffectInstanceHolder::resetEffectCounter);
     }
 
     private static void onClientSetup(final FMLClientSetupEvent event) {
