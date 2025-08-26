@@ -1761,6 +1761,7 @@
 					"name": "lowerHinge",
 					"parent": "rifle",
 					"pivot": [-0.00042, 3.70747, -1.20914],
+					"rotation": [-2.5, 0, 0],
 					"cubes": [
 						{
 							"origin": [-1.00376, 3.95747, -5.86222],
@@ -1859,9 +1860,10 @@
 					]
 				},
 				{
-					"name": "bone",
+					"name": "lowerHinge2",
 					"parent": "lowerHinge",
 					"pivot": [-0.82042, 3.70747, -5.95914],
+					"rotation": [2.5, 0, 0],
 					"cubes": [
 						{
 							"origin": [-0.80376, 3.95747, -15.38222],
@@ -2365,6 +2367,7 @@
 					"name": "upperHinge",
 					"parent": "rifle",
 					"pivot": [-0.00042, 6.19253, -1.20914],
+					"rotation": [2.5, 0, 0],
 					"cubes": [
 						{
 							"origin": [-1.00376, 5.60253, -5.86222],
@@ -2463,9 +2466,10 @@
 					]
 				},
 				{
-					"name": "bone2",
+					"name": "upperHinge2",
 					"parent": "upperHinge",
 					"pivot": [-0.82042, 6.19253, -5.95914],
+					"rotation": [-2.5, 0, 0],
 					"cubes": [
 						{
 							"origin": [-0.80376, 5.74253, -15.38222],

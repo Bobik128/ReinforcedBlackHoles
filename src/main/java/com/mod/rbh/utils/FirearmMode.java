@@ -1,5 +1,6 @@
 package com.mod.rbh.utils;
 
+import com.mod.rbh.entity.BlackHole;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -9,6 +10,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -139,7 +141,20 @@ public class FirearmMode {
             this.setEquipTime(itemStack, entity, equipTime);
         }
 
-        if (FirearmDataUtils.isCharging(itemStack)) {
+        if (FirearmDataUtils.isHoldingAttackKey(itemStack)) {
+            int power = FirearmDataUtils.getChargeLevel(itemStack);
+            if (power != 0) {
+                float modifier = (float) FirearmDataUtils.getChargeLevel(itemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+                Vec3 lookVector = entity.getLookAngle();
+//                Vec3 additionalOffset = lookVector.multiply(0.5f, 0.5f, 0.5f);
+                BlackHole hole = new BlackHole(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier);
+                entity.level().addFreshEntity(hole);
+                hole.shoot(lookVector.x, lookVector.y, lookVector.z, 0.8f, 0.01f);
+                FirearmDataUtils.setChargeLevel(itemStack, 0);
+            }
+        }
+
+        if (FirearmDataUtils.isCharging(itemStack) && !FirearmDataUtils.isHoldingAttackKey(itemStack)) {
             if (isSelected) {
                 int nowChargeLevel = FirearmDataUtils.getChargeLevel(itemStack);
 

@@ -7,10 +7,12 @@ import org.joml.Quaternionf;
 
 public class SphereMesh {
     private static final Quaternionf chcedQuat = new Quaternionf();
-    public static void render(PoseStack poseStack, VertexConsumer buffer, float radius, int latBands, int longBands, int light, int overlay) {
+    public static void render(PoseStack poseStack, VertexConsumer buffer, float radius, int latBands, int longBands, int light, int overlay, boolean renderInverted) {
         poseStack.pushPose();
         PoseStack.Pose pose = poseStack.last();
-        pose.pose().rotate(pose.pose().getNormalizedRotation(chcedQuat).invert());
+        if (renderInverted) {
+            pose.pose().rotate(pose.pose().getNormalizedRotation(chcedQuat).invert());
+        }
 
         for (int latNumber = 0; latNumber < latBands; latNumber++) {
             float theta1 = (float) (Math.PI * latNumber / latBands);
@@ -53,5 +55,7 @@ public class SphereMesh {
                 .normal(pose.normal(), 0, 1, 0)
                 .endVertex();
     }
+
+
 }
 

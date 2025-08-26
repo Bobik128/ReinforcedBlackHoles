@@ -4,6 +4,7 @@ import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
+import com.mod.rbh.utils.FirearmDataUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -15,8 +16,10 @@ import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
+
     public SingularityRifleRenderer() {
         super(new SingularityRifleModel());
+        ((SingularityRifleModel) this.model).renderer = this;
     }
 
     @Override
@@ -27,6 +30,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         @Override
     public void renderRecursively(PoseStack poseStack, SingularityRifle animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        if (FirearmDataUtils.getChargeLevel(currentItemStack) <= 0) return;
         if (bone.getName().equals("blackHoleLocatorPre")) {
             if (
                     renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
@@ -38,12 +42,14 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                 boolean isFirstPerson = renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                         || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
 
+                float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+
                 poseStack.pushPose();
                 poseStack.translate(0, 0.3125f, -0.421f);
                 poseStack.translate(bone.getPosX()/16, bone.getPosY()/16, bone.getPosZ()/16);
                 PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
                 if (holeEffectInstance != null)
-                    BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, 0.08f, 0.03f);
+                    BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier);
                 poseStack.popPose();
 
             }

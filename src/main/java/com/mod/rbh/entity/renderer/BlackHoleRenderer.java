@@ -34,10 +34,10 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     @Override
     public void render(@NotNull BlackHole entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
-        renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, 0.3f, 0.15f);
+        renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize());
     }
 
-    private static void uniformSetter(PostPass pass, Matrix4f inverseProj, Vector3fc camRel, Vector2f screenPos,
+    private static void uniformSetter(PostPass pass, Matrix4f normalProj, Vector3fc camRel, Vector2f screenPos,
                                float radius, float holeRadius, float distFromCam, int color) {
 
         // Extract RGBA from int color
@@ -52,7 +52,8 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         float expScale = 1.0f / (float) (Math.exp(5.0) - 1.0);
 
         // Set uniforms
-        pass.getEffect().safeGetUniform("InverseProjection").set(inverseProj);
+        pass.getEffect().safeGetUniform("InverseProjection").set(new Matrix4f(normalProj).invert());
+//        pass.getEffect().safeGetUniform("ProjMatrix").set(normalProj);
         pass.getEffect().safeGetUniform("HoleCenter").set(camRel.x(), camRel.y(), camRel.z());
         pass.getEffect().safeGetUniform("HoleScreenCenter").set(screenPos.x, screenPos.y);
         pass.getEffect().safeGetUniform("HoleColor").set(r, g, b, a);
@@ -126,7 +127,6 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         Vector2f screenPos = getScreenSpace(cameraRelativePos, preBobProjection);
         float distFromCam = cameraRelativePos.length();
-        Matrix4f inverseProj = new Matrix4f(preBobProjection).invert();
 
         effectInstance.setRenderFunc(() -> {
             effectInstance.dist = distFromCam;
@@ -138,9 +138,9 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);    // this one binds your finalTarget
             VertexConsumer vc = localBuf.getBuffer(rt);
 
-            SphereMesh.render(rawPoseStack, vc, effectRadius, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY);
+            SphereMesh.render(rawPoseStack, vc, effectRadius, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY, true);
 
-            SphereMesh.render(rawPoseStack, vc, holeRadius, 8, 8, pPackedLight, OverlayTexture.NO_OVERLAY);
+            SphereMesh.render(rawPoseStack, vc, holeRadius, 8, 8, pPackedLight, OverlayTexture.NO_OVERLAY, true);
 
             // Flush ONLY our stuff; this unbinds your RT and restores GL state for later draws
             localBuf.endBatch();
@@ -148,7 +148,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         });
 
         effectInstance.uniformSetter = (pass) ->
-                uniformSetter(pass, inverseProj, cameraRelativePos, screenPos,
+                uniformSetter(pass, preBobProjection, cameraRelativePos, screenPos,
                         effectRadius, holeRadius, distFromCam, 0xFFFFFF00);
 
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);

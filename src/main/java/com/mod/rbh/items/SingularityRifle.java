@@ -44,6 +44,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenPlay("animation.rifle.idle");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
+    public static float MAX_SIZE = 0.08f;
+    public static float MAX_EFFECT_SIZE = 0.2f;
     public static int MAX_CHARGE_LEVEL = 100;
 
     public FirearmMode mode;
