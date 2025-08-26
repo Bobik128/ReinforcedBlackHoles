@@ -1,6 +1,7 @@
 package com.mod.rbh.utils;
 
 import com.mod.rbh.items.SingularityRifle;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -136,6 +137,25 @@ public class FirearmMode {
         if (equipTime > 0) {
             --equipTime;
             this.setEquipTime(itemStack, entity, equipTime);
+        }
+
+        if (FirearmDataUtils.isCharging(itemStack)) {
+            if (isSelected) {
+                int nowChargeLevel = FirearmDataUtils.getChargeLevel(itemStack);
+
+                if (nowChargeLevel < SingularityRifle.MAX_CHARGE_LEVEL) {
+                    FirearmDataUtils.setChargeLevel(itemStack, FirearmDataUtils.getChargeLevel(itemStack) + 1);
+                    if (entity instanceof Player plr)
+                        plr.displayClientMessage(Component.literal("Rifle charge level is: " + FirearmDataUtils.getChargeLevel(itemStack)), true);
+                } else {
+                    if (entity instanceof Player plr)
+                        plr.displayClientMessage(Component.literal("Rifle charge level is at max"), true);
+                    FirearmDataUtils.setCharging(itemStack, false);
+                }
+
+            } else {
+                FirearmDataUtils.setCharging(itemStack, false);
+            }
         }
 
         if (isSelected && !FirearmDataUtils.isEquipped(itemStack)) equip(itemStack, entity);

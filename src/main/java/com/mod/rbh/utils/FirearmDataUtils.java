@@ -390,6 +390,20 @@ public class FirearmDataUtils {
         return itemStack.getOrCreateTag().contains("equippedLastTick");
     }
 
+    // Equipped methods
+
+    public static void setCharging(ItemStack itemStack, boolean holdingAttackKey) {
+        if (holdingAttackKey) {
+            itemStack.getOrCreateTag().putBoolean("chargingRifle", true);
+        } else {
+            itemStack.getOrCreateTag().remove("chargingRifle");
+        }
+    }
+
+    public static boolean isCharging(ItemStack itemStack) {
+        return itemStack.getOrCreateTag().contains("chargingRifle");
+    }
+
     // Aiming methods
 
     public static void setAiming(ItemStack itemStack, boolean aiming) {
@@ -420,8 +434,8 @@ public class FirearmDataUtils {
         return itemStack.getOrCreateTag().getInt("EQTime");
     }
 
-    public static void setChargeLevel(ItemStack itemStack, int time) {
-        itemStack.getOrCreateTag().putInt("ChargeLevel", time);
+    public static void setChargeLevel(ItemStack itemStack, int level) {
+        itemStack.getOrCreateTag().putInt("ChargeLevel", level);
     }
 
     public static int getChargeLevel(ItemStack itemStack) {

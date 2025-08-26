@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -26,14 +25,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.example.registry.SoundRegistry;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
-import software.bernie.geckolib.util.ClientUtils;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
@@ -47,6 +43,8 @@ import java.util.stream.Collectors;
 public class SingularityRifle extends Item implements GeoItem, FovModifyingItem, HoldAttackKeyInteraction {
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenPlay("animation.rifle.idle");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    public static int MAX_CHARGE_LEVEL = 100;
 
     public FirearmMode mode;
     public final PostEffectRegistry.HoleEffectInstance effectInstance;
@@ -151,8 +149,12 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
         mode.tryRunningReloadAction(stack, entity, FirearmMode.ReloadPhaseType.PREPARE, true, false);
     }
 
-    public void charge(ItemStack mainhandItem, ServerPlayer sender) {
-        sender.displayClientMessage(Component.literal("pressed charge key on server"), true);
+    public void chargeStart(ItemStack mainhandItem, ServerPlayer sender) {
+        FirearmDataUtils.setCharging(mainhandItem, true);
+    }
+
+    public void chargeEnd(ItemStack mainhandItem, ServerPlayer sender) {
+        FirearmDataUtils.setCharging(mainhandItem, false);
     }
 
     @Override
@@ -211,7 +213,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     public enum Action implements StringRepresentable {
         RELOAD(false),
         FIRING(true),
-        CHARGE(true),
+        CHARGE_START(true),
+        CHARGE_END(true),
         RELOADING(true),
         DRAW(false),
         COOLDOWN(false);

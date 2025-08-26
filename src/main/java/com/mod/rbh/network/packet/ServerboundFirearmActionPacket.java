@@ -29,7 +29,8 @@ public record ServerboundFirearmActionPacket(SingularityRifle.Action action) imp
         if (mainhandItem.getItem() instanceof SingularityRifle mainFirearm) {
             switch (this.action) {
                 case RELOAD -> mainFirearm.onReload(mainhandItem, sender);
-                case CHARGE -> mainFirearm.charge(mainhandItem, sender);
+                case CHARGE_START -> mainFirearm.chargeStart(mainhandItem, sender);
+                case CHARGE_END -> mainFirearm.chargeEnd(mainhandItem, sender);
             }
         }
     }

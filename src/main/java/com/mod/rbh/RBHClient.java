@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 public class RBHClient {
     public static final KeyMapping RELOAD_RIFLE = createSafeKeyMapping("key.reinforcedblackholes.reload_firearm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R);
     public static final KeyMapping CHARGE_RIFLE = createSafeKeyMapping("key.reinforcedblackholes.charge_firearm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G);
+    public static boolean chargeKeyIsPressed = false;
 
     private static ResourceLocation resource(String string) {
         return ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID,string);
@@ -42,7 +43,7 @@ public class RBHClient {
         });
         ItemProperties.registerGeneric(resource("is_charging"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof SingularityRifle firearm
-                    && firearm.getCurrentAction(itemStack) == SingularityRifle.Action.CHARGE ? 1 : 0;
+                    && firearm.getCurrentAction(itemStack) == SingularityRifle.Action.CHARGE_START ? 1 : 0;
         });
         ItemProperties.registerGeneric(resource("is_firing"), (itemStack, level, entity, seed) -> {
             return itemStack.getItem() instanceof SingularityRifle firearm
@@ -77,13 +78,24 @@ public class RBHClient {
             if (useStack.getItem() instanceof SingularityRifle) {
                 if (RELOAD_RIFLE.isDown()) {
                     RBHNetwork.sendToServer(new ServerboundFirearmActionPacket(SingularityRifle.Action.RELOAD));
-                } else if (CHARGE_RIFLE.isDown()) {
-                    RBHNetwork.sendToServer(new ServerboundFirearmActionPacket(SingularityRifle.Action.CHARGE));
                 }
+                if (CHARGE_RIFLE.isDown()) {
+                    if (!chargeKeyIsPressed) {
+                        chargeKeyIsPressed = true;
+                        RBHNetwork.sendToServer(new ServerboundFirearmActionPacket(SingularityRifle.Action.CHARGE_START));
+                    }
+                } else {
+                    if (chargeKeyIsPressed) {
+                        chargeKeyIsPressed = false;
+                        RBHNetwork.sendToServer(new ServerboundFirearmActionPacket(SingularityRifle.Action.CHARGE_END));
+                    }
+                }
+            } else if (chargeKeyIsPressed) {
+                chargeKeyIsPressed = false;
+                RBHNetwork.sendToServer(new ServerboundFirearmActionPacket(SingularityRifle.Action.CHARGE_END));
             }
         }
     }
-
 
     public static void registerKeyMappings(Consumer<KeyMapping> cons) {
         cons.accept(RELOAD_RIFLE);
