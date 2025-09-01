@@ -154,32 +154,6 @@ public class PostEffectRegistry {
                 mainTarget.bindWrite(false);
             }
         }
-//        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
-//            if (postEffect.isEnabled() && postEffect.postChain != null) {
-//                postEffect.wipe();
-//                mainTarget.bindWrite(false);
-//            }
-//        }
-    }
-
-    public static void copyWholeLevelDepth(RenderTarget main) {
-//        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
-//            for (HoleEffectInstance effectInstance : postEffect.holes.keySet()) {
-//                if (effectInstance.copyPhase == DepthCopyPhase.AFTER_LEVEL && !effectInstance.passes.isEmpty()) {
-//                    effectInstance.passes.get(0).inTarget.copyDepthFrom(main);
-//                }
-//            }
-//        }
-    }
-
-    public static void copyWholeArmDepth(RenderTarget main) {
-//        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
-//            for (HoleEffectInstance effectInstance : postEffect.holes.keySet()) {
-//                if (effectInstance.copyPhase == DepthCopyPhase.AFTER_ARM && !effectInstance.passes.isEmpty()) {
-//                    effectInstance.passes.get(0).inTarget.copyDepthFrom(main);
-//                }
-//            }
-//        }
     }
 
     public static void processEffects(RenderTarget mainTarget, float f, RenderPhase phase) {

@@ -7,8 +7,8 @@
 				"texture_width": 64,
 				"texture_height": 64,
 				"visible_bounds_width": 5,
-				"visible_bounds_height": 3,
-				"visible_bounds_offset": [0, 0.5, 0]
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
 			},
 			"bones": [
 				{
@@ -612,12 +612,14 @@
 				{
 					"name": "L_ARM",
 					"parent": "rifle",
-					"pivot": [6.74791, 1.5374, 7.00432],
-					"rotation": [-10.51352, 32.42025, -1.0273],
+					"pivot": [6.74791, -0.46263, 7.00432],
+					"rotation": [-100.51352, 32.42025, -1.0273],
 					"cubes": [
 						{
 							"origin": [4.74791, -2.46263, -4.99568],
 							"size": [4, 4, 12],
+							"pivot": [6.74791, -0.46263, 7.00432],
+							"rotation": [90, 0, 0],
 							"uv": {
 								"north": {"uv": [62, 0], "uv_size": [2, 2]},
 								"east": {"uv": [62, 0], "uv_size": [2, 2]},
@@ -632,12 +634,14 @@
 				{
 					"name": "R_ARM",
 					"parent": "rifle",
-					"pivot": [-0.00209, 2.7874, 16.00432],
-					"rotation": [-2.5, 0, 0],
+					"pivot": [-0.00209, 0.78737, 16.00432],
+					"rotation": [-92.5, 0, 0],
 					"cubes": [
 						{
 							"origin": [-2.00209, -1.21263, 4.00432],
 							"size": [4, 4, 12],
+							"pivot": [-0.00209, 0.78737, 16.00432],
+							"rotation": [90, 0, 0],
 							"uv": {
 								"north": {"uv": [62, 0], "uv_size": [2, 2]},
 								"east": {"uv": [62, 0], "uv_size": [2, 2]},

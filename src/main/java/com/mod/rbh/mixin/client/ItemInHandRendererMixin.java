@@ -30,8 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ItemInHandRendererMixin {
 
     @Unique
-    private static final Vec3 reinforcedBlackHoles$unequipedPos = new Vec3(0.56F, -1.2F, -0.1F);
-    @Unique
     private static final Vec3 reinforcedBlackHoles$equipedPos = new Vec3(0.45F, -0.52F, -0.9F);
     @Unique
     private static final Vec3 reinforcedBlackHoles$aimingPos = new Vec3(0f, -0.5F, -0.5F);
@@ -67,37 +65,39 @@ public abstract class ItemInHandRendererMixin {
 
             boolean rightHand = (hand == InteractionHand.MAIN_HAND) == (player.getMainArm() == HumanoidArm.RIGHT);
 
-            float progress = reinforcedBlackHoles$getAimingProgress(player, stack, rifle.mode, partialTicks);
-            float equipProgress = reinforcedBlackHoles$getEquipProgress(player, stack, rifle, partialTicks);
+            if (!rightHand) {
+                poseStack.popPose();
+                ci.cancel();
+                return;
+            }
 
-            float k = rightHand ? 1 : -1;
-            float xRot = 0f;
+            float progress = reinforcedBlackHoles$getAimingProgress(player, stack, rifle.mode, partialTicks);
+//            float equipProgress = reinforcedBlackHoles$getEquipProgress(player, stack, rifle, partialTicks);
+
+            float k = 1;
             Vec3 finalPos = reinforcedBlackHoles$equipedPos.lerp(reinforcedBlackHoles$aimingPos, progress);
-            finalPos = finalPos.lerp(reinforcedBlackHoles$unequipedPos, equipProgress);
-            xRot = Mth.lerp(equipProgress, 0f, 80f);
 
             poseStack.translate(k * finalPos.x, finalPos.y, finalPos.z);
-            poseStack.mulPose(Axis.XP.rotationDegrees(xRot));
 
             ((ItemInHandRenderer)(Object)this).renderItem(
                     player,
                     stack,
-                    rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
-                    !rightHand,
+                    ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
+                    false,
                     poseStack,
                     buffer,
                     combinedLight
             );
 
-            poseStack.translate(0.4f * k, 0.1f, 0.95f);
-            poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
-
-            PlayerRenderer playerrenderer = (PlayerRenderer)this.entityRenderDispatcher.<AbstractClientPlayer>getRenderer(player);
-            if (rightHand) {
-                playerrenderer.renderRightHand(poseStack, buffer, combinedLight, player);
-            } else {
-                playerrenderer.renderLeftHand(poseStack, buffer, combinedLight, player);
-            }
+//            poseStack.translate(0.4f * k, 0.1f, 0.95f);
+//            poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
+//
+//            PlayerRenderer playerrenderer = (PlayerRenderer)this.entityRenderDispatcher.<AbstractClientPlayer>getRenderer(player);
+//            if (rightHand) {
+//                playerrenderer.renderRightHand(poseStack, buffer, combinedLight, player);
+//            } else {
+//                playerrenderer.renderLeftHand(poseStack, buffer, combinedLight, player);
+//            }
 
             poseStack.popPose();
             ci.cancel();
