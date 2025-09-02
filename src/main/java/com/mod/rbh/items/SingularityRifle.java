@@ -54,7 +54,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     public SingularityRifle(Properties pProperties) {
         super(pProperties.stacksTo(1));
         mode = new FirearmMode(8, 8, null, null,
-                5, 5, null, null
+                5, 5, null, null,
+                4
                 );
         effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
     }

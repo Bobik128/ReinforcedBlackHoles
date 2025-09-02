@@ -5,7 +5,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.event.RenderHandEvent;
 
 public class HandLagAdder {
     private static final float SMOOTHING = 0.2f;   // 0..1 (lower => more trailing)

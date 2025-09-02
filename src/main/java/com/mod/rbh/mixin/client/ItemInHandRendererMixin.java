@@ -2,6 +2,7 @@ package com.mod.rbh.mixin.client;
 
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
+import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.FirearmMode;
 import com.mod.rbh.utils.HandLagAdder;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -9,12 +10,9 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -77,12 +75,18 @@ public abstract class ItemInHandRendererMixin {
             HandLagAdder.lagHand(partialTicks, poseStack);
 
             float progress = reinforcedBlackHoles$getAimingProgress(player, stack, rifle.mode, partialTicks);
-//            float equipProgress = reinforcedBlackHoles$getEquipProgress(player, stack, rifle, partialTicks);
+            float runningProgress = 1.0f - reinforcedBlackHoles$getRunningProgress(player, stack, rifle, partialTicks);
 
             float k = 1;
             Vec3 finalPos = reinforcedBlackHoles$equipedPos.lerp(reinforcedBlackHoles$aimingPos, progress);
 
             poseStack.translate(k * finalPos.x, finalPos.y, finalPos.z);
+
+            poseStack.translate(-runningProgress * 0.23f, -runningProgress * 0.16f, runningProgress * 0.14f);
+
+            poseStack.mulPose(Axis.YP.rotationDegrees(70 * runningProgress));
+            poseStack.mulPose(Axis.XP.rotationDegrees(-20 * runningProgress));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(6 * runningProgress));
 
             ((ItemInHandRenderer)(Object)this).renderItem(
                     player,
@@ -113,17 +117,17 @@ public abstract class ItemInHandRendererMixin {
     }
 
     @Unique
-    private float reinforcedBlackHoles$getEquipProgress(AbstractClientPlayer player, ItemStack stack, SingularityRifle rifle, float partialTicks) {
-        boolean isEquiped = rifle.isEquiped(stack, player);
+    private float reinforcedBlackHoles$getRunningProgress(AbstractClientPlayer player, ItemStack stack, SingularityRifle rifle, float partialTicks) {
+        boolean isRunning = FirearmDataUtils.isRunning(stack);
         FirearmMode mode = rifle.mode;
 
-        int denom = isEquiped ? mode.equipTime() : mode.unequipTime();
-        float equipTime = (float) denom - mode.getEquipTime(stack, player);
+        int denom = mode.getRunningTime();
+        float equipTime = (float) denom - mode.getRunTime(stack, player);
         float frac = denom > 0 ? equipTime / (float) denom : 1;
         float frac1 = denom > 0 ? partialTicks / (float) denom : 0;
-        float d = isEquiped ? frac + frac1 : 1 - frac - frac1;
+        float d = isRunning ? frac + frac1 : 1 - frac - frac1;
         d = Mth.clamp(d, 0f, 1f);
-        return 1.0f - d * d;
+        return 1.0f - d;
     }
 
     @Inject(method = "renderHandsWithItems",
