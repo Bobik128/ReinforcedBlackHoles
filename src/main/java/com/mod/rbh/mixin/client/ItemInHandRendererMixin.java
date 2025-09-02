@@ -3,6 +3,7 @@ package com.mod.rbh.mixin.client;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.utils.FirearmMode;
+import com.mod.rbh.utils.HandLagAdder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -10,6 +11,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -72,6 +74,8 @@ public abstract class ItemInHandRendererMixin {
                 return;
             }
 
+            HandLagAdder.lagHand(partialTicks, poseStack);
+
             float progress = reinforcedBlackHoles$getAimingProgress(player, stack, rifle.mode, partialTicks);
 //            float equipProgress = reinforcedBlackHoles$getEquipProgress(player, stack, rifle, partialTicks);
 
@@ -89,16 +93,6 @@ public abstract class ItemInHandRendererMixin {
                     buffer,
                     combinedLight
             );
-
-//            poseStack.translate(0.4f * k, 0.1f, 0.95f);
-//            poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
-//
-//            PlayerRenderer playerrenderer = (PlayerRenderer)this.entityRenderDispatcher.<AbstractClientPlayer>getRenderer(player);
-//            if (rightHand) {
-//                playerrenderer.renderRightHand(poseStack, buffer, combinedLight, player);
-//            } else {
-//                playerrenderer.renderLeftHand(poseStack, buffer, combinedLight, player);
-//            }
 
             poseStack.popPose();
             ci.cancel();
