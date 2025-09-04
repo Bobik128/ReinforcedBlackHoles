@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 
+import java.awt.*;
 import java.lang.Math;
 
 public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
@@ -34,7 +35,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     @Override
     public void render(@NotNull BlackHole entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
-        renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize());
+        renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize(), entity.shouldBeRainbow());
     }
 
     private static void uniformSetter(PostPass pass, Matrix4f normalProj, Vector3fc camRel, Vector2f screenPos,
@@ -92,7 +93,8 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             PostEffectRegistry.RenderPhase phase,
             int pPackedLight,
             float effectRadius,
-            float holeRadius
+            float holeRadius,
+            boolean rainbow
     ) {
         PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         if (chain == null || effectInstance.passes.isEmpty()) return;
@@ -149,7 +151,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         effectInstance.uniformSetter = (pass) ->
                 uniformSetter(pass, preBobProjection, cameraRelativePos, screenPos,
-                        effectRadius, holeRadius, distFromCam, 0xFFFFFF00);
+                        effectRadius, holeRadius, distFromCam, rainbow ? glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f) : 0xFFFFFF00);
 
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
@@ -163,4 +165,24 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
     public ResourceLocation getTextureLocation(BlackHole pEntity) {
         return null;
     }
+
+    public static int glowColor(long nowMs, float cycleSeconds, float sat, float baseBright, float pulseSeconds) {
+        float tCycle = (nowMs % (long)(cycleSeconds * 1000f)) / (cycleSeconds * 1000f);
+        float hue = tCycle; // 0..1 wraps every cycleSeconds
+
+        float bright = baseBright;
+        if (pulseSeconds > 0f) {
+            double phase = (nowMs % (long)(pulseSeconds * 1000f)) / (pulseSeconds * 1000.0);
+            // pulse in [ -1, 1 ] -> remap to [0,1], then scale
+            float pulse = (float)(0.5 + 0.5 * Math.sin(2.0 * Math.PI * phase));
+            // allow brightness to breathe around baseBright
+            bright = clamp01(baseBright * 0.7f + pulse * baseBright * 0.3f);
+        }
+
+        int rgb = Color.HSBtoRGB(hue, clamp01(sat), clamp01(bright));
+        // force full alpha
+        return 0xFF000000 | (rgb & 0x00FFFFFF);
+    }
+
+    private static float clamp01(float v) { return Math.max(0f, Math.min(1f, v)); }
 }

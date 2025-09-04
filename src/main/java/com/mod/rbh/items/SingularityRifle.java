@@ -26,22 +26,27 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SingularityRifle extends Item implements GeoItem, FovModifyingItem, HoldAttackKeyInteraction {
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenPlay("animation.rifle.idle");
+    private static final RawAnimation EQUIP_ANIM = RawAnimation.begin().thenPlay("animation.rifle.equip");
+    private static final RawAnimation UNEQUIP_ANIM = RawAnimation.begin().thenPlay("animation.rifle.unequip");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public static float MAX_SIZE = 0.08f;
@@ -54,10 +59,12 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     public SingularityRifle(Properties pProperties) {
         super(pProperties.stacksTo(1));
         mode = new FirearmMode(8, 8, null, null,
-                5, 5, null, null,
+                5, 5, null, null, EQUIP_ANIM, UNEQUIP_ANIM,
                 4
                 );
         effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
+
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
@@ -97,7 +104,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(
-                new AnimationController<>(this, "main", 0, (state) -> state.setAndContinue(IDLE_ANIM))
+                new AnimationController<>(this, "main", 0, (state) -> state.setAndContinue(IDLE_ANIM)),
+                new AnimationController<>(this, "move", 0, (state) -> PlayState.STOP).triggerableAnim("equip", EQUIP_ANIM).triggerableAnim("unequip", UNEQUIP_ANIM)
         );
     }
 
@@ -119,6 +127,11 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged;
+    }
+
+    public boolean shouldBeColorful(ItemStack item) {
+        String name = item.getDisplayName().getString();
+        return name.equals("[jeb_]");
     }
 
     @Override

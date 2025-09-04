@@ -3,16 +3,21 @@ package com.mod.rbh.utils;
 import com.mod.rbh.entity.BlackHole;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animation.RawAnimation;
 
 import javax.annotation.Nullable;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
@@ -34,11 +39,15 @@ public class FirearmMode {
     // Equip
     public final int equipTime;
     public final int unequipTime;
+
+    private final RawAnimation equipAnim;
+    private final RawAnimation unequipAnim;
+
     @Nullable
     protected final SoundEvent equipSound;
     @Nullable protected final SoundEvent unequipSound;
 
-    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound, int runningTime) {
+    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound, RawAnimation equipAnim, RawAnimation unequipAnim, int runningTime) {
         this.aimTime = aimTime;
         this.unaimTime = unaimTime;
         this.aimSound = aimSound;
@@ -47,6 +56,9 @@ public class FirearmMode {
         this.unequipTime = unequipTime;
         this.equipSound = equipSound;
         this.unequipSound = unequipSound;
+
+        this.equipAnim = equipAnim;
+        this.unequipAnim = unequipAnim;
 
         this.runningTime = runningTime;
     }
@@ -59,6 +71,8 @@ public class FirearmMode {
     }
 
     public void startAiming(ItemStack itemStack, LivingEntity entity) {
+        if (!entity.level().isClientSide()) return;
+
         FirearmDataUtils.setAiming(itemStack, true);
         int currentUnaimingTime = this.getAimingTime(itemStack, entity);
         float frac = this.unaimTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.unaimTime;
@@ -69,8 +83,10 @@ public class FirearmMode {
     }
 
     public void stopAiming(ItemStack itemStack, LivingEntity entity) {
+        if (!entity.level().isClientSide()) return;
+
         FirearmDataUtils.setAiming(itemStack, false);
-        int currentAimingTime = this.getAimingTime(itemStack, entity);;
+        int currentAimingTime = this.getAimingTime(itemStack, entity);
         float frac = this.aimTime == 0 ? 0 : (float) currentAimingTime / (float) this.aimTime;
         frac = 1f - frac;
         this.setAimingTime(itemStack, entity, Mth.ceil(this.unaimTime * frac));
@@ -80,19 +96,33 @@ public class FirearmMode {
     }
 
     public void equip(ItemStack itemStack, LivingEntity entity) {
+
+        if (entity.level() instanceof ServerLevel serverLevel)
+            ((SingularityRifle)itemStack.getItem()).triggerAnim(entity, GeoItem.getOrAssignId(entity.getItemInHand(InteractionHand.MAIN_HAND), serverLevel), "move", "equip");
+
+        if (!entity.level().isClientSide()) return;
+
         int currentUnaimingTime = this.getEquipTime(itemStack, entity);
         float frac = this.unequipTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.unequipTime;
         frac = 1f - frac;
         this.setEquipTime(itemStack, entity, Mth.ceil(this.equipTime * frac));
+
         if (this.equipSound != null)
             entity.level().playSound(entity, entity.blockPosition(), this.equipSound, SoundSource.NEUTRAL, 1f, 1f);
     }
 
     public void unequip(ItemStack itemStack, LivingEntity entity) {
+
+        if (entity.level() instanceof ServerLevel serverLevel)
+            ((SingularityRifle)itemStack.getItem()).triggerAnim(entity, GeoItem.getOrAssignId(entity.getItemInHand(InteractionHand.MAIN_HAND), serverLevel), "move", "unequip");
+
+        if (!entity.level().isClientSide()) return;
+
         int currentAimingTime = this.getEquipTime(itemStack, entity);;
         float frac = this.equipTime == 0 ? 0 : (float) currentAimingTime / (float) this.equipTime;
         frac = 1f - frac;
         this.setEquipTime(itemStack, entity, Mth.ceil(this.unequipTime * frac));
+
         if (this.unequipSound != null)
             entity.level().playSound(entity, entity.blockPosition(), this.unequipSound, SoundSource.NEUTRAL, 1f, 1f);
     }
@@ -184,7 +214,7 @@ public class FirearmMode {
                 float modifier = (float) FirearmDataUtils.getChargeLevel(itemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
                 Vec3 lookVector = entity.getLookAngle();
 //                Vec3 additionalOffset = lookVector.multiply(0.5f, 0.5f, 0.5f);
-                BlackHole hole = new BlackHole(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier);
+                BlackHole hole = new BlackHole(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier, ((SingularityRifle) itemStack.getItem()).shouldBeColorful(itemStack));
                 entity.level().addFreshEntity(hole);
                 hole.shoot(lookVector.x, lookVector.y, lookVector.z, 2.2f, 0.01f);
                 FirearmDataUtils.setChargeLevel(itemStack, 0);

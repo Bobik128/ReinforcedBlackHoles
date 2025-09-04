@@ -85,7 +85,7 @@ public abstract class ItemInHandRendererMixin {
             poseStack.translate(-runningProgress * 0.23f, -runningProgress * 0.16f, runningProgress * 0.14f);
 
             poseStack.mulPose(Axis.YP.rotationDegrees(70 * runningProgress));
-            poseStack.mulPose(Axis.XP.rotationDegrees(-20 * runningProgress));
+            poseStack.mulPose(Axis.XP.rotationDegrees(-26 * runningProgress));
             poseStack.mulPose(Axis.ZP.rotationDegrees(6 * runningProgress));
 
             ((ItemInHandRenderer)(Object)this).renderItem(

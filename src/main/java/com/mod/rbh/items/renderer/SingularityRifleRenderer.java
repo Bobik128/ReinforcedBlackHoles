@@ -72,7 +72,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                 poseStack.translate(bone.getPosX()/16, bone.getPosY()/16, bone.getPosZ()/16);
                 PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
                 if (holeEffectInstance != null)
-                    BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier);
+                    BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle)currentItemStack.getItem()).shouldBeColorful(currentItemStack));
                 poseStack.popPose();
 
             }

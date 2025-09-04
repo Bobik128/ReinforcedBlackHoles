@@ -40,6 +40,8 @@ public class BlackHole extends Projectile {
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> EFFECT_SIZE =
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> RAINBOW =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.BOOLEAN);
 
     public static final int RENDER_DISTANCE = 120;
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -54,6 +56,11 @@ public class BlackHole extends Projectile {
         this.setPos(pos);
         this.setSize(size);
         this.setEffectSize(effectSize);
+    }
+
+    public BlackHole(Vec3 pos, Level level, float size, float effectSize, boolean rainbow) {
+        this(pos, level, size, effectSize);
+        this.setRainbow(rainbow);
     }
 
     public BlackHole(EntityType<? extends Projectile> pEntityType, Level pLevel) {
@@ -81,6 +88,7 @@ public class BlackHole extends Projectile {
     protected void defineSynchedData() {
         this.entityData.define(SIZE, 0.5f);
         this.entityData.define(EFFECT_SIZE, 1.0f);
+        this.entityData.define(RAINBOW, false);
     }
 
     @Override
@@ -206,6 +214,14 @@ public class BlackHole extends Projectile {
 
     public float getEffectSize() {
         return this.entityData.get(EFFECT_SIZE);
+    }
+
+    public void setRainbow(boolean value) {
+        this.entityData.set(RAINBOW, value);
+    }
+
+    public boolean shouldBeRainbow() {
+        return this.entityData.get(RAINBOW);
     }
 
 }
