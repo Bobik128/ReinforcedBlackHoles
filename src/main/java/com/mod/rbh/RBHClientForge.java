@@ -1,5 +1,6 @@
 package com.mod.rbh;
 
+import com.mod.rbh.items.renderer.ExtendedRifleItemRenderer;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
@@ -50,5 +51,6 @@ public class RBHClientForge {
 
     private static void onClientTick(TickEvent.ClientTickEvent event) {
         RifleHoleEffectInstanceHolder.clientTick();
+        ExtendedRifleItemRenderer.tick();
     }
 }

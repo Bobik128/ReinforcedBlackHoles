@@ -1,6 +1,7 @@
 package com.mod.rbh.mixin.client;
 
 import com.mod.rbh.items.SingularityRifle;
+import com.mod.rbh.items.renderer.ExtendedRifleItemRenderer;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.FirearmMode;
@@ -13,6 +14,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -26,6 +28,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.network.GeckoLibNetwork;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
@@ -61,8 +65,21 @@ public abstract class ItemInHandRendererMixin {
                                      int combinedLight,
                                      CallbackInfo ci) {
 
-        if (stack.getItem() instanceof SingularityRifle rifle) {
+        if (stack.getItem() instanceof SingularityRifle || ExtendedRifleItemRenderer.shouldRender(hand)) {
             poseStack.pushPose();
+
+            if (stack.getItem() instanceof SingularityRifle) {
+                ExtendedRifleItemRenderer.startUnequip(16, stack, hand);
+            } else {
+                stack = ExtendedRifleItemRenderer.getCurrentRifle(hand);
+                if (!(stack.getItem() instanceof SingularityRifle)) {
+                    poseStack.popPose();
+                    return;
+                }
+                ((SingularityRifle) stack.getItem()).triggerAnim(player, GeoItem.getId(stack), "move", "unequip");
+            }
+
+            SingularityRifle rifle = ((SingularityRifle) stack.getItem());
 
             boolean rightHand = (hand == InteractionHand.MAIN_HAND) == (player.getMainArm() == HumanoidArm.RIGHT);
 

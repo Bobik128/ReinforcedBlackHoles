@@ -27,7 +27,7 @@
 				}
 			}
 		},
-		"animation.rifle.idle": {
+		"animation.rifle.idle_spin": {
 			"loop": true,
 			"animation_length": 1,
 			"bones": {
@@ -70,6 +70,9 @@
 					}
 				}
 			}
+		},
+		"animation.rifle.idle": {
+			"animation_length": 0.0417
 		}
 	},
 	"geckolib_format_version": 2

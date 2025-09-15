@@ -2,6 +2,8 @@ package com.mod.rbh.utils;
 
 import com.mod.rbh.entity.BlackHole;
 import com.mod.rbh.items.SingularityRifle;
+import com.mod.rbh.items.renderer.ExtendedRifleItemRenderer;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -97,8 +99,10 @@ public class FirearmMode {
 
     public void equip(ItemStack itemStack, LivingEntity entity) {
 
-        if (entity.level() instanceof ServerLevel serverLevel)
-            ((SingularityRifle)itemStack.getItem()).triggerAnim(entity, GeoItem.getOrAssignId(entity.getItemInHand(InteractionHand.MAIN_HAND), serverLevel), "move", "equip");
+        if (entity.level() instanceof ClientLevel) {
+            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "move", "equip");
+            ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "move", "equip");
+        }
 
         if (!entity.level().isClientSide()) return;
 
@@ -112,10 +116,6 @@ public class FirearmMode {
     }
 
     public void unequip(ItemStack itemStack, LivingEntity entity) {
-
-        if (entity.level() instanceof ServerLevel serverLevel)
-            ((SingularityRifle)itemStack.getItem()).triggerAnim(entity, GeoItem.getOrAssignId(entity.getItemInHand(InteractionHand.MAIN_HAND), serverLevel), "move", "unequip");
-
         if (!entity.level().isClientSide()) return;
 
         int currentAimingTime = this.getEquipTime(itemStack, entity);;
@@ -198,10 +198,14 @@ public class FirearmMode {
             this.setAimingTime(itemStack, entity, aimingTime);
         }
         int equipTime = this.getEquipTime(itemStack, entity);
+
         if (equipTime > 0) {
             --equipTime;
             this.setEquipTime(itemStack, entity, equipTime);
+        } else if (entity.level() instanceof ClientLevel) {
+            ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "move", "idle");
         }
+
         int runningTime = this.getRunTime(itemStack, entity);
         if (runningTime > 0) {
             --runningTime;

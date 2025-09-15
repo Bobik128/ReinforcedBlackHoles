@@ -38,12 +38,12 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SingularityRifle extends Item implements GeoItem, FovModifyingItem, HoldAttackKeyInteraction {
+    private static final RawAnimation IDLE_ANIM_SPIN = RawAnimation.begin().thenPlay("animation.rifle.idle_spin");
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenPlay("animation.rifle.idle");
     private static final RawAnimation EQUIP_ANIM = RawAnimation.begin().thenPlay("animation.rifle.equip");
     private static final RawAnimation UNEQUIP_ANIM = RawAnimation.begin().thenPlay("animation.rifle.unequip");
@@ -104,8 +104,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(
-                new AnimationController<>(this, "main", 0, (state) -> state.setAndContinue(IDLE_ANIM)),
-                new AnimationController<>(this, "move", 0, (state) -> PlayState.STOP).triggerableAnim("equip", EQUIP_ANIM).triggerableAnim("unequip", UNEQUIP_ANIM)
+                new AnimationController<>(this, "main", 0, (state) -> state.setAndContinue(IDLE_ANIM_SPIN)),
+                new AnimationController<>(this, "move", 0, (state) -> PlayState.STOP).triggerableAnim("equip", EQUIP_ANIM).triggerableAnim("unequip", UNEQUIP_ANIM).setAnimationSpeed(1.2).triggerableAnim("idle", IDLE_ANIM)
         );
     }
 
