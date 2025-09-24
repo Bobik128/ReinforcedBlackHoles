@@ -3,6 +3,7 @@ package com.mod.rbh.items.renderer;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
+import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,7 +18,9 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -51,7 +54,40 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
     @Override
     public void renderRecursively(PoseStack poseStack, SingularityRifle animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+//        super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+
+        if (bone.isTrackingMatrices()) {
+            Matrix4f poseState = new Matrix4f(poseStack.last().pose());
+            bone.setModelSpaceMatrix(RenderUtils.invertAndMultiplyMatrices(poseState, this.modelRenderTranslations));
+            bone.setLocalSpaceMatrix(RenderUtils.invertAndMultiplyMatrices(poseState, this.itemRenderTranslations));
+        }
+
+        poseStack.pushPose();
+        RenderUtils.prepMatrixForBone(poseStack, bone);
+
+        ResourceLocation texture = this.getTextureLocation(this.animatable);
+        RenderType renderTypeOverride = this.getRenderTypeOverrideForBone(bone, animatable, texture, bufferSource, partialTick);
+
+        if (texture != null && renderTypeOverride == null) {
+            renderTypeOverride = this.getRenderType(this.animatable, texture, bufferSource, partialTick);
+        }
+
+        if (renderTypeOverride != null) {
+            buffer = bufferSource.getBuffer(renderTypeOverride);
+        }
+
+        super.renderCubesOfBone(poseStack, bone, buffer, isGlowingPart(bone.getName()) ? 0xF000F0 : packedLight, packedOverlay, red, green, blue, alpha);
+
+        if (renderTypeOverride != null) {
+            buffer = bufferSource.getBuffer(this.getRenderType(this.animatable, this.getTextureLocation(this.animatable), bufferSource, partialTick));
+        }
+
+        if (!isReRender) {
+            this.applyRenderLayersForBone(poseStack, animatable, bone, renderType, bufferSource, buffer, partialTick, packedLight, packedOverlay);
+        }
+
+        this.renderChildBones(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        poseStack.popPose();
 
         if (FirearmDataUtils.getChargeLevel(currentItemStack) <= 0) return;
         if (bone.getName().equals("blackHoleLocatorPre")) {
@@ -81,5 +117,21 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         if (bone.getName().toUpperCase().endsWith("_EMISSIVE")) {
             //TODO emmisive textures handling
         }
+    }
+
+    public static boolean isGlowingPartStatic(String name) {
+        return name.toUpperCase().endsWith("_GLOWING") || name.toUpperCase().endsWith("_EMISSIVE");
+    }
+
+    public boolean isGlowingPart(String name) {
+        return isGlowingPartStatic(name);
+    }
+
+    protected @javax.annotation.Nullable RenderType getRenderTypeOverrideForBone(GeoBone bone, SingularityRifle animatable, ResourceLocation texturePath, MultiBufferSource bufferSource, float partialTick) {
+        if (bone != null && isGlowingPart(bone.getName())) {
+            return RBHRenderTypes.getEmissiveRenderType(texturePath);
+        }
+
+        return null;
     }
 }
