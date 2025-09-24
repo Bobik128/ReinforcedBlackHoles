@@ -101,7 +101,7 @@ public abstract class ItemInHandRendererMixin {
 
             poseStack.translate(-runningProgress * 0.23f, -runningProgress * 0.16f, runningProgress * 0.14f);
 
-            poseStack.mulPose(Axis.YP.rotationDegrees(70 * runningProgress));
+            poseStack.mulPose(Axis.YP.rotationDegrees(55 * runningProgress));
             poseStack.mulPose(Axis.XP.rotationDegrees(-26 * runningProgress));
             poseStack.mulPose(Axis.ZP.rotationDegrees(6 * runningProgress));
 
@@ -139,8 +139,8 @@ public abstract class ItemInHandRendererMixin {
         FirearmMode mode = rifle.mode;
 
         int denom = mode.getRunningTime();
-        float equipTime = (float) denom - mode.getRunTime(stack, player);
-        float frac = denom > 0 ? equipTime / (float) denom : 1;
+        float runTime = (float) denom - mode.getRunTime(stack, player);
+        float frac = denom > 0 ? runTime / (float) denom : 1;
         float frac1 = denom > 0 ? partialTicks / (float) denom : 0;
         float d = isRunning ? frac + frac1 : 1 - frac - frac1;
         d = Mth.clamp(d, 0f, 1f);

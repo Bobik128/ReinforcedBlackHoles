@@ -2,15 +2,12 @@ package com.mod.rbh.utils;
 
 import com.mod.rbh.entity.BlackHole;
 import com.mod.rbh.items.SingularityRifle;
-import com.mod.rbh.items.renderer.ExtendedRifleItemRenderer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +16,6 @@ import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animation.RawAnimation;
 
 import javax.annotation.Nullable;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
@@ -128,17 +124,25 @@ public class FirearmMode {
     }
 
     public void startRunning(ItemStack itemStack, LivingEntity entity) {
-        int currentUnaimingTime = this.getRunTime(itemStack, entity);
-        float frac = this.runningTime == 0 ? 0 : (float) currentUnaimingTime / (float) this.runningTime;
+
+        if (!entity.level().isClientSide()) return;
+
+        FirearmDataUtils.setRunning(itemStack, true);
+        int runTime = this.getRunTime(itemStack, entity);
+        float frac = this.runningTime == 0 ? 0 : (float) runTime / (float) this.runningTime;
         frac = 1f - frac;
-        this.setRunTime(itemStack, entity, Mth.ceil(this.runningTime * frac));
+        this.setRTime(itemStack, entity, Mth.ceil(this.runningTime * frac));
     }
 
     public void stopRunning(ItemStack itemStack, LivingEntity entity) {
-        int currentAimingTime = this.getRunTime(itemStack, entity);;
-        float frac = this.runningTime == 0 ? 0 : (float) currentAimingTime / (float) this.runningTime;
+
+        if (!entity.level().isClientSide()) return;
+        FirearmDataUtils.setRunning(itemStack, false);
+
+        int runTime = this.getRunTime(itemStack, entity);;
+        float frac = this.runningTime == 0 ? 0 : (float) runTime / (float) this.runningTime;
         frac = 1f - frac;
-        this.setRunTime(itemStack, entity, Mth.ceil(this.runningTime * frac));
+        this.setRTime(itemStack, entity, Mth.ceil(this.runningTime * frac));
     }
 
     public boolean isAiming(ItemStack itemStack, LivingEntity entity) {
@@ -165,7 +169,7 @@ public class FirearmMode {
         return FirearmDataUtils.getRunTime(itemStack);
     }
 
-    public void setRunTime(ItemStack itemStack, LivingEntity entity, int time) {
+    public void setRTime(ItemStack itemStack, LivingEntity entity, int time) {
         FirearmDataUtils.setRunTime(itemStack, time);
     }
 
@@ -207,9 +211,9 @@ public class FirearmMode {
         }
 
         int runningTime = this.getRunTime(itemStack, entity);
-        if (runningTime > 0) {
+        if (runningTime > 0 && entity.level().isClientSide) {
             --runningTime;
-            this.setRunTime(itemStack, entity, runningTime);
+            this.setRTime(itemStack, entity, runningTime);
         }
 
         if (FirearmDataUtils.isHoldingAttackKey(itemStack)) {
@@ -247,11 +251,18 @@ public class FirearmMode {
         if (isSelected && !FirearmDataUtils.isEquipped(itemStack)) equip(itemStack, entity);
         if (!isSelected && FirearmDataUtils.isEquipped(itemStack)) unequip(itemStack, entity);
 
-        if (this.isRunning(itemStack, entity) && !FirearmDataUtils.isRunning(itemStack)) this.startRunning(itemStack, entity);
-        if (!this.isRunning(itemStack, entity) && FirearmDataUtils.isRunning(itemStack)) this.stopRunning(itemStack, entity);
+        if (entity.level().isClientSide) {
+            boolean wasRunning = FirearmDataUtils.isRunning(itemStack);
+            boolean isNowRunning = this.isRunning(itemStack, entity);
+
+            if (isNowRunning && !wasRunning)
+                this.startRunning(itemStack, entity);
+            if (!isNowRunning && wasRunning)
+                this.stopRunning(itemStack, entity);
+        }
 
         FirearmDataUtils.setEquipped(itemStack, isSelected);
-        FirearmDataUtils.setRunning(itemStack, this.isRunning(itemStack, entity));
+//        FirearmDataUtils.setRunning(itemStack, this.isRunning(itemStack, entity));
     }
 
     public enum ReloadPhaseType implements StringRepresentable {
