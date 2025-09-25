@@ -109,6 +109,16 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         RenderTarget finalTarget = holePostPass.inTarget;
         RenderTarget swapTarget = holePostPass.outTarget;
 
+        // ===== Save GL state =====
+        RenderTarget mainTarget = Minecraft.getInstance().getMainRenderTarget();
+
+        // ===== Ensure correct target sizes (should be done on resize, not here) =====
+        Window window = Minecraft.getInstance().getWindow();
+        if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
+            finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
+            swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
+        }
+
         // ===== Prepare post-effect uniforms =====
 
         Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
@@ -129,16 +139,14 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             effectInstance.dist = distFromCam;
 
             // --- Save current state ---
-            FboGuard guard = new FboGuard();
-            guard.save();
+            int prevDrawFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
+            int prevReadFbo = GL30.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
+            int prevFbo     = GL30.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING); // safety for packs using GL_FRAMEBUFFER
+            int[] vp = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
+            boolean hadScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
+            int[] sc = new int[4]; if (hadScissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
 
-            Window window = Minecraft.getInstance().getWindow();
-            if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
-                finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-                swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-            }
-
-            // --- Draw spheres into offscreen RT via RenderType ---
+            // --- Draw spheres into your offscreen RT via your RenderType ---
             BufferBuilder bb = new BufferBuilder(256 * 1024);
             MultiBufferSource.BufferSource local = MultiBufferSource.immediate(bb);
 
@@ -148,7 +156,21 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             SphereMesh.render(rawPoseStack, vc, holeRadius,   8,  8, pPackedLight, OverlayTexture.NO_OVERLAY, true);
             local.endBatch();
 
-            guard.restore();
+            // --- Restore framebuffer and raster state exactly as found ---
+            GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevDrawFbo);
+            GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, prevReadFbo);
+            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, prevFbo); // belt & suspenders
+
+            GL11.glViewport(vp[0], vp[1], vp[2], vp[3]);
+            if (hadScissor) { GL11.glEnable(GL11.GL_SCISSOR_TEST); GL11.glScissor(sc[0], sc[1], sc[2], sc[3]); }
+            else GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+            // Re-assert vanilla-ish defaults expected by Iris hand pass
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(true);
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
         });
 
         effectInstance.uniformSetter = (pass) ->
@@ -158,6 +180,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
 
+        mainTarget.bindWrite(true);
         mainGuard.restore();
     }
 
