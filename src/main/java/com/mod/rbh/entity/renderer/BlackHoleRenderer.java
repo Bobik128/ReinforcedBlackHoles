@@ -109,13 +109,6 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         RenderTarget finalTarget = holePostPass.inTarget;
         RenderTarget swapTarget = holePostPass.outTarget;
 
-        // ===== Ensure correct target sizes (should be done on resize, not here) =====
-        Window window = Minecraft.getInstance().getWindow();
-        if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
-            finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-            swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-        }
-
         // ===== Prepare post-effect uniforms =====
 
         Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
@@ -138,6 +131,12 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             // --- Save current state ---
             FboGuard guard = new FboGuard();
             guard.save();
+
+            Window window = Minecraft.getInstance().getWindow();
+            if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
+                finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
+                swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
+            }
 
             // --- Draw spheres into offscreen RT via RenderType ---
             BufferBuilder bb = new BufferBuilder(256 * 1024);

@@ -161,25 +161,23 @@ public class PostEffectRegistry {
     }
 
     public static void processEffects(RenderTarget mainTarget, float f, RenderPhase phase) {
-        if (phase == RenderPhase.AFTER_LEVEL) {
-            for (PostEffect fx : postEffects.values()) {
+        PhaseScope.with(phase, () -> {
+            if (phase == RenderPhase.AFTER_LEVEL) {
+                for (PostEffect fx : postEffects.values()) {
+                    if (fx.isEnabled() && fx.postChain != null) {
+                        fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                    }
+                }
+            }
+            for (MutablePostEffect fx : mutablePostEffects.values()) {
                 if (fx.isEnabled() && fx.postChain != null) {
-                    fx.postChain.process(Minecraft.getInstance().getFrameTime());
-                    // REMOVE: mainTarget.bindWrite(false);
+                    fx.process(phase);
+                    if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
+                        fx.postChain.process(Minecraft.getInstance().getFrameTime());
                 }
             }
-        }
-        for (MutablePostEffect fx : mutablePostEffects.values()) {
-            if (fx.isEnabled() && fx.postChain != null) {
-                fx.process(phase);
-                if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty()) {
-                    fx.postChain.process(Minecraft.getInstance().getFrameTime());
-                }
-                // REMOVE: mainTarget.bindWrite(false);
-            }
-        }
+        });
     }
-
 
     public static class MutablePostEffect extends PostEffect {
         protected final Map<HoleEffectInstance, Integer> holes = new HashMap<>();
@@ -379,6 +377,19 @@ public class PostEffectRegistry {
         public void resize(int x, int y) {
             if (this.postChain != null)
                 this.postChain.resize(x, y);
+        }
+    }
+
+    public static final class PhaseScope {
+        private static final ThreadLocal<PostEffectRegistry.RenderPhase> CURRENT = new ThreadLocal<>();
+        public static void with(PostEffectRegistry.RenderPhase phase, Runnable r) {
+            PostEffectRegistry.RenderPhase old = CURRENT.get();
+            CURRENT.set(phase);
+            try { r.run(); } finally { CURRENT.set(old); }
+        }
+        public static PostEffectRegistry.RenderPhase current() {
+            PostEffectRegistry.RenderPhase p = CURRENT.get();
+            return p != null ? p : PostEffectRegistry.RenderPhase.AFTER_LEVEL;
         }
     }
 

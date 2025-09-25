@@ -22,9 +22,8 @@ public class RBHRenderTypes extends RenderType {
     public RBHRenderTypes(String pName, VertexFormat pFormat, VertexFormat.Mode pMode, int pBufferSize, boolean pAffectsCrumbling, boolean pSortOnUpload, Runnable pSetupState, Runnable pClearState) {
         super(pName, pFormat, pMode, pBufferSize, pAffectsCrumbling, pSortOnUpload, pSetupState, pClearState);
     }
-
     public static RenderType getBlackHole(ResourceLocation tex, @Nullable RenderTarget rt) {
-        final FboGuard guard = new FboGuard();
+        final FboGuard guard = new FboGuard(); // your class
 
         return (RenderType) create("black_hole",
                 DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true,
@@ -34,31 +33,21 @@ public class RBHRenderTypes extends RenderType {
                         .setTextureState(new TextureStateShard(tex, false, false))
                         .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                         .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
-
-                        // *** CRITICAL: don't ever bind MAIN here ***
                         .setOutputState(new OutputStateShard("black_hole_target",
                                 () -> {
-                                    if (rt != null) {
-                                        guard.save();
-
+                                    if (rt == null) return;
+                                    guard.save();
+                                    // *** Critical: skip depth copy in hand phase ***
+                                    if (PostEffectRegistry.PhaseScope.current() == PostEffectRegistry.RenderPhase.AFTER_LEVEL) {
+                                        // safe only in world phase
                                         rt.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
-                                        // If you really need depth in the RT, copy it ONLY when the source is the
-                                        // currently used color/depth buffer (Iris routes it, so “main” is wrong here).
-                                        // Easiest fix: skip depth copy altogether for the hand pass.
-                                        // You can gate this with a threadlocal flag you set for AFTER_LEVEL only.
-                                        // Example (pseudo):
-                                        // if (BlackHolePassPhase.get() == AFTER_LEVEL) {
-                                        //     rt.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
-                                        // }
-
-                                        rt.bindWrite(false);
                                     }
+                                    rt.bindWrite(false);
                                 },
                                 () -> {
-                                    if (rt != null) {
-                                        // *** restore previous FBO + viewport/scissor, NOT main ***
-                                        guard.restore();
-                                    }
+                                    if (rt == null) return;
+                                    // restore previous FBO + viewport/scissor, NOT main
+                                    guard.restore();
                                 }))
                         .createCompositeState(false));
     }
