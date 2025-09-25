@@ -1,5 +1,6 @@
 package com.mod.rbh.items.renderer;
 
+import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.FboGuard;
@@ -16,6 +17,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +32,8 @@ import software.bernie.geckolib.util.RenderUtils;
 import java.util.Objects;
 // TODO fix not rendering in hand when there is black hole
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
+
+    private static boolean lastTimeShadersEnabled = false;
 
     public SingularityRifleRenderer() {
         super(new SingularityRifleModel());
@@ -104,12 +108,22 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
                 float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
 
+                boolean shadersEnabled = ShaderCompat.shadersEnabled();
+
                 poseStack.pushPose();
-                poseStack.translate(0, 0.3125f, -0.421f);
-                poseStack.translate(bone.getPosX()/16, bone.getPosY()/16, bone.getPosZ()/16);
-                PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
-                if (holeEffectInstance != null)
-                    BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle)currentItemStack.getItem()).shouldBeColorful(currentItemStack));
+                if (!shadersEnabled) {
+                    poseStack.translate(0, 0.3125f, -0.421f);
+                    poseStack.translate(bone.getPosX() / 16, bone.getPosY() / 16, bone.getPosZ() / 16);
+                    PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
+                    if (holeEffectInstance != null)
+                        BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack));
+                }
+                if (shadersEnabled && !lastTimeShadersEnabled) {
+                    Minecraft.getInstance().player.displayClientMessage(Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
+                }
+
+                lastTimeShadersEnabled = shadersEnabled;
+
                 poseStack.popPose();
 
             }

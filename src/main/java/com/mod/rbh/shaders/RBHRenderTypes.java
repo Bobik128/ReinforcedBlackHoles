@@ -1,5 +1,6 @@
 package com.mod.rbh.shaders;
 
+import com.mod.rbh.compat.ShaderCompat;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -38,7 +39,7 @@ public class RBHRenderTypes extends RenderType {
                                     if (rt == null) return;
                                     guard.save();
                                     // *** Critical: skip depth copy in hand phase ***
-                                    if (PostEffectRegistry.PhaseScope.current() == PostEffectRegistry.RenderPhase.AFTER_LEVEL) {
+                                    if (PostEffectRegistry.PhaseScope.current() != PostEffectRegistry.RenderPhase.AFTER_ARM || !ShaderCompat.shadersEnabled()) {
                                         // safe only in world phase
                                         rt.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
                                     }
