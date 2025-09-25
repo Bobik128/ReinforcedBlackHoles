@@ -6,6 +6,7 @@ import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -129,42 +130,42 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         Vector2f screenPos = getScreenSpace(cameraRelativePos, preBobProjection);
         float distFromCam = cameraRelativePos.length();
-
         effectInstance.setRenderFunc(() -> {
             effectInstance.dist = distFromCam;
 
-            // Save state that iris cares about
-            int prevFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
-            int[] vp = new int[4];
-            GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
-            boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
-            int[] sc = new int[4];
-            if (scissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
+            // --- Save current state ---
+            int prevDrawFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
+            int prevReadFbo = GL30.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
+            int prevFbo     = GL30.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING); // safety for packs using GL_FRAMEBUFFER
+            int[] vp = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
+            boolean hadScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
+            int[] sc = new int[4]; if (hadScissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
 
-            // ===== Render black hole sphere into main scene =====
-            BufferBuilder localBB = new BufferBuilder(256 * 1024);                  // dedicated, not the global Tesselator
-            MultiBufferSource.BufferSource localBuf = MultiBufferSource.immediate(localBB);
+            // --- Draw spheres into your offscreen RT via your RenderType ---
+            BufferBuilder bb = new BufferBuilder(256 * 1024);
+            MultiBufferSource.BufferSource local = MultiBufferSource.immediate(bb);
 
-            RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);    // this one binds your finalTarget
-            VertexConsumer vc = localBuf.getBuffer(rt);
-
+            RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget); // binds finalTarget
+            VertexConsumer vc = local.getBuffer(rt);
             SphereMesh.render(rawPoseStack, vc, effectRadius, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY, true);
+            SphereMesh.render(rawPoseStack, vc, holeRadius,   8,  8, pPackedLight, OverlayTexture.NO_OVERLAY, true);
+            local.endBatch();
 
-            SphereMesh.render(rawPoseStack, vc, holeRadius, 8, 8, pPackedLight, OverlayTexture.NO_OVERLAY, true);
-
-            // Flush ONLY our stuff; this unbinds your RT and restores GL state for later draws
-            localBuf.endBatch();
-
-            // restore viewport and scissor
-            GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevFbo);
+            // --- Restore framebuffer and raster state exactly as found ---
+            GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevDrawFbo);
+            GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, prevReadFbo);
+            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, prevFbo); // belt & suspenders
 
             GL11.glViewport(vp[0], vp[1], vp[2], vp[3]);
-            if (scissor) {
-                GL11.glEnable(GL11.GL_SCISSOR_TEST);
-                GL11.glScissor(sc[0], sc[1], sc[2], sc[3]);
-            } else {
-                GL11.glDisable(GL11.GL_SCISSOR_TEST);
-            }
+            if (hadScissor) { GL11.glEnable(GL11.GL_SCISSOR_TEST); GL11.glScissor(sc[0], sc[1], sc[2], sc[3]); }
+            else GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+            // Re-assert vanilla-ish defaults expected by Iris hand pass
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(true);
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
         });
 
         effectInstance.uniformSetter = (pass) ->
