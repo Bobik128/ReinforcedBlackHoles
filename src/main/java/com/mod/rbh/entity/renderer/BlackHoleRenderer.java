@@ -2,6 +2,7 @@ package com.mod.rbh.entity.renderer;
 
 import com.mod.rbh.api.IGameRenderer;
 import com.mod.rbh.entity.BlackHole;
+import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -36,6 +37,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
     @Override
     public void render(@NotNull BlackHole entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
+        if (entity.effectInstance == null) return;
         renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize(), entity.shouldBeRainbow());
     }
 
@@ -97,15 +99,15 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             float holeRadius,
             boolean rainbow
     ) {
+        FboGuard mainGuard = new FboGuard();
+        mainGuard.save();
+
         PostChain chain = PostEffectRegistry.getMutablePostChainFor(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         if (chain == null || effectInstance.passes.isEmpty()) return;
 
         PostPass holePostPass = effectInstance.passes.get(0);
         RenderTarget finalTarget = holePostPass.inTarget;
         RenderTarget swapTarget = holePostPass.outTarget;
-
-        // ===== Save GL state =====
-        RenderTarget mainTarget = Minecraft.getInstance().getMainRenderTarget();
 
         // ===== Ensure correct target sizes (should be done on resize, not here) =====
         Window window = Minecraft.getInstance().getWindow();
@@ -134,14 +136,10 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             effectInstance.dist = distFromCam;
 
             // --- Save current state ---
-            int prevDrawFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
-            int prevReadFbo = GL30.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
-            int prevFbo     = GL30.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING); // safety for packs using GL_FRAMEBUFFER
-            int[] vp = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
-            boolean hadScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
-            int[] sc = new int[4]; if (hadScissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
+            FboGuard guard = new FboGuard();
+            guard.save();
 
-            // --- Draw spheres into your offscreen RT via your RenderType ---
+            // --- Draw spheres into offscreen RT via RenderType ---
             BufferBuilder bb = new BufferBuilder(256 * 1024);
             MultiBufferSource.BufferSource local = MultiBufferSource.immediate(bb);
 
@@ -151,21 +149,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
             SphereMesh.render(rawPoseStack, vc, holeRadius,   8,  8, pPackedLight, OverlayTexture.NO_OVERLAY, true);
             local.endBatch();
 
-            // --- Restore framebuffer and raster state exactly as found ---
-            GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevDrawFbo);
-            GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, prevReadFbo);
-            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, prevFbo); // belt & suspenders
-
-            GL11.glViewport(vp[0], vp[1], vp[2], vp[3]);
-            if (hadScissor) { GL11.glEnable(GL11.GL_SCISSOR_TEST); GL11.glScissor(sc[0], sc[1], sc[2], sc[3]); }
-            else GL11.glDisable(GL11.GL_SCISSOR_TEST);
-
-            // Re-assert vanilla-ish defaults expected by Iris hand pass
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthMask(true);
-            RenderSystem.depthFunc(GL11.GL_LEQUAL);
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            guard.restore();
         });
 
         effectInstance.uniformSetter = (pass) ->
@@ -175,8 +159,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
 
-        // ===== Restore framebuffer & viewport =====
-        mainTarget.bindWrite(true);
+        mainGuard.restore();
     }
 
 

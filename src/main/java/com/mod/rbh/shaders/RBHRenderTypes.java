@@ -41,7 +41,7 @@ public class RBHRenderTypes extends RenderType {
                                     if (rt != null) {
                                         guard.save();
 
-                                        renderTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                                        rt.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
                                         // If you really need depth in the RT, copy it ONLY when the source is the
                                         // currently used color/depth buffer (Iris routes it, so “main” is wrong here).
                                         // Easiest fix: skip depth copy altogether for the hand pass.

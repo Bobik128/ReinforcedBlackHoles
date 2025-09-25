@@ -124,16 +124,16 @@ public class PostEffectRegistry {
     }
 
     public static void blitEffects() {
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        RenderSystem.blendFuncSeparate(
-                GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE,
-                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+//        RenderSystem.enableBlend();
+//        RenderSystem.enableDepthTest();
+//        RenderSystem.blendFuncSeparate(
+//                GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE,
+//                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
         for (PostEffect fx : postEffects.values()) {
             if (fx.postChain != null && fx.isEnabled()) {
-                fx.getRenderTarget().blitToScreen(Minecraft.getInstance().getWindow().getWidth(),
-                        Minecraft.getInstance().getWindow().getHeight(), false);
+//                fx.getRenderTarget().blitToScreen(Minecraft.getInstance().getWindow().getWidth(),
+//                        Minecraft.getInstance().getWindow().getHeight(), false);
                 fx.getRenderTarget().clear(Minecraft.ON_OSX);
                 // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
                 fx.setEnabled(false);
@@ -141,7 +141,7 @@ public class PostEffectRegistry {
         }
         for (MutablePostEffect fx : mutablePostEffects.values()) {
             if (fx.postChain != null && fx.isEnabled()) {
-                fx.blitAll();
+//                fx.blitAll();
                 fx.wipe();
                 // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
                 fx.setEnabled(false);
@@ -317,6 +317,10 @@ public class PostEffectRegistry {
         }
 
         public static HoleEffectInstance createEffectInstance() {
+
+            FboGuard guard = new FboGuard();
+            guard.save();
+
             Window window = Minecraft.getInstance().getWindow();
             RenderTarget finalTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
             RenderTarget swapTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
@@ -333,6 +337,8 @@ public class PostEffectRegistry {
             List<PostPass> passes = new ArrayList<>();
             if (holePass != null)
                 passes.add(holePass);
+
+            guard.restore();
             return new PostEffectRegistry.HoleEffectInstance(passes, null, finalTarget, 0.0f);
         }
     }

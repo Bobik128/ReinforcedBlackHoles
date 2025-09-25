@@ -2,6 +2,7 @@ package com.mod.rbh.items.renderer;
 
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.items.SingularityRifle;
+import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;

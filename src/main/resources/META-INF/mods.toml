@@ -73,3 +73,10 @@ mandatory=true
 versionRange="[4.4,)"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="oculus"
+mandatory=false
+versionRange="[1.8.0,)"
+ordering="AFTER"
+side="BOTH"
