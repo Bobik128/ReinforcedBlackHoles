@@ -27,7 +27,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.RenderUtils;
 
 import java.util.Objects;
-
+// TODO fix not rendering in hand when there is black hole
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
 
     public SingularityRifleRenderer() {

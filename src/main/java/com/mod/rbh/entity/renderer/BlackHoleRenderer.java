@@ -133,6 +133,14 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         effectInstance.setRenderFunc(() -> {
             effectInstance.dist = distFromCam;
 
+            // Save state that iris cares about
+            int prevFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
+            int[] vp = new int[4];
+            GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
+            boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
+            int[] sc = new int[4];
+            if (scissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
+
             // ===== Render black hole sphere into main scene =====
             BufferBuilder localBB = new BufferBuilder(256 * 1024);                  // dedicated, not the global Tesselator
             MultiBufferSource.BufferSource localBuf = MultiBufferSource.immediate(localBB);
@@ -146,7 +154,17 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
             // Flush ONLY our stuff; this unbinds your RT and restores GL state for later draws
             localBuf.endBatch();
-            mainTarget.bindWrite(true);
+
+            // restore viewport and scissor
+            GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevFbo);
+
+            GL11.glViewport(vp[0], vp[1], vp[2], vp[3]);
+            if (scissor) {
+                GL11.glEnable(GL11.GL_SCISSOR_TEST);
+                GL11.glScissor(sc[0], sc[1], sc[2], sc[3]);
+            } else {
+                GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            }
         });
 
         effectInstance.uniformSetter = (pass) ->

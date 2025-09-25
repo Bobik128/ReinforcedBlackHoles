@@ -150,7 +150,7 @@ public abstract class ItemInHandRendererMixin {
     @Inject(method = "renderHandsWithItems",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
-                    shift = At.Shift.BEFORE))
+                    shift = At.Shift.AFTER))
     private void beforeEndBatch(float pPartialTicks, PoseStack pPoseStack, MultiBufferSource.BufferSource pBuffer, LocalPlayer pPlayerEntity, int pCombinedLight, CallbackInfo ci) {
 //        PostEffectRegistry.copyWholeArmDepth(Minecraft.getInstance().getMainRenderTarget());
         PostEffectRegistry.processEffects(Minecraft.getInstance().getMainRenderTarget(), pPartialTicks, PostEffectRegistry.RenderPhase.AFTER_ARM);
