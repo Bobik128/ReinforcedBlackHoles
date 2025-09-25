@@ -126,21 +126,25 @@ public class PostEffectRegistry {
     public static void blitEffects() {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        for (PostEffect postEffect : postEffects.values()) {
-            if (postEffect.postChain != null && postEffect.isEnabled()) {
-                postEffect.getRenderTarget().blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
-                postEffect.getRenderTarget().clear(Minecraft.ON_OSX);
-                Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-                postEffect.setEnabled(false);
+        RenderSystem.blendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE,
+                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
+        for (PostEffect fx : postEffects.values()) {
+            if (fx.postChain != null && fx.isEnabled()) {
+                fx.getRenderTarget().blitToScreen(Minecraft.getInstance().getWindow().getWidth(),
+                        Minecraft.getInstance().getWindow().getHeight(), false);
+                fx.getRenderTarget().clear(Minecraft.ON_OSX);
+                // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+                fx.setEnabled(false);
             }
         }
-        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
-            if (postEffect.postChain != null && postEffect.isEnabled()) {
-                postEffect.blitAll();
-                postEffect.wipe();
-                Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-                postEffect.setEnabled(false);
+        for (MutablePostEffect fx : mutablePostEffects.values()) {
+            if (fx.postChain != null && fx.isEnabled()) {
+                fx.blitAll();
+                fx.wipe();
+                // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+                fx.setEnabled(false);
             }
         }
         RenderSystem.disableBlend();
@@ -148,29 +152,30 @@ public class PostEffectRegistry {
     }
 
     public static void clearAndBindWrite(RenderTarget mainTarget) {
-        for (PostEffect postEffect : postEffects.values()) {
-            if (postEffect.isEnabled() && postEffect.postChain != null) {
-                postEffect.getRenderTarget().clear(Minecraft.ON_OSX);
-                mainTarget.bindWrite(false);
+        for (PostEffect fx : postEffects.values()) {
+            if (fx.isEnabled() && fx.postChain != null) {
+                fx.getRenderTarget().clear(Minecraft.ON_OSX);
+                // REMOVE: mainTarget.bindWrite(false);
             }
         }
     }
 
     public static void processEffects(RenderTarget mainTarget, float f, RenderPhase phase) {
         if (phase == RenderPhase.AFTER_LEVEL) {
-            for (PostEffect postEffect : postEffects.values()) {
-                if (postEffect.isEnabled() && postEffect.postChain != null) {
-                    postEffect.postChain.process(Minecraft.getInstance().getFrameTime());
-                    mainTarget.bindWrite(false);
+            for (PostEffect fx : postEffects.values()) {
+                if (fx.isEnabled() && fx.postChain != null) {
+                    fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                    // REMOVE: mainTarget.bindWrite(false);
                 }
             }
         }
-        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
-            if (postEffect.isEnabled() && postEffect.postChain != null) {
-                postEffect.process(phase);
-                if (!IPostChain.fromPostChain(postEffect.postChain).getPostPasses().isEmpty())
-                    postEffect.postChain.process(Minecraft.getInstance().getFrameTime());
-                mainTarget.bindWrite(false);
+        for (MutablePostEffect fx : mutablePostEffects.values()) {
+            if (fx.isEnabled() && fx.postChain != null) {
+                fx.process(phase);
+                if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty()) {
+                    fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                }
+                // REMOVE: mainTarget.bindWrite(false);
             }
         }
     }

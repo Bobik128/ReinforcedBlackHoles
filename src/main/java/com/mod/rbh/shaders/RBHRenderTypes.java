@@ -23,28 +23,69 @@ public class RBHRenderTypes extends RenderType {
         super(pName, pFormat, pMode, pBufferSize, pAffectsCrumbling, pSortOnUpload, pSetupState, pClearState);
     }
 
-    public static RenderType getBlackHole(ResourceLocation locationIn, @Nullable RenderTarget renderTarget) {
-        return (RenderType)create("black_hole", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true, CompositeState.builder()
-                .setShaderState(RENDERTYPE_BLACK_HOLE_SHADER)
-                .setCullState(RenderStateShard.CULL)
-                .setTextureState((EmptyTextureStateShard)new TextureStateShard(locationIn, false, false))
-                .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
-                .setOutputState(new OutputStateShard("black_hole_target",
-                        () -> {
-                            if (renderTarget != null) {
-//                                if (Minecraft.getInstance().levelRenderer.getItemEntityTarget() != null) {
-//                                    renderTarget.copyDepthFrom(Minecraft.getInstance().levelRenderer.getItemEntityTarget());
-//                                } else {
-                                    renderTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
-//                                }
-                                renderTarget.bindWrite(false);
-                            }
-                        },
-                        () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false))
-                )
-                .createCompositeState(false));
+    public static RenderType getBlackHole(ResourceLocation tex, @Nullable RenderTarget rt) {
+        final FboGuard guard = new FboGuard();
+
+        return (RenderType) create("black_hole",
+                DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true,
+                CompositeState.builder()
+                        .setShaderState(RENDERTYPE_BLACK_HOLE_SHADER)
+                        .setCullState(RenderStateShard.CULL)
+                        .setTextureState(new TextureStateShard(tex, false, false))
+                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                        .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+
+                        // *** CRITICAL: don't ever bind MAIN here ***
+                        .setOutputState(new OutputStateShard("black_hole_target",
+                                () -> {
+                                    if (rt != null) {
+                                        guard.save();
+
+                                        renderTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                                        // If you really need depth in the RT, copy it ONLY when the source is the
+                                        // currently used color/depth buffer (Iris routes it, so “main” is wrong here).
+                                        // Easiest fix: skip depth copy altogether for the hand pass.
+                                        // You can gate this with a threadlocal flag you set for AFTER_LEVEL only.
+                                        // Example (pseudo):
+                                        // if (BlackHolePassPhase.get() == AFTER_LEVEL) {
+                                        //     rt.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                                        // }
+
+                                        rt.bindWrite(false);
+                                    }
+                                },
+                                () -> {
+                                    if (rt != null) {
+                                        // *** restore previous FBO + viewport/scissor, NOT main ***
+                                        guard.restore();
+                                    }
+                                }))
+                        .createCompositeState(false));
     }
+
+
+//    public static RenderType getBlackHole(ResourceLocation locationIn, @Nullable RenderTarget renderTarget) {
+//        return (RenderType)create("black_hole", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true, CompositeState.builder()
+//                .setShaderState(RENDERTYPE_BLACK_HOLE_SHADER)
+//                .setCullState(RenderStateShard.CULL)
+//                .setTextureState((EmptyTextureStateShard)new TextureStateShard(locationIn, false, false))
+//                .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+//                .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+//                .setOutputState(new OutputStateShard("black_hole_target",
+//                        () -> {
+//                            if (renderTarget != null) {
+////                                if (Minecraft.getInstance().levelRenderer.getItemEntityTarget() != null) {
+////                                    renderTarget.copyDepthFrom(Minecraft.getInstance().levelRenderer.getItemEntityTarget());
+////                                } else {
+//                                    renderTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+////                                }
+//                                renderTarget.bindWrite(false);
+//                            }
+//                        },
+//                        () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false))
+//                )
+//                .createCompositeState(false));
+//    }
 
     public static RenderType getEmissiveRenderType(ResourceLocation texture) {
         TextureStateShard textureState = new TextureStateShard(texture, false, false);
