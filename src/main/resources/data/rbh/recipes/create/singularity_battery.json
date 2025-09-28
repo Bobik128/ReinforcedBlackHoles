@@ -1,0 +1,59 @@
+{
+  "type": "create:sequenced_assembly",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "ingredient": {
+    "item": "rbh:singularity_battery_empty"
+  },
+  "loops": 1,
+  "results": [
+    {
+      "item": "rbh:singularity_battery"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "rbh:singularity_battery_incomplete"
+        },
+        [
+          {
+            "item": "minecraft:nether_star"
+          }
+        ]
+      ],
+      "results": [
+        {
+          "item": "rbh:singularity_battery_incomplete"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "rbh:singularity_battery_incomplete"
+        },
+        [
+          {
+            "item": "minecraft:experience_bottle"
+          }
+        ]
+      ],
+      "results": [
+        {
+          "item": "rbh:singularity_battery_incomplete"
+        }
+      ]
+    }
+  ],
+  "transitionalItem": {
+    "item": "rbh:singularity_battery_incomplete"
+  }
+}

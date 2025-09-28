@@ -20,6 +20,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         simpleItem(RBHItems.SINGULARITY_BATTERY);
         simpleItem(RBHItems.SINGULARITY_BATTERY_EMPTY);
+        simpleItem(RBHItems.SINGULARITY_BATTERY_INCOMPLETE);
 
 //        withExistingParent(ModItems.KEYCODE_LINK_ITEM.getId().getPath(),
 //                ResourceLocation.fromNamespaceAndPath(ReinforcedBreakable.MOD_ID, "block/keycode_link_off"));

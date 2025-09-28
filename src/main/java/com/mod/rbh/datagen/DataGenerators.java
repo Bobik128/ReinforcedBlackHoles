@@ -1,6 +1,7 @@
 package com.mod.rbh.datagen;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.datagen.recipe.ModRecipeProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;

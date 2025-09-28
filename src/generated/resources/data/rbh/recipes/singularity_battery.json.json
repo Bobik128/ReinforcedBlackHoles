@@ -1,0 +1,34 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:mod_loaded",
+            "modid": "create"
+          }
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shapeless",
+        "category": "misc",
+        "ingredients": [
+          {
+            "item": "rbh:singularity_battery_empty"
+          },
+          {
+            "item": "minecraft:nether_star"
+          },
+          {
+            "item": "minecraft:experience_bottle"
+          }
+        ],
+        "result": {
+          "item": "rbh:singularity_battery"
+        }
+      }
+    }
+  ]
+}
