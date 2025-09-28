@@ -14,6 +14,12 @@ public class RBHItems {
     public static final RegistryObject<Item> SINGULARITY_RIFLE = ITEMS.register("singularity_rifle",
             () -> new SingularityRifle(new Item.Properties()));
 
+    public static final RegistryObject<Item> SINGULARITY_BATTERY = ITEMS.register("singularity_battery",
+            () -> new Item(new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<Item> SINGULARITY_BATTERY_EMPTY = ITEMS.register("singularity_battery_empty",
+            () -> new Item(new Item.Properties().stacksTo(16)));
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

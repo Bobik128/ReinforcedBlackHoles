@@ -19,6 +19,8 @@ public class RBHCreativeModeTab {
                     .title(Component.translatable("rbh.creativetab.tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(RBHItems.SINGULARITY_RIFLE.get());
+                        pOutput.accept(RBHItems.SINGULARITY_BATTERY.get());
+                        pOutput.accept(RBHItems.SINGULARITY_BATTERY_EMPTY.get());
                     })
                     .build());
 

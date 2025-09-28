@@ -54,7 +54,6 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     public static int MAX_CHARGE_LEVEL = 100;
 
     public FirearmMode mode;
-    public final PostEffectRegistry.HoleEffectInstance effectInstance;
 
     public SingularityRifle(Properties pProperties) {
         super(pProperties.stacksTo(1));
@@ -62,7 +61,6 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
                 5, 5, null, null, EQUIP_ANIM, UNEQUIP_ANIM,
                 5
                 );
-        effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
 
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }

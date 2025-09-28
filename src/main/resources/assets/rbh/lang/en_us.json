@@ -1,4 +1,8 @@
 {
   "rbh.creativetab.tab": "Reinforced Black Holes",
-  "key.reinforcedblackholes.category": "Reinforced black holes"
+  "key.reinforcedblackholes.category": "Reinforced black holes",
+
+  "item.rbh.singularity_rifle": "Singularity Rifle",
+  "item.rbh.singularity_battery": "Singularity Battery",
+  "item.rbh.singularity_battery_empty": "Empty Singularity Battery"
 }
