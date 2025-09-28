@@ -1,1 +1,7 @@
-// 1.20.1	2025-09-28T12:25:04.233634267	Recipes
+// 1.20.1	2025-09-28T13:01:30.522563012	Recipes
+e75411ece4a0286fd17701354c358d886636561c data/rbh/advancements/recipes/combat/singularity_rifle.json
+5c957f5b3b7cf144ba5cd0fe4ebbb8d9d94a1641 data/rbh/advancements/recipes/misc/singularity_battery.json
+bd2e81bbe928a822b3a23ddd0e01a0a2c7e75f96 data/rbh/advancements/recipes/misc/singularity_battery_empty.json
+cec5acac5a304def02d6347c541df7ebc1f78063 data/rbh/recipes/singularity_battery.json
+ec31f731fcdfd5f15d7991b59d560cb71da6f05f data/rbh/recipes/singularity_battery_empty.json
+4ac66280bc9ad2342134fb7324244b9a3610c80f data/rbh/recipes/singularity_rifle.json

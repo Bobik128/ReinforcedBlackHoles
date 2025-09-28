@@ -1,5 +1,6 @@
 package com.mod.rbh;
 
+import com.mod.rbh.compat.CreateCompat;
 import com.mod.rbh.entity.RBHEntityTypes;
 import com.mod.rbh.items.RBHCreativeModeTab;
 import com.mod.rbh.items.RBHItems;
@@ -53,6 +54,7 @@ public class ReinforcedBlackHoles
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             RBHNetwork.init();
+            CreateCompat.init();
         });
     }
 

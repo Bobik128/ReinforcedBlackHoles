@@ -1,173 +1,173 @@
-[28Sep2025 12:24:24.500] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, /home/tomas/.gradle/caches/forge_gradle/assets, --gameDir, ., --fml.forgeVersion, 47.4.6, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources, --mixin.config, rbh.mixins.json]
-[28Sep2025 12:24:24.512] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.15 by Eclipse Adoptium; OS Linux arch amd64 version 6.16.8-200.fc42.x86_64
-[28Sep2025 12:24:24.962] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[28Sep2025 12:24:25.173] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/home/tomas/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23116!/ Service=ModLauncher Env=CLIENT
-[28Sep2025 12:24:26.744] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/javafmllanguage/1.20.1-47.4.6/9e86bf67e222253576e982856d9958695725adb5/javafmllanguage-1.20.1-47.4.6.jar is missing mods.toml file
-[28Sep2025 12:24:26.749] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/lowcodelanguage/1.20.1-47.4.6/56100545804adc991cc48ab68b86ba46c5873246/lowcodelanguage-1.20.1-47.4.6.jar is missing mods.toml file
-[28Sep2025 12:24:26.753] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/mclanguage/1.20.1-47.4.6/fd228d7d879a9da774eda022ea3092cedb5178f1/mclanguage-1.20.1-47.4.6.jar is missing mods.toml file
-[28Sep2025 12:24:26.759] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/fmlcore/1.20.1-47.4.6/cefc55ada370ce2f23f92834530eb967c0de1fdd/fmlcore-1.20.1-47.4.6.jar is missing mods.toml file
-[28Sep2025 12:24:27.825] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 5 dependencies adding them to mods collection
-[28Sep2025 12:24:33.389] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by rbh.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[28Sep2025 12:24:33.390] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[28Sep2025 12:24:33.438] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.444] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.fantastic.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.449] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.vertexformat.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.452] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.bettermipmaps.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.457] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.fixes.maxfpscrash.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.462] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by oculus-batched-entity-rendering.mixins.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.469] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.sodium.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.475] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.indigo.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.482] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.indium.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.488] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.dh.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.494] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.pixelmon.json is lower than the default level supported by the current mixin service (JAVA_16).
-[28Sep2025 12:24:33.533] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, /home/tomas/.gradle/caches/forge_gradle/assets, --assetIndex, 5, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources]
-[28Sep2025 12:24:33.623] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[28Sep2025 12:24:33.628] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[28Sep2025 12:24:33.671] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[28Sep2025 12:24:33.673] [main/INFO] [mixin/]: Selecting config rbh.mixins.json
-[28Sep2025 12:24:33.693] [main/WARN] [mixin/]: Reference map 'rbh.refmap.json' for rbh.mixins.json could not be read. If this is a development environment you can ignore this message
-[28Sep2025 12:24:33.698] [main/INFO] [mixin/]: Selecting config fabric-api-base.init.mixins.json
-[28Sep2025 12:24:33.774] [main/INFO] [mixin/]: Selecting config geckolib.mixins.json
-[28Sep2025 12:24:34.902] [main/INFO] [mixin/]: Remapping refMap geckolib.refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:34.904] [main/INFO] [mixin/]: Selecting config mixins.sodiumoptionsapi.json
-[28Sep2025 12:24:34.907] [main/INFO] [mixin/]: Remapping refMap sodiumoptionsapi-forge-1.20.1-forge-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:34.908] [main/INFO] [mixin/]: Selecting config embeddium.mixins.json
-[28Sep2025 12:24:34.943] [main/INFO] [Embeddium/]: Loaded configuration file for Embeddium: 55 options available, 3 override(s) found
-[28Sep2025 12:24:34.952] [main/INFO] [Embeddium-GraphicsAdapterProbe/]: Searching for graphics cards...
-[28Sep2025 12:24:35.050] [main/INFO] [Embeddium-GraphicsAdapterProbe/]: Found graphics card: GraphicsAdapterInfo[vendor=INTEL, name=TigerLake-LP GT2 [Iris Xe Graphics], version=unknown]
-[28Sep2025 12:24:35.070] [main/WARN] [Embeddium-Workarounds/]: Embeddium has applied one or more workarounds to prevent crashes or other issues on your system: [NO_ERROR_CONTEXT_UNSUPPORTED]
-[28Sep2025 12:24:35.071] [main/WARN] [Embeddium-Workarounds/]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
-[28Sep2025 12:24:35.111] [main/INFO] [mixin/]: Remapping refMap embeddium-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.112] [main/INFO] [mixin/]: Selecting config mixins.oculus.json
-[28Sep2025 12:24:35.133] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.134] [main/INFO] [mixin/]: Selecting config mixins.oculus.fantastic.json
-[28Sep2025 12:24:35.155] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.156] [main/INFO] [mixin/]: Selecting config mixins.oculus.vertexformat.json
-[28Sep2025 12:24:35.176] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.177] [main/INFO] [mixin/]: Selecting config mixins.oculus.bettermipmaps.json
-[28Sep2025 12:24:35.196] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.196] [main/INFO] [mixin/]: Selecting config mixins.oculus.fixes.maxfpscrash.json
-[28Sep2025 12:24:35.209] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.210] [main/INFO] [mixin/]: Selecting config oculus-batched-entity-rendering.mixins.json
-[28Sep2025 12:24:35.225] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.226] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.sodium.json
-[28Sep2025 12:24:35.237] [main/INFO] [mixin/]: Remapping refMap sodiumCompatibility-oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.238] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.indigo.json
-[28Sep2025 12:24:35.258] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.259] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.indium.json
-[28Sep2025 12:24:35.283] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.284] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.dh.json
-[28Sep2025 12:24:35.313] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.316] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.pixelmon.json
-[28Sep2025 12:24:35.337] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.338] [main/INFO] [mixin/]: Selecting config mixins.sodiumdynamiclights.json
-[28Sep2025 12:24:35.346] [main/INFO] [mixin/]: Remapping refMap sodiumdynamiclights-forge-1.20.1-forge-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
-[28Sep2025 12:24:35.346] [main/INFO] [mixin/]: Selecting config mixinextras.init.mixins.json
-[28Sep2025 12:24:35.684] [main/INFO] [mixin/]: Preparing rbh.mixins.json (10)
-[28Sep2025 12:24:36.335] [main/INFO] [mixin/]: Preparing fabric-api-base.init.mixins.json (0)
-[28Sep2025 12:24:36.336] [main/INFO] [mixin/]: Preparing geckolib.mixins.json (1)
-[28Sep2025 12:24:36.352] [main/INFO] [mixin/]: Preparing mixins.sodiumoptionsapi.json (7)
-[28Sep2025 12:24:36.429] [main/INFO] [mixin/]: Preparing embeddium.mixins.json (0)
-[28Sep2025 12:24:36.430] [main/INFO] [mixin/]: Preparing mixins.oculus.json (88)
-[28Sep2025 12:24:37.335] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/entity/RenderFlame (java.lang.ClassNotFoundException: mekanism.client.render.entity.RenderFlame)
-[28Sep2025 12:24:37.343] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/armor/MekaSuitArmor (java.lang.ClassNotFoundException: mekanism.client.render.armor.MekaSuitArmor)
-[28Sep2025 12:24:37.515] [main/INFO] [mixin/]: Preparing mixins.oculus.fantastic.json (5)
-[28Sep2025 12:24:37.614] [main/INFO] [mixin/]: Preparing mixins.oculus.vertexformat.json (8)
-[28Sep2025 12:24:37.762] [main/WARN] [mixin/]: @Mixin target net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask is public in mixins.oculus.vertexformat.json:block_rendering.MixinChunkRebuildTask and should be specified in value
-[28Sep2025 12:24:37.787] [main/INFO] [mixin/]: Preparing mixins.oculus.bettermipmaps.json (0)
-[28Sep2025 12:24:37.787] [main/INFO] [mixin/]: Preparing mixins.oculus.fixes.maxfpscrash.json (1)
-[28Sep2025 12:24:37.790] [main/INFO] [mixin/]: Preparing oculus-batched-entity-rendering.mixins.json (17)
-[28Sep2025 12:24:37.838] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.sodium.json (49)
-[28Sep2025 12:24:38.103] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.indigo.json (1)
-[28Sep2025 12:24:38.158] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.indium.json (1)
-[28Sep2025 12:24:38.210] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.dh.json (4)
-[28Sep2025 12:24:38.214] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.pixelmon.json (1)
-[28Sep2025 12:24:38.246] [main/INFO] [mixin/]: Preparing mixins.sodiumdynamiclights.json (22)
-[28Sep2025 12:24:39.210] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
-[28Sep2025 12:24:39.215] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
-[28Sep2025 12:24:39.225] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
-[28Sep2025 12:24:39.231] [main/WARN] [mixin/]: Error loading class: net/fabricmc/fabric/impl/client/indigo/renderer/aocalc/AoCalculator (java.lang.ClassNotFoundException: net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator)
-[28Sep2025 12:24:39.231] [main/INFO] [mixin/]: Preparing mixinextras.init.mixins.json (0)
-[28Sep2025 12:24:39.303] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.world.sky.WorldRendererMixin' as rule 'mixin.features.render.world.sky' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.304] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.world.sky.ClientWorldMixin' as rule 'mixin.features.render.world.sky' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.305] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.world.sky.BackgroundRendererMixin' as rule 'mixin.features.render.world.sky' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.312] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.gui.font.GlyphRendererMixin' as rule 'mixin.features.render.gui.font' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.312] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.gui.font.FontSetMixin' as rule 'mixin.features.render.gui.font' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.314] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.shadows.EntityRenderDispatcherMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.315] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.remove_streams.ModelPartMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.315] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.remove_streams.HierarchicalModelMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.316] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.fast_render.ModelPartMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.317] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.fast_render.CuboidMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.318] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.cull.EntityRendererMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
-[28Sep2025 12:24:39.966] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
-[28Sep2025 12:24:39.973] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
-[28Sep2025 12:24:39.978] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
-[28Sep2025 12:24:39.983] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
-[28Sep2025 12:24:39.988] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
-[28Sep2025 12:24:39.993] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
-[28Sep2025 12:24:39.998] [main/INFO] [mixin/]: Prepared 205 mixins in 6.324 sec (30.8ms avg) (0ms load, 0ms transform, 0ms plugin)
-[28Sep2025 12:24:40.797] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
-[28Sep2025 12:24:40.843] [main/INFO] [mixin/]: Mixing texture.MixinResourceLocation from mixins.oculus.json into net.minecraft.resources.ResourceLocation
-[28Sep2025 12:24:40.850] [main/WARN] [mixin/]: mixins.oculus.json:texture.MixinResourceLocation: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
-[28Sep2025 12:24:41.289] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [rbh]
-[28Sep2025 12:24:41.619] [main/INFO] [mixin/]: Mixing MixinBlockStateBehavior from mixins.oculus.json into net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase
-[28Sep2025 12:24:41.744] [main/INFO] [mixin/]: Mixing lightsource.EntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.Entity
-[28Sep2025 12:24:42.228] [main/INFO] [mixin/]: Mixing lightsource.LivingEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.LivingEntity
-[28Sep2025 12:24:42.450] [main/INFO] [mixin/]: Mixing LevelMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.level.Level
-[28Sep2025 12:24:42.647] [main/INFO] [mixin/]: Mixing lightsource.PlayerEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.player.Player
-[28Sep2025 12:24:42.793] [main/INFO] [mixin/]: Mixing MixinItem from mixins.oculus.json into net.minecraft.world.item.Item
-[28Sep2025 12:24:43.146] [main/INFO] [mixin/]: Mixing EntityTypeMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.EntityType
-[28Sep2025 12:24:43.271] [main/INFO] [mixin/]: Mixing BlockEntityTypeMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.level.block.entity.BlockEntityType
-[28Sep2025 12:24:43.518] [main/INFO] [mixin/]: Mixing features.render.immediate.DirectionMixin from embeddium.mixins.json into net.minecraft.core.Direction
-[28Sep2025 12:24:44.096] [main/INFO] [mixin/]: Mixing features.options.render_layers.LeavesBlockMixin from embeddium.mixins.json into net.minecraft.world.level.block.LeavesBlock
-[28Sep2025 12:24:45.240] [main/INFO] [mixin/]: Mixing lightsource.BlockEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.level.block.entity.BlockEntity
-[28Sep2025 12:24:46.194] [main/INFO] [mixin/]: Mixing lightsource.PrimedTntEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.item.PrimedTnt
-[28Sep2025 12:24:49.684] [main/INFO] [mixin/]: Mixing lightsource.AbstractMinecartEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.vehicle.AbstractMinecart
-[28Sep2025 12:24:49.817] [main/INFO] [mixin/]: Mixing lightsource.BlockAttachedEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.decoration.HangingEntity
-[28Sep2025 12:24:52.199] [main/INFO] [mixin/]: Mixing lightsource.AbstractHurtingProjectileEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.projectile.AbstractHurtingProjectile
-[28Sep2025 12:24:54.544] [main/INFO] [mixin/]: Mixing MixinBiomes from mixins.oculus.json into net.minecraft.world.level.biome.Biomes
-[28Sep2025 12:24:54.854] [main/INFO] [mixin/]: Mixing DimensionTypeAccessor from mixins.oculus.json into net.minecraft.world.level.dimension.DimensionType
-[28Sep2025 12:24:56.280] [main/INFO] [mixin/]: Mixing features.world.biome.BiomeMixin from embeddium.mixins.json into net.minecraft.world.level.biome.Biome
-[28Sep2025 12:24:56.295] [main/INFO] [mixin/]: Mixing MixinBiome from mixins.oculus.json into net.minecraft.world.level.biome.Biome
-[28Sep2025 12:24:57.859] [modloading-worker-0/ERROR] [Embeddium-MixinTaintDetector/]: Mod mixin into Embeddium internals detected. This instance is now tainted. The Embeddium team does not provide any guarantee of support for issues encountered while such mods are installed.
-[28Sep2025 12:24:57.866] [modloading-worker-0/WARN] [Embeddium-MixinTaintDetector/]: Mod(s) [oculus] are modifying Embeddium class me.jellysquid.mods.sodium.client.gui.SodiumGameOptions, which may cause instability.
-[28Sep2025 12:24:57.870] [modloading-worker-0/INFO] [mixin/]: Mixing options.MixinSodiumGameOptions from mixins.oculus.compat.sodium.json into me.jellysquid.mods.sodium.client.gui.SodiumGameOptions
-[28Sep2025 12:24:57.870] [modloading-worker-0/WARN] [mixin/]: mixins.oculus.compat.sodium.json:options.MixinSodiumGameOptions: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
-[28Sep2025 12:24:57.941] [modloading-worker-0/INFO] [mixin/]: Mixing client.MinecraftMixin from rbh.mixins.json into net.minecraft.client.Minecraft
-[28Sep2025 12:24:57.970] [modloading-worker-0/INFO] [mixin/]: Mixing MixinMinecraft_PipelineManagement from mixins.oculus.json into net.minecraft.client.Minecraft
-[28Sep2025 12:24:57.981] [modloading-worker-0/INFO] [mixin/]: Mixing MinecraftClientMixin from mixins.sodiumdynamiclights.json into net.minecraft.client.Minecraft
-[28Sep2025 12:24:57.983] [modloading-worker-0/INFO] [mixin/]: Mixing core.render.MinecraftAccessor from embeddium.mixins.json into net.minecraft.client.Minecraft
-[28Sep2025 12:24:58.004] [modloading-worker-0/INFO] [mixin/]: Mixing core.MinecraftClientMixin from embeddium.mixins.json into net.minecraft.client.Minecraft
-[28Sep2025 12:24:58.006] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$postInit$0(Lnet/minecraft/client/gui/screens/Screen;)Lnet/minecraft/client/gui/screens/Screen; to mdd5611d$lambda$postInit$0$0 in embeddium.mixins.json:core.MinecraftClientMixin
-[28Sep2025 12:24:58.709] [modloading-worker-0/INFO] [mixin/]: Mixing MixinOptions_Entrypoint from mixins.oculus.json into net.minecraft.client.Options
-[28Sep2025 12:24:58.716] [modloading-worker-0/INFO] [mixin/]: Mixing MixinMaxFpsCrashFix from mixins.oculus.fixes.maxfpscrash.json into net.minecraft.client.Options
-[28Sep2025 12:24:58.716] [modloading-worker-0/WARN] [mixin/]: mixins.oculus.fixes.maxfpscrash.json:MixinMaxFpsCrashFix: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
-[28Sep2025 12:24:58.723] [modloading-worker-0/INFO] [mixin/]: Mixing sky.MixinOptions_CloudsOverride from mixins.oculus.json into net.minecraft.client.Options
-[28Sep2025 12:24:58.726] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$iris$overrideCloudsType$0(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/irisshaders/iris/pipeline/WorldRenderingPipeline;)V to mdd5611d$lambda$iris$overrideCloudsType$0$0 in mixins.oculus.json:sky.MixinOptions_CloudsOverride
-[28Sep2025 12:24:58.907] [modloading-worker-0/INFO] [mixin/]: Mixing MixinTitleScreen from mixins.oculus.json into net.minecraft.client.gui.screens.TitleScreen
-[28Sep2025 12:24:58.989] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.6, for MC 1.20.1 with MCP 20230612.114412
-[28Sep2025 12:24:58.999] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.6 Initialized
-[28Sep2025 12:24:59.040] [modloading-worker-0/INFO] [mixin/]: Mixing client.MultiPlayerGameModeMixin from rbh.mixins.json into net.minecraft.client.multiplayer.MultiPlayerGameMode
-[28Sep2025 12:24:59.108] [modloading-worker-0/INFO] [mixin/]: Mixing features.gui.screen.LevelLoadingScreenMixin from embeddium.mixins.json into net.minecraft.client.gui.screens.LevelLoadingScreen
-[28Sep2025 12:24:59.110] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$renderChunks$0(Lit/unimi/dsi/fastutil/objects/Object2IntMap$Entry;)V to mdd5611d$lambda$renderChunks$0$0 in embeddium.mixins.json:features.gui.screen.LevelLoadingScreenMixin
-[28Sep2025 12:24:59.451] [modloading-worker-0/INFO] [mixin/]: Mixing features.render.world.ClientLevelMixin from embeddium.mixins.json into net.minecraft.client.multiplayer.ClientLevel
-[28Sep2025 12:24:59.455] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$new$0(Lnet/minecraft/world/level/biome/AmbientParticleSettings;)V to mdd5611d$lambda$new$0$0 in embeddium.mixins.json:features.render.world.ClientLevelMixin
-[28Sep2025 12:24:59.480] [modloading-worker-0/INFO] [mixin/]: Mixing block_rendering.MixinClientLevel from mixins.oculus.vertexformat.json into net.minecraft.client.multiplayer.ClientLevel
-[28Sep2025 12:24:59.481] [modloading-worker-0/WARN] [mixin/]: mixins.oculus.vertexformat.json:block_rendering.MixinClientLevel: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
-[28Sep2025 12:24:59.483] [modloading-worker-0/INFO] [mixin/]: Mixing ClientLevelMixin from mixins.sodiumdynamiclights.json into net.minecraft.client.multiplayer.ClientLevel
-[28Sep2025 12:24:59.486] [modloading-worker-0/INFO] [mixin/]: Mixing core.world.biome.ClientWorldMixin from embeddium.mixins.json into net.minecraft.client.multiplayer.ClientLevel
-[28Sep2025 12:24:59.489] [modloading-worker-0/INFO] [mixin/]: Mixing core.world.map.ClientWorldMixin from embeddium.mixins.json into net.minecraft.client.multiplayer.ClientLevel
-[28Sep2025 12:24:59.789] [modloading-worker-0/INFO] [mixin/]: Mixing MixinRenderTarget from mixins.oculus.json into com.mojang.blaze3d.pipeline.RenderTarget
-[28Sep2025 12:24:59.794] [modloading-worker-0/INFO] [mixin/]: Mixing state_tracking.MixinRenderTarget from mixins.oculus.json into com.mojang.blaze3d.pipeline.RenderTarget
-[28Sep2025 12:24:59.795] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$iris$onBindFramebuffer$0(ZLnet/irisshaders/iris/pipeline/WorldRenderingPipeline;)V to mdd5611d$lambda$iris$onBindFramebuffer$0$0 in mixins.oculus.json:state_tracking.MixinRenderTarget
-[28Sep2025 12:24:59.875] [modloading-worker-0/INFO] [mixin/]: Mixing client.GuiMixin from rbh.mixins.json into net.minecraft.client.gui.Gui
-[28Sep2025 12:25:00.051] [modloading-worker-0/INFO] [mixin/]: Mixing gui.MixinGui from mixins.oculus.json into net.minecraft.client.gui.Gui
-[28Sep2025 12:25:00.054] [modloading-worker-0/INFO] [mixin/]: Mixing features.options.overlays.InGameHudMixin from embeddium.mixins.json into net.minecraft.client.gui.Gui
-[28Sep2025 12:25:00.183] [modloading-worker-0/INFO] [mixin/]: Mixing gui.MixinForgeGui from mixins.oculus.json into net.minecraftforge.client.gui.overlay.ForgeGui
-[28Sep2025 12:25:00.188] [modloading-worker-0/INFO] [mixin/]: Mixing features.render.gui.debug.ForgeGuiMixin from embeddium.mixins.json into net.minecraftforge.client.gui.overlay.ForgeGui
-[28Sep2025 12:25:00.190] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$renderLinesVanilla$0(Lme/jellysquid/mods/sodium/mixin/features/render/gui/debug/DebugScreenOverlayAccessor;Lnet/minecraft/client/gui/GuiGraphics;Ljava/util/ArrayList;Ljava/util/ArrayList;)V to mdd5611d$lambda$renderLinesVanilla$0$0 in embeddium.mixins.json:features.render.gui.debug.ForgeGuiMixin
-[28Sep2025 12:25:00.451] [modloading-worker-0/WARN] [software.bernie.geckolib.GeckoLib/]: Minecraft.getInstance() was null, could not register reload listeners
-[28Sep2025 12:25:00.451] [modloading-worker-0/ERROR] [Embeddium/]: Failed to update fingerprint
+[28Sep2025 13:00:53.793] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, /home/tomas/.gradle/caches/forge_gradle/assets, --gameDir, ., --fml.forgeVersion, 47.4.6, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources, --mixin.config, rbh.mixins.json]
+[28Sep2025 13:00:53.807] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.15 by Eclipse Adoptium; OS Linux arch amd64 version 6.16.8-200.fc42.x86_64
+[28Sep2025 13:00:54.426] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[28Sep2025 13:00:54.733] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/home/tomas/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23116!/ Service=ModLauncher Env=CLIENT
+[28Sep2025 13:00:56.386] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/javafmllanguage/1.20.1-47.4.6/9e86bf67e222253576e982856d9958695725adb5/javafmllanguage-1.20.1-47.4.6.jar is missing mods.toml file
+[28Sep2025 13:00:56.391] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/lowcodelanguage/1.20.1-47.4.6/56100545804adc991cc48ab68b86ba46c5873246/lowcodelanguage-1.20.1-47.4.6.jar is missing mods.toml file
+[28Sep2025 13:00:56.397] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/mclanguage/1.20.1-47.4.6/fd228d7d879a9da774eda022ea3092cedb5178f1/mclanguage-1.20.1-47.4.6.jar is missing mods.toml file
+[28Sep2025 13:00:56.402] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/fmlcore/1.20.1-47.4.6/cefc55ada370ce2f23f92834530eb967c0de1fdd/fmlcore-1.20.1-47.4.6.jar is missing mods.toml file
+[28Sep2025 13:00:57.358] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 5 dependencies adding them to mods collection
+[28Sep2025 13:01:02.545] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by rbh.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[28Sep2025 13:01:02.546] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[28Sep2025 13:01:02.608] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.614] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.fantastic.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.619] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.vertexformat.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.625] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.bettermipmaps.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.630] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.fixes.maxfpscrash.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.638] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by oculus-batched-entity-rendering.mixins.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.644] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.sodium.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.650] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.indigo.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.655] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.indium.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.661] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.dh.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.668] [main/INFO] [mixin/]: Compatibility level JAVA_8 specified by mixins.oculus.compat.pixelmon.json is lower than the default level supported by the current mixin service (JAVA_16).
+[28Sep2025 13:01:02.710] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, /home/tomas/.gradle/caches/forge_gradle/assets, --assetIndex, 5, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources]
+[28Sep2025 13:01:02.791] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
+[28Sep2025 13:01:02.797] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
+[28Sep2025 13:01:02.854] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
+[28Sep2025 13:01:02.856] [main/INFO] [mixin/]: Selecting config rbh.mixins.json
+[28Sep2025 13:01:02.871] [main/WARN] [mixin/]: Reference map 'rbh.refmap.json' for rbh.mixins.json could not be read. If this is a development environment you can ignore this message
+[28Sep2025 13:01:02.877] [main/INFO] [mixin/]: Selecting config fabric-api-base.init.mixins.json
+[28Sep2025 13:01:02.931] [main/INFO] [mixin/]: Selecting config geckolib.mixins.json
+[28Sep2025 13:01:03.995] [main/INFO] [mixin/]: Remapping refMap geckolib.refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:03.995] [main/INFO] [mixin/]: Selecting config mixins.sodiumoptionsapi.json
+[28Sep2025 13:01:03.998] [main/INFO] [mixin/]: Remapping refMap sodiumoptionsapi-forge-1.20.1-forge-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:03.999] [main/INFO] [mixin/]: Selecting config embeddium.mixins.json
+[28Sep2025 13:01:04.034] [main/INFO] [Embeddium/]: Loaded configuration file for Embeddium: 55 options available, 3 override(s) found
+[28Sep2025 13:01:04.041] [main/INFO] [Embeddium-GraphicsAdapterProbe/]: Searching for graphics cards...
+[28Sep2025 13:01:04.129] [main/INFO] [Embeddium-GraphicsAdapterProbe/]: Found graphics card: GraphicsAdapterInfo[vendor=INTEL, name=TigerLake-LP GT2 [Iris Xe Graphics], version=unknown]
+[28Sep2025 13:01:04.150] [main/WARN] [Embeddium-Workarounds/]: Embeddium has applied one or more workarounds to prevent crashes or other issues on your system: [NO_ERROR_CONTEXT_UNSUPPORTED]
+[28Sep2025 13:01:04.152] [main/WARN] [Embeddium-Workarounds/]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
+[28Sep2025 13:01:04.217] [main/INFO] [mixin/]: Remapping refMap embeddium-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.218] [main/INFO] [mixin/]: Selecting config mixins.oculus.json
+[28Sep2025 13:01:04.247] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.248] [main/INFO] [mixin/]: Selecting config mixins.oculus.fantastic.json
+[28Sep2025 13:01:04.269] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.270] [main/INFO] [mixin/]: Selecting config mixins.oculus.vertexformat.json
+[28Sep2025 13:01:04.284] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.285] [main/INFO] [mixin/]: Selecting config mixins.oculus.bettermipmaps.json
+[28Sep2025 13:01:04.297] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.298] [main/INFO] [mixin/]: Selecting config mixins.oculus.fixes.maxfpscrash.json
+[28Sep2025 13:01:04.316] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.317] [main/INFO] [mixin/]: Selecting config oculus-batched-entity-rendering.mixins.json
+[28Sep2025 13:01:04.327] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.327] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.sodium.json
+[28Sep2025 13:01:04.334] [main/INFO] [mixin/]: Remapping refMap sodiumCompatibility-oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.334] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.indigo.json
+[28Sep2025 13:01:04.348] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.350] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.indium.json
+[28Sep2025 13:01:04.365] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.366] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.dh.json
+[28Sep2025 13:01:04.384] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.385] [main/INFO] [mixin/]: Selecting config mixins.oculus.compat.pixelmon.json
+[28Sep2025 13:01:04.403] [main/INFO] [mixin/]: Remapping refMap oculus-mixins-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.403] [main/INFO] [mixin/]: Selecting config mixins.sodiumdynamiclights.json
+[28Sep2025 13:01:04.408] [main/INFO] [mixin/]: Remapping refMap sodiumdynamiclights-forge-1.20.1-forge-refmap.json using /home/tomas/IdeaProjects/ReinforcedBlackHoles/build/createSrgToMcp/output.srg
+[28Sep2025 13:01:04.408] [main/INFO] [mixin/]: Selecting config mixinextras.init.mixins.json
+[28Sep2025 13:01:04.824] [main/INFO] [mixin/]: Preparing rbh.mixins.json (10)
+[28Sep2025 13:01:05.437] [main/INFO] [mixin/]: Preparing fabric-api-base.init.mixins.json (0)
+[28Sep2025 13:01:05.438] [main/INFO] [mixin/]: Preparing geckolib.mixins.json (1)
+[28Sep2025 13:01:05.454] [main/INFO] [mixin/]: Preparing mixins.sodiumoptionsapi.json (7)
+[28Sep2025 13:01:05.516] [main/INFO] [mixin/]: Preparing embeddium.mixins.json (0)
+[28Sep2025 13:01:05.517] [main/INFO] [mixin/]: Preparing mixins.oculus.json (88)
+[28Sep2025 13:01:06.277] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/entity/RenderFlame (java.lang.ClassNotFoundException: mekanism.client.render.entity.RenderFlame)
+[28Sep2025 13:01:06.285] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/armor/MekaSuitArmor (java.lang.ClassNotFoundException: mekanism.client.render.armor.MekaSuitArmor)
+[28Sep2025 13:01:06.396] [main/INFO] [mixin/]: Preparing mixins.oculus.fantastic.json (5)
+[28Sep2025 13:01:06.429] [main/INFO] [mixin/]: Preparing mixins.oculus.vertexformat.json (8)
+[28Sep2025 13:01:06.504] [main/WARN] [mixin/]: @Mixin target net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask is public in mixins.oculus.vertexformat.json:block_rendering.MixinChunkRebuildTask and should be specified in value
+[28Sep2025 13:01:06.529] [main/INFO] [mixin/]: Preparing mixins.oculus.bettermipmaps.json (0)
+[28Sep2025 13:01:06.529] [main/INFO] [mixin/]: Preparing mixins.oculus.fixes.maxfpscrash.json (1)
+[28Sep2025 13:01:06.531] [main/INFO] [mixin/]: Preparing oculus-batched-entity-rendering.mixins.json (17)
+[28Sep2025 13:01:06.594] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.sodium.json (49)
+[28Sep2025 13:01:06.854] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.indigo.json (1)
+[28Sep2025 13:01:06.880] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.indium.json (1)
+[28Sep2025 13:01:06.904] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.dh.json (4)
+[28Sep2025 13:01:06.909] [main/INFO] [mixin/]: Preparing mixins.oculus.compat.pixelmon.json (1)
+[28Sep2025 13:01:06.925] [main/INFO] [mixin/]: Preparing mixins.sodiumdynamiclights.json (22)
+[28Sep2025 13:01:07.858] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
+[28Sep2025 13:01:07.863] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
+[28Sep2025 13:01:07.872] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
+[28Sep2025 13:01:07.878] [main/WARN] [mixin/]: Error loading class: net/fabricmc/fabric/impl/client/indigo/renderer/aocalc/AoCalculator (java.lang.ClassNotFoundException: net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator)
+[28Sep2025 13:01:07.879] [main/INFO] [mixin/]: Preparing mixinextras.init.mixins.json (0)
+[28Sep2025 13:01:07.951] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.world.sky.WorldRendererMixin' as rule 'mixin.features.render.world.sky' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.953] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.world.sky.ClientWorldMixin' as rule 'mixin.features.render.world.sky' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.954] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.world.sky.BackgroundRendererMixin' as rule 'mixin.features.render.world.sky' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.962] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.gui.font.GlyphRendererMixin' as rule 'mixin.features.render.gui.font' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.963] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.gui.font.FontSetMixin' as rule 'mixin.features.render.gui.font' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.964] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.shadows.EntityRenderDispatcherMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.965] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.remove_streams.ModelPartMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.966] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.remove_streams.HierarchicalModelMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.967] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.fast_render.ModelPartMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.968] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.fast_render.CuboidMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:07.969] [main/WARN] [Embeddium/]: Force-disabling mixin 'features.render.entity.cull.EntityRendererMixin' as rule 'mixin.features.render.entity' (added by mods [oculus]) disables it and children
+[28Sep2025 13:01:08.521] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
+[28Sep2025 13:01:08.526] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/ArrayLightDataCache (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache)
+[28Sep2025 13:01:08.530] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
+[28Sep2025 13:01:08.534] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/flat/FlatLightPipeline (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.flat.FlatLightPipeline)
+[28Sep2025 13:01:08.538] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
+[28Sep2025 13:01:08.542] [main/WARN] [mixin/]: Error loading class: net/caffeinemc/mods/sodium/client/model/light/data/LightDataAccess (java.lang.ClassNotFoundException: net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess)
+[28Sep2025 13:01:08.546] [main/INFO] [mixin/]: Prepared 205 mixins in 5.690 sec (27.8ms avg) (0ms load, 0ms transform, 0ms plugin)
+[28Sep2025 13:01:09.233] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
+[28Sep2025 13:01:09.261] [main/INFO] [mixin/]: Mixing texture.MixinResourceLocation from mixins.oculus.json into net.minecraft.resources.ResourceLocation
+[28Sep2025 13:01:09.267] [main/WARN] [mixin/]: mixins.oculus.json:texture.MixinResourceLocation: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
+[28Sep2025 13:01:09.627] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [rbh]
+[28Sep2025 13:01:09.946] [main/INFO] [mixin/]: Mixing MixinBlockStateBehavior from mixins.oculus.json into net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase
+[28Sep2025 13:01:10.059] [main/INFO] [mixin/]: Mixing lightsource.EntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.Entity
+[28Sep2025 13:01:10.507] [main/INFO] [mixin/]: Mixing lightsource.LivingEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.LivingEntity
+[28Sep2025 13:01:10.718] [main/INFO] [mixin/]: Mixing LevelMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.level.Level
+[28Sep2025 13:01:10.888] [main/INFO] [mixin/]: Mixing lightsource.PlayerEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.player.Player
+[28Sep2025 13:01:11.015] [main/INFO] [mixin/]: Mixing MixinItem from mixins.oculus.json into net.minecraft.world.item.Item
+[28Sep2025 13:01:11.258] [main/INFO] [mixin/]: Mixing EntityTypeMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.EntityType
+[28Sep2025 13:01:11.367] [main/INFO] [mixin/]: Mixing BlockEntityTypeMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.level.block.entity.BlockEntityType
+[28Sep2025 13:01:11.601] [main/INFO] [mixin/]: Mixing features.render.immediate.DirectionMixin from embeddium.mixins.json into net.minecraft.core.Direction
+[28Sep2025 13:01:12.130] [main/INFO] [mixin/]: Mixing features.options.render_layers.LeavesBlockMixin from embeddium.mixins.json into net.minecraft.world.level.block.LeavesBlock
+[28Sep2025 13:01:13.161] [main/INFO] [mixin/]: Mixing lightsource.BlockEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.level.block.entity.BlockEntity
+[28Sep2025 13:01:14.140] [main/INFO] [mixin/]: Mixing lightsource.PrimedTntEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.item.PrimedTnt
+[28Sep2025 13:01:17.340] [main/INFO] [mixin/]: Mixing lightsource.AbstractMinecartEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.vehicle.AbstractMinecart
+[28Sep2025 13:01:17.447] [main/INFO] [mixin/]: Mixing lightsource.BlockAttachedEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.decoration.HangingEntity
+[28Sep2025 13:01:19.478] [main/INFO] [mixin/]: Mixing lightsource.AbstractHurtingProjectileEntityMixin from mixins.sodiumdynamiclights.json into net.minecraft.world.entity.projectile.AbstractHurtingProjectile
+[28Sep2025 13:01:21.532] [main/INFO] [mixin/]: Mixing MixinBiomes from mixins.oculus.json into net.minecraft.world.level.biome.Biomes
+[28Sep2025 13:01:21.801] [main/INFO] [mixin/]: Mixing DimensionTypeAccessor from mixins.oculus.json into net.minecraft.world.level.dimension.DimensionType
+[28Sep2025 13:01:22.947] [main/INFO] [mixin/]: Mixing features.world.biome.BiomeMixin from embeddium.mixins.json into net.minecraft.world.level.biome.Biome
+[28Sep2025 13:01:22.959] [main/INFO] [mixin/]: Mixing MixinBiome from mixins.oculus.json into net.minecraft.world.level.biome.Biome
+[28Sep2025 13:01:24.329] [modloading-worker-0/ERROR] [Embeddium-MixinTaintDetector/]: Mod mixin into Embeddium internals detected. This instance is now tainted. The Embeddium team does not provide any guarantee of support for issues encountered while such mods are installed.
+[28Sep2025 13:01:24.332] [modloading-worker-0/WARN] [Embeddium-MixinTaintDetector/]: Mod(s) [oculus] are modifying Embeddium class me.jellysquid.mods.sodium.client.gui.SodiumGameOptions, which may cause instability.
+[28Sep2025 13:01:24.336] [modloading-worker-0/INFO] [mixin/]: Mixing options.MixinSodiumGameOptions from mixins.oculus.compat.sodium.json into me.jellysquid.mods.sodium.client.gui.SodiumGameOptions
+[28Sep2025 13:01:24.337] [modloading-worker-0/WARN] [mixin/]: mixins.oculus.compat.sodium.json:options.MixinSodiumGameOptions: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
+[28Sep2025 13:01:24.545] [modloading-worker-0/INFO] [mixin/]: Mixing client.MinecraftMixin from rbh.mixins.json into net.minecraft.client.Minecraft
+[28Sep2025 13:01:24.586] [modloading-worker-0/INFO] [mixin/]: Mixing MixinMinecraft_PipelineManagement from mixins.oculus.json into net.minecraft.client.Minecraft
+[28Sep2025 13:01:24.601] [modloading-worker-0/INFO] [mixin/]: Mixing MinecraftClientMixin from mixins.sodiumdynamiclights.json into net.minecraft.client.Minecraft
+[28Sep2025 13:01:24.603] [modloading-worker-0/INFO] [mixin/]: Mixing core.render.MinecraftAccessor from embeddium.mixins.json into net.minecraft.client.Minecraft
+[28Sep2025 13:01:24.623] [modloading-worker-0/INFO] [mixin/]: Mixing core.MinecraftClientMixin from embeddium.mixins.json into net.minecraft.client.Minecraft
+[28Sep2025 13:01:24.626] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$postInit$0(Lnet/minecraft/client/gui/screens/Screen;)Lnet/minecraft/client/gui/screens/Screen; to mdb5d061$lambda$postInit$0$0 in embeddium.mixins.json:core.MinecraftClientMixin
+[28Sep2025 13:01:25.118] [modloading-worker-0/INFO] [mixin/]: Mixing MixinOptions_Entrypoint from mixins.oculus.json into net.minecraft.client.Options
+[28Sep2025 13:01:25.121] [modloading-worker-0/INFO] [mixin/]: Mixing MixinMaxFpsCrashFix from mixins.oculus.fixes.maxfpscrash.json into net.minecraft.client.Options
+[28Sep2025 13:01:25.122] [modloading-worker-0/WARN] [mixin/]: mixins.oculus.fixes.maxfpscrash.json:MixinMaxFpsCrashFix: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
+[28Sep2025 13:01:25.124] [modloading-worker-0/INFO] [mixin/]: Mixing sky.MixinOptions_CloudsOverride from mixins.oculus.json into net.minecraft.client.Options
+[28Sep2025 13:01:25.126] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$iris$overrideCloudsType$0(Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;Lnet/irisshaders/iris/pipeline/WorldRenderingPipeline;)V to mdb5d061$lambda$iris$overrideCloudsType$0$0 in mixins.oculus.json:sky.MixinOptions_CloudsOverride
+[28Sep2025 13:01:25.381] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.6, for MC 1.20.1 with MCP 20230612.114412
+[28Sep2025 13:01:25.387] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.6 Initialized
+[28Sep2025 13:01:25.477] [modloading-worker-0/INFO] [mixin/]: Mixing client.MultiPlayerGameModeMixin from rbh.mixins.json into net.minecraft.client.multiplayer.MultiPlayerGameMode
+[28Sep2025 13:01:25.538] [modloading-worker-0/INFO] [mixin/]: Mixing MixinTitleScreen from mixins.oculus.json into net.minecraft.client.gui.screens.TitleScreen
+[28Sep2025 13:01:25.637] [modloading-worker-0/INFO] [mixin/]: Mixing features.gui.screen.LevelLoadingScreenMixin from embeddium.mixins.json into net.minecraft.client.gui.screens.LevelLoadingScreen
+[28Sep2025 13:01:25.638] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$renderChunks$0(Lit/unimi/dsi/fastutil/objects/Object2IntMap$Entry;)V to mdb5d061$lambda$renderChunks$0$0 in embeddium.mixins.json:features.gui.screen.LevelLoadingScreenMixin
+[28Sep2025 13:01:25.968] [modloading-worker-0/INFO] [mixin/]: Mixing features.render.world.ClientLevelMixin from embeddium.mixins.json into net.minecraft.client.multiplayer.ClientLevel
+[28Sep2025 13:01:25.973] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$new$0(Lnet/minecraft/world/level/biome/AmbientParticleSettings;)V to mdb5d061$lambda$new$0$0 in embeddium.mixins.json:features.render.world.ClientLevelMixin
+[28Sep2025 13:01:26.002] [modloading-worker-0/INFO] [mixin/]: Mixing block_rendering.MixinClientLevel from mixins.oculus.vertexformat.json into net.minecraft.client.multiplayer.ClientLevel
+[28Sep2025 13:01:26.002] [modloading-worker-0/WARN] [mixin/]: mixins.oculus.vertexformat.json:block_rendering.MixinClientLevel: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_8 supports class version 52)
+[28Sep2025 13:01:26.004] [modloading-worker-0/INFO] [mixin/]: Mixing ClientLevelMixin from mixins.sodiumdynamiclights.json into net.minecraft.client.multiplayer.ClientLevel
+[28Sep2025 13:01:26.008] [modloading-worker-0/INFO] [mixin/]: Mixing core.world.biome.ClientWorldMixin from embeddium.mixins.json into net.minecraft.client.multiplayer.ClientLevel
+[28Sep2025 13:01:26.011] [modloading-worker-0/INFO] [mixin/]: Mixing core.world.map.ClientWorldMixin from embeddium.mixins.json into net.minecraft.client.multiplayer.ClientLevel
+[28Sep2025 13:01:26.250] [modloading-worker-0/INFO] [mixin/]: Mixing MixinRenderTarget from mixins.oculus.json into com.mojang.blaze3d.pipeline.RenderTarget
+[28Sep2025 13:01:26.255] [modloading-worker-0/INFO] [mixin/]: Mixing state_tracking.MixinRenderTarget from mixins.oculus.json into com.mojang.blaze3d.pipeline.RenderTarget
+[28Sep2025 13:01:26.256] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$iris$onBindFramebuffer$0(ZLnet/irisshaders/iris/pipeline/WorldRenderingPipeline;)V to mdb5d061$lambda$iris$onBindFramebuffer$0$0 in mixins.oculus.json:state_tracking.MixinRenderTarget
+[28Sep2025 13:01:26.352] [modloading-worker-0/INFO] [mixin/]: Mixing client.GuiMixin from rbh.mixins.json into net.minecraft.client.gui.Gui
+[28Sep2025 13:01:26.383] [modloading-worker-0/INFO] [mixin/]: Mixing gui.MixinGui from mixins.oculus.json into net.minecraft.client.gui.Gui
+[28Sep2025 13:01:26.386] [modloading-worker-0/INFO] [mixin/]: Mixing features.options.overlays.InGameHudMixin from embeddium.mixins.json into net.minecraft.client.gui.Gui
+[28Sep2025 13:01:26.482] [modloading-worker-0/INFO] [mixin/]: Mixing gui.MixinForgeGui from mixins.oculus.json into net.minecraftforge.client.gui.overlay.ForgeGui
+[28Sep2025 13:01:26.484] [modloading-worker-0/INFO] [mixin/]: Mixing features.render.gui.debug.ForgeGuiMixin from embeddium.mixins.json into net.minecraftforge.client.gui.overlay.ForgeGui
+[28Sep2025 13:01:26.485] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$renderLinesVanilla$0(Lme/jellysquid/mods/sodium/mixin/features/render/gui/debug/DebugScreenOverlayAccessor;Lnet/minecraft/client/gui/GuiGraphics;Ljava/util/ArrayList;Ljava/util/ArrayList;)V to mdb5d061$lambda$renderLinesVanilla$0$0 in embeddium.mixins.json:features.render.gui.debug.ForgeGuiMixin
+[28Sep2025 13:01:26.742] [modloading-worker-0/WARN] [software.bernie.geckolib.GeckoLib/]: Minecraft.getInstance() was null, could not register reload listeners
+[28Sep2025 13:01:26.742] [modloading-worker-0/ERROR] [Embeddium/]: Failed to update fingerprint
 java.lang.NullPointerException: Cannot invoke "net.minecraft.client.Minecraft.getUser()" because the return value of "net.minecraft.client.Minecraft.getInstance()" is null
 	at me.jellysquid.mods.sodium.client.data.fingerprint.FingerprintMeasure.create(FingerprintMeasure.java:19) ~[embeddium-908741-5681725_mapped_parchment_2023.08.06-1.20.1.jar%23193!/:?]
 	at me.jellysquid.mods.sodium.client.SodiumClientMod.updateFingerprint(SodiumClientMod.java:108) ~[embeddium-908741-5681725_mapped_parchment_2023.08.06-1.20.1.jar%23193!/:?]
@@ -186,36 +186,36 @@ java.lang.NullPointerException: Cannot invoke "net.minecraft.client.Minecraft.ge
 	at java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655) ~[?:?]
 	at java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622) ~[?:?]
 	at java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165) ~[?:?]
-[28Sep2025 12:25:00.465] [modloading-worker-0/INFO] [mixin/]: Mixing features.textures.animations.tracking.SpriteMixin from embeddium.mixins.json into net.minecraft.client.renderer.texture.TextureAtlasSprite
-[28Sep2025 12:25:00.534] [modloading-worker-0/WARN] [Embeddium-MixinTaintDetector/]: Mod(s) [sodiumoptionsapi, oculus] are modifying Embeddium class me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI, which may cause instability.
-[28Sep2025 12:25:00.535] [modloading-worker-0/INFO] [mixin/]: Mixing sodium.SodiumOptionsGuiMixin from mixins.sodiumoptionsapi.json into me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI
-[28Sep2025 12:25:00.539] [modloading-worker-0/INFO] [mixin/]: Mixing options.MixinSodiumOptionsGUI from mixins.oculus.compat.sodium.json into me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI
-[28Sep2025 12:25:00.666] [modloading-worker-0/INFO] [mixin/]: Mixing core.model.colors.ItemColorsMixin from embeddium.mixins.json into net.minecraft.client.color.item.ItemColors
-[28Sep2025 12:25:00.736] [modloading-worker-0/INFO] [mixin/]: Mixing core.model.colors.BlockColorsMixin from embeddium.mixins.json into net.minecraft.client.color.block.BlockColors
-[28Sep2025 12:25:00.904] [modloading-worker-0/INFO] [mixin/]: Mixing features.model.ModelDataMixin from embeddium.mixins.json into net.minecraftforge.client.model.data.ModelData
-[28Sep2025 12:25:00.926] [modloading-worker-0/INFO] [mixin/]: Mixing client.ShaderInstanceMixin from rbh.mixins.json into net.minecraft.client.renderer.ShaderInstance
-[28Sep2025 12:25:00.934] [modloading-worker-0/INFO] [mixin/]: Mixing MixinShaderInstance from mixins.oculus.json into net.minecraft.client.renderer.ShaderInstance
-[28Sep2025 12:25:00.953] [modloading-worker-0/INFO] [mixin/]: Mixing features.shader.uniform.ShaderProgramMixin from embeddium.mixins.json into net.minecraft.client.renderer.ShaderInstance
-[28Sep2025 12:25:01.251] [modloading-worker-0/INFO] [mixin/]: Mixing workarounds.context_creation.WindowMixin from embeddium.mixins.json into com.mojang.blaze3d.platform.Window
-[28Sep2025 12:25:01.286] [modloading-worker-0/INFO] [mixin/]: Mixing MixinWindow from mixins.oculus.json into com.mojang.blaze3d.platform.Window
-[28Sep2025 12:25:01.451] [modloading-worker-0/INFO] [mixin/]: Mixing features.textures.animations.tracking.DrawContextMixin from embeddium.mixins.json into net.minecraft.client.gui.GuiGraphics
-[28Sep2025 12:25:02.857] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1/forge-1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1-recomp.jar%23181!/assets/.mcassetsroot' uses unexpected schema
-[28Sep2025 12:25:02.859] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1/forge-1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1-recomp.jar%23181!/data/.mcassetsroot' uses unexpected schema
-[28Sep2025 12:25:03.270] [main/INFO] [mixin/]: Mixing texture.pbr.MixinDirectoryLister from mixins.oculus.json into net.minecraft.client.renderer.texture.atlas.sources.DirectoryLister
-[28Sep2025 12:25:03.272] [main/INFO] [mixin/]: Renaming synthetic method lambda$run$0(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/FileToIdConverter;Lnet/minecraft/client/renderer/texture/atlas/SpriteSource$Output;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/server/packs/resources/Resource;)V to mdd5611d$lambda$run$0$0 in mixins.oculus.json:texture.pbr.MixinDirectoryLister
-[28Sep2025 12:25:03.418] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[28Sep2025 12:25:03.426] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 6 ms
-[28Sep2025 12:25:03.426] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: rbh
-[28Sep2025 12:25:03.427] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: rbh finished after 0 ms
-[28Sep2025 12:25:03.427] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: rbh
-[28Sep2025 12:25:03.453] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: rbh finished after 25 ms
-[28Sep2025 12:25:03.454] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id rbh
-[28Sep2025 12:25:04.178] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id rbh finished after 724 ms
-[28Sep2025 12:25:04.179] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id rbh
-[28Sep2025 12:25:04.183] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id rbh finished after 3 ms
-[28Sep2025 12:25:04.183] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : rbh
-[28Sep2025 12:25:04.194] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : rbh finished after 10 ms
-[28Sep2025 12:25:04.194] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:point_of_interest_type mod id rbh
-[28Sep2025 12:25:04.226] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:point_of_interest_type mod id rbh finished after 31 ms
-[28Sep2025 12:25:04.227] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 809 ms
-[28Sep2025 12:25:04.239] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 4, old count: 0, new count: 5, removed stale: 0, written: 4
+[28Sep2025 13:01:26.751] [modloading-worker-0/INFO] [mixin/]: Mixing features.textures.animations.tracking.SpriteMixin from embeddium.mixins.json into net.minecraft.client.renderer.texture.TextureAtlasSprite
+[28Sep2025 13:01:26.803] [modloading-worker-0/WARN] [Embeddium-MixinTaintDetector/]: Mod(s) [sodiumoptionsapi, oculus] are modifying Embeddium class me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI, which may cause instability.
+[28Sep2025 13:01:26.804] [modloading-worker-0/INFO] [mixin/]: Mixing sodium.SodiumOptionsGuiMixin from mixins.sodiumoptionsapi.json into me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI
+[28Sep2025 13:01:26.807] [modloading-worker-0/INFO] [mixin/]: Mixing options.MixinSodiumOptionsGUI from mixins.oculus.compat.sodium.json into me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI
+[28Sep2025 13:01:26.911] [modloading-worker-0/INFO] [mixin/]: Mixing core.model.colors.ItemColorsMixin from embeddium.mixins.json into net.minecraft.client.color.item.ItemColors
+[28Sep2025 13:01:26.997] [modloading-worker-0/INFO] [mixin/]: Mixing core.model.colors.BlockColorsMixin from embeddium.mixins.json into net.minecraft.client.color.block.BlockColors
+[28Sep2025 13:01:27.098] [modloading-worker-0/INFO] [mixin/]: Mixing features.model.ModelDataMixin from embeddium.mixins.json into net.minecraftforge.client.model.data.ModelData
+[28Sep2025 13:01:27.125] [modloading-worker-0/INFO] [mixin/]: Mixing client.ShaderInstanceMixin from rbh.mixins.json into net.minecraft.client.renderer.ShaderInstance
+[28Sep2025 13:01:27.135] [modloading-worker-0/INFO] [mixin/]: Mixing MixinShaderInstance from mixins.oculus.json into net.minecraft.client.renderer.ShaderInstance
+[28Sep2025 13:01:27.158] [modloading-worker-0/INFO] [mixin/]: Mixing features.shader.uniform.ShaderProgramMixin from embeddium.mixins.json into net.minecraft.client.renderer.ShaderInstance
+[28Sep2025 13:01:27.515] [modloading-worker-0/INFO] [mixin/]: Mixing workarounds.context_creation.WindowMixin from embeddium.mixins.json into com.mojang.blaze3d.platform.Window
+[28Sep2025 13:01:27.563] [modloading-worker-0/INFO] [mixin/]: Mixing MixinWindow from mixins.oculus.json into com.mojang.blaze3d.platform.Window
+[28Sep2025 13:01:27.836] [modloading-worker-0/INFO] [mixin/]: Mixing features.textures.animations.tracking.DrawContextMixin from embeddium.mixins.json into net.minecraft.client.gui.GuiGraphics
+[28Sep2025 13:01:28.981] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1/forge-1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1-recomp.jar%23181!/assets/.mcassetsroot' uses unexpected schema
+[28Sep2025 13:01:28.982] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1/forge-1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1-recomp.jar%23181!/data/.mcassetsroot' uses unexpected schema
+[28Sep2025 13:01:29.375] [main/INFO] [mixin/]: Mixing texture.pbr.MixinDirectoryLister from mixins.oculus.json into net.minecraft.client.renderer.texture.atlas.sources.DirectoryLister
+[28Sep2025 13:01:29.376] [main/INFO] [mixin/]: Renaming synthetic method lambda$run$0(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/FileToIdConverter;Lnet/minecraft/client/renderer/texture/atlas/SpriteSource$Output;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/server/packs/resources/Resource;)V to mdb5d061$lambda$run$0$0 in mixins.oculus.json:texture.pbr.MixinDirectoryLister
+[28Sep2025 13:01:29.519] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[28Sep2025 13:01:29.631] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 111 ms
+[28Sep2025 13:01:29.632] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: rbh
+[28Sep2025 13:01:29.633] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: rbh finished after 0 ms
+[28Sep2025 13:01:29.633] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: rbh
+[28Sep2025 13:01:29.658] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: rbh finished after 25 ms
+[28Sep2025 13:01:29.659] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id rbh
+[28Sep2025 13:01:30.476] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id rbh finished after 817 ms
+[28Sep2025 13:01:30.477] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id rbh
+[28Sep2025 13:01:30.479] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id rbh finished after 2 ms
+[28Sep2025 13:01:30.480] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : rbh
+[28Sep2025 13:01:30.487] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : rbh finished after 7 ms
+[28Sep2025 13:01:30.487] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:point_of_interest_type mod id rbh
+[28Sep2025 13:01:30.518] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:point_of_interest_type mod id rbh finished after 30 ms
+[28Sep2025 13:01:30.519] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 1000 ms
+[28Sep2025 13:01:30.533] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 10, old count: 4, new count: 11, removed stale: 0, written: 6
