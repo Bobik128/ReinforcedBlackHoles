@@ -1,5 +1,6 @@
 package com.mod.rbh.items.renderer;
 
+import com.mod.rbh.client.RifleIcons;
 import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.items.SingularityRifle;
@@ -10,8 +11,11 @@ import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -29,6 +33,7 @@ import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.RenderUtils;
 
+import java.awt.*;
 import java.util.Objects;
 // TODO fix not rendering in hand when there is black hole
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
@@ -92,6 +97,9 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         }
 
         this.renderChildBones(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+
+        if (bone.getName().equals("monitor")) renderText(poseStack, bufferSource, 0xF000F0, packedOverlay, animatable);
+
         poseStack.popPose();
 
         if (FirearmDataUtils.getChargeLevel(currentItemStack) <= 0) return;
@@ -111,7 +119,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                 boolean shadersEnabled = ShaderCompat.shadersEnabled();
 
                 poseStack.pushPose();
-                if (!shadersEnabled) {
+                if (!shadersEnabled || !(renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)) {
                     poseStack.translate(0, 0.3125f, -0.421f);
                     poseStack.translate(bone.getPosX() / 16, bone.getPosY() / 16, bone.getPosZ() / 16);
                     PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
@@ -132,6 +140,78 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         if (bone.getName().toUpperCase().endsWith("_EMISSIVE")) {
             //TODO emmisive textures handling
         }
+    }
+
+    private void renderText(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int overlay, SingularityRifle animatable) {
+        Font font = Minecraft.getInstance().font;
+
+        poseStack.pushPose();
+        poseStack.translate(0, 0.43, 0.2);
+
+        poseStack.pushPose();
+        poseStack.translate(-0.011, 0, 0);
+
+        float fontScale = 0.0026f;
+        poseStack.scale(fontScale, -fontScale, fontScale);
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        font.drawInBatch(
+                Integer.toString(FirearmDataUtils.getChargeLevel(getCurrentItemStack())),
+                0, 0,
+                0xFFFFFF,
+                false,
+                poseStack.last().pose(),
+                bufferSource,
+                Font.DisplayMode.NORMAL,
+                0,
+                packedLight
+        );
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        poseStack.translate(-0.034, 0, 0);
+
+        float fontScale2 = 0.001f;
+        poseStack.scale(fontScale2, -fontScale2, fontScale2);
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        font.drawInBatch(
+                "eng.",
+                0, 0,
+                0xFFFFFF,
+                false,
+                poseStack.last().pose(),
+                bufferSource,
+                Font.DisplayMode.NORMAL,
+                0,
+                packedLight
+        );
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        poseStack.translate(-0.02, 0, 0.04);
+
+        float iconScale = 0.0022f;
+        poseStack.scale(iconScale, -iconScale, iconScale);
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        RifleIcons.drawColoredIcon(poseStack, bufferSource, packedLight, overlay, RifleIcons.Icons.QUARTER);
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        poseStack.translate(0.005, 0, 0.04);
+
+        poseStack.scale(iconScale, -iconScale, iconScale);
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+
+        RifleIcons.drawColoredIcon(poseStack, bufferSource, packedLight, overlay, RifleIcons.Icons.EMPTY);
+
+        poseStack.popPose();
+
+        poseStack.popPose();
     }
 
     public static boolean isGlowingPartStatic(String name) {
