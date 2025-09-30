@@ -15,7 +15,7 @@ public class RBHCreativeModeTab {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ReinforcedBlackHoles.MODID);
 
     public static final RegistryObject<CreativeModeTab> CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register("rbh.tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.DRAGON_EGG))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(RBHItems.SINGULARITY_BATTERY.get()))
                     .title(Component.translatable("rbh.creativetab.tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(RBHItems.SINGULARITY_RIFLE.get());

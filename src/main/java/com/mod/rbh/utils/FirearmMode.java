@@ -263,12 +263,12 @@ public class FirearmMode {
                         // change bat 2
                         FirearmDataUtils.setBattery2Energy(itemStack, engInBat);
                         SingularityBattery.setEnergy(itemInSlot, bat2);
-                        inventoryCarrier.displayClientMessage(Component.literal("bat 2 refilled"), true);
+                        inventoryCarrier.displayClientMessage(Component.literal("Battery 2 refilled"), true);
                     } else if (bat1 != SingularityBattery.MAX_ENERGY && engInBat > bat1) {
                         // change bat 1
                         FirearmDataUtils.setBattery1Energy(itemStack, engInBat);
                         SingularityBattery.setEnergy(itemInSlot, bat1);
-                        inventoryCarrier.displayClientMessage(Component.literal("bat 1 refilled"), true);
+                        inventoryCarrier.displayClientMessage(Component.literal("Battery 1 refilled"), true);
                     } else {
                         inventoryCarrier.displayClientMessage(Component.literal("No need for reload"), true);
                     }
