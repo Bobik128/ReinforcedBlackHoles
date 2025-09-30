@@ -3,6 +3,7 @@ package com.mod.rbh.items.renderer;
 import com.mod.rbh.client.RifleIcons;
 import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
+import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
@@ -197,7 +198,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         poseStack.scale(iconScale, -iconScale, iconScale);
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-        RifleIcons.drawColoredIcon(poseStack, bufferSource, packedLight, overlay, RifleIcons.Icons.QUARTER);
+        RifleIcons.drawColoredIcon(poseStack, bufferSource, packedLight, overlay, getIconForEnergy(FirearmDataUtils.getBattery1Energy(currentItemStack), SingularityBattery.MAX_ENERGY));
 
         poseStack.popPose();
 
@@ -207,11 +208,27 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         poseStack.scale(iconScale, -iconScale, iconScale);
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-        RifleIcons.drawColoredIcon(poseStack, bufferSource, packedLight, overlay, RifleIcons.Icons.EMPTY);
+        RifleIcons.drawColoredIcon(poseStack, bufferSource, packedLight, overlay, getIconForEnergy(FirearmDataUtils.getBattery2Energy(currentItemStack), SingularityBattery.MAX_ENERGY));
 
         poseStack.popPose();
 
         poseStack.popPose();
+    }
+
+    private static RifleIcons.Icons getIconForEnergy(int nowEnergy, int maxEnergy) {
+        float k = (float) nowEnergy / maxEnergy;
+
+        if (k == 0f) {
+            return RifleIcons.Icons.EMPTY;
+        } else if (k <= 0.25f) {
+            return RifleIcons.Icons.QUARTER;
+        } else if (k <= 0.5f) {
+            return RifleIcons.Icons.HALF;
+        } else if (k <= 0.75f) {
+            return RifleIcons.Icons.THREE_QUARTERS;
+        } else if (k <= 1f) {
+            return RifleIcons.Icons.FULL;
+        } else return RifleIcons.Icons.WARNING;
     }
 
     public static boolean isGlowingPartStatic(String name) {

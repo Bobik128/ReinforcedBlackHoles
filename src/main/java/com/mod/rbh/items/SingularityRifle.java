@@ -53,13 +53,16 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     public static float MAX_EFFECT_SIZE = 0.2f;
     public static int MAX_CHARGE_LEVEL = 100;
 
+    public static final ItemStack ammoItem = new ItemStack(RBHItems.SINGULARITY_BATTERY.get());
+
     public FirearmMode mode;
 
     public SingularityRifle(Properties pProperties) {
         super(pProperties.stacksTo(1));
         mode = new FirearmMode(8, 8, null, null,
                 5, 5, null, null, EQUIP_ANIM, UNEQUIP_ANIM,
-                5
+                5,
+                ammoItem
                 );
 
         SingletonGeoAnimatable.registerSyncedAnimatable(this);

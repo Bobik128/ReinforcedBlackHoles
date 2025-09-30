@@ -1,6 +1,7 @@
 package com.mod.rbh.utils;
 
 import com.mod.rbh.entity.BlackHole;
+import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
@@ -9,20 +10,22 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animation.RawAnimation;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FirearmMode {
+
+    private final ItemStack ammoItem;
 
     // Aiming
     public final int aimTime;
@@ -45,7 +48,7 @@ public class FirearmMode {
     protected final SoundEvent equipSound;
     @Nullable protected final SoundEvent unequipSound;
 
-    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound, RawAnimation equipAnim, RawAnimation unequipAnim, int runningTime) {
+    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound, RawAnimation equipAnim, RawAnimation unequipAnim, int runningTime, ItemStack ammo) {
         this.aimTime = aimTime;
         this.unaimTime = unaimTime;
         this.aimSound = aimSound;
@@ -59,6 +62,8 @@ public class FirearmMode {
         this.unequipAnim = unequipAnim;
 
         this.runningTime = runningTime;
+
+        this.ammoItem = ammo;
     }
 
     public boolean canAim(ItemStack itemStack, LivingEntity entity) {
@@ -185,7 +190,58 @@ public class FirearmMode {
 
     public void tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhaseType phaseType,
                                        boolean onInput, boolean firstReload) {
+        if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("ReloadKeyPressed"), false);
 
+        if (entity instanceof InventoryCarrier inventoryCarrier) {
+            boolean hasBattery = inventoryCarrier.getInventory().hasAnyOf(new HashSet<>(List.of(new Item[]{ammoItem.getItem()})));
+
+            if (!hasBattery) {
+                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("No Battery in your inventory"), true);
+            }
+
+            int bat1 = FirearmDataUtils.getBattery1Energy(itemStack);
+            int bat2 = FirearmDataUtils.getBattery2Energy(itemStack);
+
+            int slot = findMostChargedBatterySlot(inventoryCarrier);
+            ItemStack itemInSlot = inventoryCarrier.getInventory().getItem(slot);
+
+            if (!(itemInSlot.getItem() instanceof SingularityBattery)) return;
+
+            int engInBat = SingularityBattery.getEnergy(itemInSlot);
+
+            if (bat1 >= bat2 && bat2 != SingularityBattery.MAX_ENERGY && engInBat > bat2) {
+                // change bat 2
+                FirearmDataUtils.setBattery2Energy(itemStack, engInBat);
+                SingularityBattery.setEnergy(itemInSlot, bat2);
+                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("bat 2 refilled"), true);
+            } else if (bat1 != SingularityBattery.MAX_ENERGY && engInBat > bat1) {
+                // change bat 1
+                FirearmDataUtils.setBattery1Energy(itemStack, engInBat);
+                SingularityBattery.setEnergy(itemInSlot, bat1);
+                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("bat 1 refilled"), true);
+            } else {
+                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("No need for reload"), true);
+            }
+        }
+
+    }
+
+    public static int findMostChargedBatterySlot(InventoryCarrier player) {
+        int bestSlot = -1;
+        int bestEnergy = -1;
+
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof SingularityBattery) {
+                int energy = SingularityBattery.getEnergy(stack);
+                if (energy > bestEnergy) {
+                    bestEnergy = energy;
+                    bestSlot = i;
+                }
+            }
+        }
+
+        return bestSlot; // -1 if none found
     }
 
     public boolean isRunning(ItemStack itemStack, LivingEntity entity) {
@@ -234,8 +290,19 @@ public class FirearmMode {
                 int nowChargeLevel = FirearmDataUtils.getChargeLevel(itemStack);
 
                 if (nowChargeLevel < SingularityRifle.MAX_CHARGE_LEVEL) {
-                    FirearmDataUtils.setChargeLevel(itemStack, FirearmDataUtils.getChargeLevel(itemStack) + 1);
-                    if (entity instanceof Player plr)
+                    boolean bat1HasEnergy = FirearmDataUtils.getBattery1Energy(itemStack) > 0;
+                    boolean bat2HasEnergy = FirearmDataUtils.getBattery2Energy(itemStack) > 0;
+                    if (bat2HasEnergy) {
+                        FirearmDataUtils.setBattery2Energy(itemStack, FirearmDataUtils.getBattery2Energy(itemStack) - 1);
+                        FirearmDataUtils.setChargeLevel(itemStack, FirearmDataUtils.getChargeLevel(itemStack) + 1);
+
+                    } else if (bat1HasEnergy) {
+                        FirearmDataUtils.setBattery1Energy(itemStack, FirearmDataUtils.getBattery1Energy(itemStack) - 1);
+                        FirearmDataUtils.setChargeLevel(itemStack, FirearmDataUtils.getChargeLevel(itemStack) + 1);
+                    } else if (entity instanceof Player plr) {
+                        plr.displayClientMessage(Component.literal("No energy!"), true);
+                    }
+                    if (entity instanceof Player plr && (bat1HasEnergy || bat2HasEnergy))
                         plr.displayClientMessage(Component.literal("Rifle charge level is: " + FirearmDataUtils.getChargeLevel(itemStack)), true);
                 } else {
                     if (entity instanceof Player plr)
