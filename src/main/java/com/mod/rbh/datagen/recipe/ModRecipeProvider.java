@@ -43,13 +43,13 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, RBHItems.SINGULARITY_RIFLE.get())
                 .pattern("NA ")
                 .pattern("SES")
-                .pattern("Bs ")
+                .pattern("Bss")
                 .define('S', Items.NETHER_STAR)
                 .define('E', Items.DRAGON_EGG)
                 .define('N', Items.NETHERITE_INGOT)
                 .define('A', Items.AMETHYST_SHARD)
                 .define('B', Items.NETHERITE_BLOCK)
-                .define('s', Items.STICK)
+                .define('s', RBHItems.SINGULARITY_BATTERY_EMPTY.get())
                 .unlockedBy(getHasName(Items.DRAGON_EGG), has(Items.DRAGON_EGG))
                 .save(pWriter);
 

@@ -18,13 +18,13 @@
       "item": "minecraft:nether_star"
     },
     "s": {
-      "item": "minecraft:stick"
+      "item": "rbh:singularity_battery_empty"
     }
   },
   "pattern": [
     "NA ",
     "SES",
-    "Bs "
+    "Bss"
   ],
   "result": {
     "item": "rbh:singularity_rifle"
