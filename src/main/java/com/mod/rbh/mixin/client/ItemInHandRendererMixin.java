@@ -144,7 +144,8 @@ public abstract class ItemInHandRendererMixin {
         float frac1 = denom > 0 ? partialTicks / (float) denom : 0;
         float d = isRunning ? frac + frac1 : 1 - frac - frac1;
         d = Mth.clamp(d, 0f, 1f);
-        return 1.0f - d;
+        float k = 1.0f - d;
+        return (float)(-(Math.cos(Math.PI * k) - 1) / 2.0);
     }
 
     @Inject(method = "renderHandsWithItems",

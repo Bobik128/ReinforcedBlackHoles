@@ -5,6 +5,7 @@ import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -190,13 +191,11 @@ public class FirearmMode {
 
     public void tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhaseType phaseType,
                                        boolean onInput, boolean firstReload) {
-        if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("ReloadKeyPressed"), false);
-
-        if (entity instanceof InventoryCarrier inventoryCarrier) {
+        if (entity instanceof ServerPlayer inventoryCarrier) {
             boolean hasBattery = inventoryCarrier.getInventory().hasAnyOf(new HashSet<>(List.of(new Item[]{ammoItem.getItem()})));
 
             if (!hasBattery) {
-                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("No Battery in your inventory"), true);
+                inventoryCarrier.displayClientMessage(Component.literal("No Battery in your inventory"), true);
             }
 
             int bat1 = FirearmDataUtils.getBattery1Energy(itemStack);
@@ -205,7 +204,10 @@ public class FirearmMode {
             int slot = findMostChargedBatterySlot(inventoryCarrier);
             ItemStack itemInSlot = inventoryCarrier.getInventory().getItem(slot);
 
-            if (!(itemInSlot.getItem() instanceof SingularityBattery)) return;
+            if (!(itemInSlot.getItem() instanceof SingularityBattery)) {
+                inventoryCarrier.displayClientMessage(Component.literal("SlotMismatchError"), true);
+                return;
+            }
 
             int engInBat = SingularityBattery.getEnergy(itemInSlot);
 
@@ -213,20 +215,20 @@ public class FirearmMode {
                 // change bat 2
                 FirearmDataUtils.setBattery2Energy(itemStack, engInBat);
                 SingularityBattery.setEnergy(itemInSlot, bat2);
-                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("bat 2 refilled"), true);
+                inventoryCarrier.displayClientMessage(Component.literal("bat 2 refilled"), true);
             } else if (bat1 != SingularityBattery.MAX_ENERGY && engInBat > bat1) {
                 // change bat 1
                 FirearmDataUtils.setBattery1Energy(itemStack, engInBat);
                 SingularityBattery.setEnergy(itemInSlot, bat1);
-                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("bat 1 refilled"), true);
+                inventoryCarrier.displayClientMessage(Component.literal("bat 1 refilled"), true);
             } else {
-                if (entity instanceof Player plr) plr.displayClientMessage(Component.literal("No need for reload"), true);
+                inventoryCarrier.displayClientMessage(Component.literal("No need for reload"), true);
             }
         }
 
     }
 
-    public static int findMostChargedBatterySlot(InventoryCarrier player) {
+    public static int findMostChargedBatterySlot(Player player) {
         int bestSlot = -1;
         int bestEnergy = -1;
 

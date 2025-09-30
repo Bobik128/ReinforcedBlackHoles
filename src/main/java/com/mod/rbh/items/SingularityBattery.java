@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 public class SingularityBattery extends Item {
     public static final String ENERGY_TAG = "Energy";
-    public static final int MAX_ENERGY = 2000;
+    public static final int MAX_ENERGY = 600;
 
     public SingularityBattery(Properties props) {
         super(props.stacksTo(1)); // usually energy items don't stack
@@ -22,6 +22,9 @@ public class SingularityBattery extends Item {
     /* -------- NBT helpers -------- */
     public static int getEnergy(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
+        if (!tag.contains(ENERGY_TAG)) {
+            setEnergy(stack, MAX_ENERGY);
+        }
         return Math.max(0, Math.min(MAX_ENERGY, tag.getInt(ENERGY_TAG)));
     }
 

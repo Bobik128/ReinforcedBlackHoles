@@ -49,9 +49,9 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     private static final RawAnimation UNEQUIP_ANIM = RawAnimation.begin().thenPlay("animation.rifle.unequip");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public static float MAX_SIZE = 0.08f;
+    public static float MAX_SIZE = 0.075f;
     public static float MAX_EFFECT_SIZE = 0.2f;
-    public static int MAX_CHARGE_LEVEL = 100;
+    public static int MAX_CHARGE_LEVEL = 120;
 
     public static final ItemStack ammoItem = new ItemStack(RBHItems.SINGULARITY_BATTERY.get());
 
@@ -182,9 +182,6 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     @Override
     public boolean onPressAttackKey(ItemStack itemStack, LivingEntity entity) {
         FirearmDataUtils.setHoldingAttackKey(itemStack, true);
-        if (entity instanceof Player plr) {
-            plr.displayClientMessage(Component.literal("pressed attack key | client: " + entity.level().isClientSide), !entity.level().isClientSide);
-        }
 
         return true;
     }

@@ -14,7 +14,7 @@ public class RBHItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, ReinforcedBlackHoles.MODID);
 
     public static final RegistryObject<Item> SINGULARITY_BATTERY = ITEMS.register("singularity_battery",
-            () -> new SingularityBattery(new Item.Properties().stacksTo(16)));
+            () -> new SingularityBattery(new Item.Properties()));
 
     public static final RegistryObject<Item> SINGULARITY_BATTERY_EMPTY = ITEMS.register("singularity_battery_empty",
             () -> new Item(new Item.Properties().stacksTo(16)));
