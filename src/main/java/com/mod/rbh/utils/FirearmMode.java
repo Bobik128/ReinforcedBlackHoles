@@ -28,6 +28,8 @@ public class FirearmMode {
 
     private final ItemStack ammoItem;
 
+    public final int reloadTime;
+
     // Aiming
     public final int aimTime;
     public final int unaimTime;
@@ -49,7 +51,7 @@ public class FirearmMode {
     protected final SoundEvent equipSound;
     @Nullable protected final SoundEvent unequipSound;
 
-    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound, RawAnimation equipAnim, RawAnimation unequipAnim, int runningTime, ItemStack ammo) {
+    public FirearmMode(int aimTime, int unaimTime, @Nullable SoundEvent aimSound, @Nullable SoundEvent unaimSound, int equipTime, int unequipTime, @Nullable SoundEvent equipSound, @Nullable SoundEvent unequipSound, RawAnimation equipAnim, RawAnimation unequipAnim, int runningTime, ItemStack ammo, int relTime) {
         this.aimTime = aimTime;
         this.unaimTime = unaimTime;
         this.aimSound = aimSound;
@@ -63,6 +65,8 @@ public class FirearmMode {
         this.unequipAnim = unequipAnim;
 
         this.runningTime = runningTime;
+
+        this.reloadTime = relTime;
 
         this.ammoItem = ammo;
     }
@@ -192,40 +196,90 @@ public class FirearmMode {
     public void tryRunningReloadAction(ItemStack itemStack, LivingEntity entity, ReloadPhaseType phaseType,
                                        boolean onInput, boolean firstReload) {
         if (entity instanceof ServerPlayer inventoryCarrier) {
-            boolean hasBattery = inventoryCarrier.getInventory().hasAnyOf(new HashSet<>(List.of(new Item[]{ammoItem.getItem()})));
 
-            if (!hasBattery) {
-                inventoryCarrier.displayClientMessage(Component.literal("No Battery in your inventory"), true);
-            }
+            switch (phaseType) {
+                case PREPARE -> {
+                    if (Objects.equals(FirearmDataUtils.getAction(itemStack), SingularityRifle.Action.RELOAD)) return;
 
-            int bat1 = FirearmDataUtils.getBattery1Energy(itemStack);
-            int bat2 = FirearmDataUtils.getBattery2Energy(itemStack);
+                    boolean hasBattery = inventoryCarrier.getInventory().hasAnyOf(new HashSet<>(List.of(new Item[]{ammoItem.getItem()})));
+                    if (!hasBattery) {
+                        inventoryCarrier.displayClientMessage(Component.literal("No Battery in your inventory"), true);
+                        return;
+                    }
 
-            int slot = findMostChargedBatterySlot(inventoryCarrier);
-            ItemStack itemInSlot = inventoryCarrier.getInventory().getItem(slot);
+                    int bat1 = FirearmDataUtils.getBattery1Energy(itemStack);
+                    int bat2 = FirearmDataUtils.getBattery2Energy(itemStack);
 
-            if (!(itemInSlot.getItem() instanceof SingularityBattery)) {
-                inventoryCarrier.displayClientMessage(Component.literal("SlotMismatchError"), true);
-                return;
-            }
+                    int slot = findMostChargedBatterySlot(inventoryCarrier);
+                    ItemStack itemInSlot = inventoryCarrier.getInventory().getItem(slot);
 
-            int engInBat = SingularityBattery.getEnergy(itemInSlot);
+                    if (!(itemInSlot.getItem() instanceof SingularityBattery)) {
+                        inventoryCarrier.displayClientMessage(Component.literal("SlotMismatchError"), true);
+                        return;
+                    }
 
-            if (bat1 >= bat2 && bat2 != SingularityBattery.MAX_ENERGY && engInBat > bat2) {
-                // change bat 2
-                FirearmDataUtils.setBattery2Energy(itemStack, engInBat);
-                SingularityBattery.setEnergy(itemInSlot, bat2);
-                inventoryCarrier.displayClientMessage(Component.literal("bat 2 refilled"), true);
-            } else if (bat1 != SingularityBattery.MAX_ENERGY && engInBat > bat1) {
-                // change bat 1
-                FirearmDataUtils.setBattery1Energy(itemStack, engInBat);
-                SingularityBattery.setEnergy(itemInSlot, bat1);
-                inventoryCarrier.displayClientMessage(Component.literal("bat 1 refilled"), true);
-            } else {
-                inventoryCarrier.displayClientMessage(Component.literal("No need for reload"), true);
+                    int engInBat = SingularityBattery.getEnergy(itemInSlot);
+
+                    boolean reloading1 = false;
+                    if (bat1 < bat2 || bat2 == SingularityBattery.MAX_ENERGY || engInBat <= bat2) {
+                        if (bat1 != SingularityBattery.MAX_ENERGY && engInBat > bat1) {
+                            // change bat 1
+                            reloading1 = true;
+                        } else {
+                            inventoryCarrier.displayClientMessage(Component.literal("No need for reload"), true);
+                            return;
+                        }
+                    }
+
+                    FirearmDataUtils.setAction(itemStack, SingularityRifle.Action.RELOAD);
+                    FirearmDataUtils.setActionTime(itemStack, reloadTime);
+
+                    ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "reload", reloading1 ? "reload1" : "reload2");
+                }
+                case RELOAD -> {
+
+                }
+                case FINISH -> {
+                    boolean hasBattery = inventoryCarrier.getInventory().hasAnyOf(new HashSet<>(List.of(new Item[]{ammoItem.getItem()})));
+
+                    if (!hasBattery) {
+                        inventoryCarrier.displayClientMessage(Component.literal("No Battery in your inventory"), true);
+                    }
+
+                    int bat1 = FirearmDataUtils.getBattery1Energy(itemStack);
+                    int bat2 = FirearmDataUtils.getBattery2Energy(itemStack);
+
+                    int slot = findMostChargedBatterySlot(inventoryCarrier);
+                    ItemStack itemInSlot = inventoryCarrier.getInventory().getItem(slot);
+
+                    if (!(itemInSlot.getItem() instanceof SingularityBattery)) {
+                        inventoryCarrier.displayClientMessage(Component.literal("SlotMismatchError"), true);
+                        return;
+                    }
+
+                    int engInBat = SingularityBattery.getEnergy(itemInSlot);
+
+                    if (bat1 >= bat2 && bat2 != SingularityBattery.MAX_ENERGY && engInBat > bat2) {
+                        // change bat 2
+                        FirearmDataUtils.setBattery2Energy(itemStack, engInBat);
+                        SingularityBattery.setEnergy(itemInSlot, bat2);
+                        inventoryCarrier.displayClientMessage(Component.literal("bat 2 refilled"), true);
+                    } else if (bat1 != SingularityBattery.MAX_ENERGY && engInBat > bat1) {
+                        // change bat 1
+                        FirearmDataUtils.setBattery1Energy(itemStack, engInBat);
+                        SingularityBattery.setEnergy(itemInSlot, bat1);
+                        inventoryCarrier.displayClientMessage(Component.literal("bat 1 refilled"), true);
+                    } else {
+                        inventoryCarrier.displayClientMessage(Component.literal("No need for reload"), true);
+                    }
+
+                    FirearmDataUtils.setAction(itemStack, null);
+
+                    ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload1");
+                    ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload2");
+                }
             }
         }
-
     }
 
     public static int findMostChargedBatterySlot(Player player) {
@@ -259,12 +313,29 @@ public class FirearmMode {
             --aimingTime;
             this.setAimingTime(itemStack, entity, aimingTime);
         }
+
+        if (!isSelected && FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD) {
+            FirearmDataUtils.cancelReload(itemStack);
+            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload1");
+            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload2");
+        }
+
+        int actionTime = FirearmDataUtils.getActionTime(itemStack);
+        if (actionTime > 0) {
+            --actionTime;
+            if (FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD) {
+                tryRunningReloadAction(itemStack, entity, actionTime > 0 ? ReloadPhaseType.RELOAD : ReloadPhaseType.FINISH, false, false);
+            }
+            entity.setSprinting(false);
+            FirearmDataUtils.setActionTime(itemStack, actionTime);
+        }
+
         int equipTime = this.getEquipTime(itemStack, entity);
 
         if (equipTime > 0) {
             --equipTime;
             this.setEquipTime(itemStack, entity, equipTime);
-        } else if (entity.level() instanceof ClientLevel) {
+        } else if (entity.level() instanceof ClientLevel && FirearmDataUtils.getAction(itemStack) == null) {
             ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "move", "idle");
         }
 

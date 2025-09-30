@@ -27,16 +27,7 @@ public class FirearmDataUtils {
         }
     }
 
-    public static void cancelReload(ItemStack itemStack, CompoundTag tag) {
-        tag.remove("ReloadPhase");
-        tag.remove("ReloadPhaseIndex");
-        FirearmDataUtils.setAction(itemStack, null);
-        FirearmDataUtils.setActionTime(itemStack, 0);
-    }
-
-    public static void cancelUnload(ItemStack itemStack, CompoundTag tag) {
-        tag.remove("UnloadPhase");
-        tag.remove("UnloadPhaseIndex");
+    public static void cancelReload(ItemStack itemStack) {
         FirearmDataUtils.setAction(itemStack, null);
         FirearmDataUtils.setActionTime(itemStack, 0);
     }
