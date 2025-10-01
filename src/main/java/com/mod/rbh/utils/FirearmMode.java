@@ -1,6 +1,6 @@
 package com.mod.rbh.utils;
 
-import com.mod.rbh.entity.BlackHole;
+import com.mod.rbh.entity.BlackHoleProjectile;
 import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -11,7 +11,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -351,7 +350,7 @@ public class FirearmMode {
                 float modifier = (float) FirearmDataUtils.getChargeLevel(itemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
                 Vec3 lookVector = entity.getLookAngle();
 //                Vec3 additionalOffset = lookVector.multiply(0.5f, 0.5f, 0.5f);
-                BlackHole hole = new BlackHole(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier, ((SingularityRifle) itemStack.getItem()).shouldBeColorful(itemStack));
+                BlackHoleProjectile hole = new BlackHoleProjectile(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier, ((SingularityRifle) itemStack.getItem()).shouldBeColorful(itemStack));
                 entity.level().addFreshEntity(hole);
                 hole.shoot(lookVector.x, lookVector.y, lookVector.z, 2.2f, 0.01f);
                 FirearmDataUtils.setChargeLevel(itemStack, 0);

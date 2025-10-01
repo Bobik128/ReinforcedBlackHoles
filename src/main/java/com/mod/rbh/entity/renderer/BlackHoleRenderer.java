@@ -1,7 +1,7 @@
 package com.mod.rbh.entity.renderer;
 
 import com.mod.rbh.api.IGameRenderer;
-import com.mod.rbh.entity.BlackHole;
+import com.mod.rbh.entity.BlackHoleProjectile;
 import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import java.awt.*;
 import java.lang.Math;
 
-public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
+public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
     public static final ResourceLocation NETHERITE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/netherite_block.png");
     private static Logger LOGGER = LogUtils.getLogger();
 
@@ -36,13 +36,13 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
     }
 
     @Override
-    public void render(@NotNull BlackHole entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
+    public void render(@NotNull BlackHoleProjectile entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
         if (entity.effectInstance == null) return;
         renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize(), entity.shouldBeRainbow());
     }
 
     private static void uniformSetter(PostPass pass, Matrix4f normalProj, Vector3fc camRel, Vector2f screenPos,
-                               float radius, float holeRadius, float distFromCam, int color) {
+                               float radius, float holeRadius, float distFromCam, int color, float exponent) {
 
         // Extract RGBA from int color
         float a = ((color >> 24) & 0xFF) / 255f;
@@ -54,6 +54,9 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         float fov = (float) Math.toRadians(IGameRenderer.get().getFovPublic());
         float effectFraction = radius / ((float) Math.tan(fov * 0.5f) * distFromCam);
         float expScale = 1.0f / (float) (Math.exp(5.0) - 1.0);
+        float effectOffset = holeRadius / radius;
+
+        effectFraction *= radius * 3;
 
         // Set uniforms
         pass.getEffect().safeGetUniform("InverseProjection").set(new Matrix4f(normalProj).invert());
@@ -63,6 +66,8 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
         pass.getEffect().safeGetUniform("HoleColor").set(r, g, b, a);
         pass.getEffect().safeGetUniform("HoleRadius").set(holeRadius);
         pass.getEffect().safeGetUniform("Radius").set(radius);
+        pass.getEffect().safeGetUniform("Exponent").set(exponent);
+        pass.getEffect().safeGetUniform("EffectOffset").set(effectOffset);
         pass.getEffect().safeGetUniform("HoleRadius2").set(holeRadius * holeRadius);
         pass.getEffect().safeGetUniform("Radius2").set(radius * radius);
         pass.getEffect().safeGetUniform("EffectFraction").set(effectFraction);
@@ -175,7 +180,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
         effectInstance.uniformSetter = (pass) ->
                 uniformSetter(pass, preBobProjection, cameraRelativePos, screenPos,
-                        effectRadius, holeRadius, distFromCam, rainbow ? glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f) : 0xFFFFFF00);
+                        effectRadius, holeRadius, distFromCam, rainbow ? glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f) : 0xFFFFFF00, 4.0f);
 
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
@@ -186,7 +191,7 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHole> {
 
 
     @Override
-    public ResourceLocation getTextureLocation(BlackHole pEntity) {
+    public ResourceLocation getTextureLocation(BlackHoleProjectile pEntity) {
         return null;
     }
 

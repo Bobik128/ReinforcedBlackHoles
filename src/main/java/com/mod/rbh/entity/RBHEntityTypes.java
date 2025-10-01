@@ -13,10 +13,10 @@ public class RBHEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ReinforcedBlackHoles.MODID);
 
-    public static final RegistryObject<EntityType<BlackHole>> BLACK_HOLE =
-            ENTITY_TYPES.register("black_hole", () -> EntityType.Builder.<BlackHole>of(BlackHole::new, MobCategory.MISC)
+    public static final RegistryObject<EntityType<BlackHoleProjectile>> BLACK_HOLE =
+            ENTITY_TYPES.register("black_hole_projectile", () -> EntityType.Builder.<BlackHoleProjectile>of(BlackHoleProjectile::new, MobCategory.MISC)
                     .sized(0.2f, 0.2f)
-                    .build("black_hole"));
+                    .build("black_hole_projectile"));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

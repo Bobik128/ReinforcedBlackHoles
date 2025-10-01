@@ -11,6 +11,8 @@ uniform vec2 HoleScreenCenter;
 uniform vec4 HoleColor;
 uniform float HoleRadius;
 uniform float Radius;
+uniform float Exponent;
+uniform float EffectOffset;
 uniform mat4 InverseProjection;
 uniform float HoleRadius2; // HoleRadius^2 (precomputed)
 uniform float Radius2;     // Radius^2 (precomputed)
@@ -60,7 +62,7 @@ void main() {
 
             fragColor = vec4(HoleColor.rgb * fresnel, 1.0);
         } else {
-            vec4 hit2 = raycast(vec3(0.0), rd, HoleCenter, Radius2 + 0.01);
+            vec4 hit2 = raycast(vec3(0.0), rd, HoleCenter, Radius2 * 1.001);
             if (hit2.x == 1.0) {
                 vec3 hitPos = hit2.yzw;
                 vec3 N = normalize(hitPos - HoleCenter);// view-space normal
@@ -68,19 +70,25 @@ void main() {
 
                 if (dot(V, N) < 0.0) N = -N;// inside-sphere flip
 
-                float fresnel = pow(dot(V, N), 1.0);
-                float linearFresnel = 1.0 - acos(fresnel);
+//                float fresnel = pow(dot(V, N), 1.0);
+                // linear fresnel: 0 at edge, 1 at center
+                float fresnel = dot(V, N);
+                float r = sqrt(max(1.0 - fresnel * fresnel, 0.0));
+                float linearFresnel = 1.0 - r; // linear in radius
 
-                linearFresnel *= 1.0 + pow(HoleRadius / Radius, 1.1);
 
-                float k = 5.0;
-                float expFresnel = (exp(k*linearFresnel)-1.0)/(exp(k)-1.0);
+                //                float expFresnel = max(pow(linearFresnel, Exponent), 0);
+
+//                float expFresnel = max(pow( (linearFresnel - EffectOffset) / (1.0 - EffectOffset), Exponent), 0.0);
+//                float expFresnel = max(EffectOffset + ( (1.0 - EffectOffset) * pow(linearFresnel, Exponent) ), 0.0);
+                float expFresnel = max(pow(linearFresnel / (1 - EffectOffset), Exponent), 0.0);
 
                 vec2 dirVec = normalize(texCoord - HoleScreenCenter) * 0.4 * EffectFraction * expFresnel;
 
                 vec2 newCoord = vec2(dirVec + texCoord);
                 newCoord = clamp(newCoord, 0.0, 1.0);
                 fragColor = texture(MainSampler, newCoord);
+//                fragColor = vec4(expFresnel, max(0, expFresnel - 1.0), max(0, expFresnel - 2.0), 1.0);
             } else {
                 fragColor = vec4(0.0);
             }

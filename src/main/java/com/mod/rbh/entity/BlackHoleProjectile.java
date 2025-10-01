@@ -4,44 +4,35 @@ import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-public class BlackHole extends Projectile {
+public class BlackHoleProjectile extends Projectile {
     private static final EntityDataAccessor<Float> SIZE =
-            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+            SynchedEntityData.defineId(BlackHoleProjectile.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> EFFECT_SIZE =
-            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+            SynchedEntityData.defineId(BlackHoleProjectile.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> RAINBOW =
-            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.BOOLEAN);
+            SynchedEntityData.defineId(BlackHoleProjectile.class, EntityDataSerializers.BOOLEAN);
 
     public static final int RENDER_DISTANCE = 120;
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -51,19 +42,19 @@ public class BlackHole extends Projectile {
 
     @OnlyIn(Dist.CLIENT) public PostEffectRegistry.HoleEffectInstance effectInstance;
 
-    public BlackHole(Vec3 pos, Level level, float size, float effectSize) {
+    public BlackHoleProjectile(Vec3 pos, Level level, float size, float effectSize) {
         this(RBHEntityTypes.BLACK_HOLE.get(), level);
         this.setPos(pos);
         this.setSize(size);
         this.setEffectSize(effectSize);
     }
 
-    public BlackHole(Vec3 pos, Level level, float size, float effectSize, boolean rainbow) {
+    public BlackHoleProjectile(Vec3 pos, Level level, float size, float effectSize, boolean rainbow) {
         this(pos, level, size, effectSize);
         this.setRainbow(rainbow);
     }
 
-    public BlackHole(EntityType<? extends Projectile> pEntityType, Level pLevel) {
+    public BlackHoleProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         if (this.level().isClientSide) clientInit();
         this.setNoGravity(true);
@@ -87,7 +78,7 @@ public class BlackHole extends Projectile {
     @Override
     protected void defineSynchedData() {
         this.entityData.define(SIZE, 0.5f);
-        this.entityData.define(EFFECT_SIZE, 1.0f);
+        this.entityData.define(EFFECT_SIZE, 2.0f);
         this.entityData.define(RAINBOW, false);
     }
 
