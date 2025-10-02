@@ -26,7 +26,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
 
-public class BlackHoleProjectile extends Projectile {
+public class BlackHoleProjectile extends Projectile implements IBlackHole {
     private static final EntityDataAccessor<Float> SIZE =
             SynchedEntityData.defineId(BlackHoleProjectile.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> EFFECT_SIZE =
@@ -43,7 +43,7 @@ public class BlackHoleProjectile extends Projectile {
     @OnlyIn(Dist.CLIENT) public PostEffectRegistry.HoleEffectInstance effectInstance;
 
     public BlackHoleProjectile(Vec3 pos, Level level, float size, float effectSize) {
-        this(RBHEntityTypes.BLACK_HOLE.get(), level);
+        this(RBHEntityTypes.BLACK_HOLE_PROJECTILE.get(), level);
         this.setPos(pos);
         this.setSize(size);
         this.setEffectSize(effectSize);

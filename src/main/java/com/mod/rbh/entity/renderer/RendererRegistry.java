@@ -11,6 +11,6 @@ import net.minecraftforge.fml.common.Mod;
 public class RendererRegistry {
         @SubscribeEvent
         public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
-            event.registerEntityRenderer(RBHEntityTypes.BLACK_HOLE.get(), BlackHoleRenderer::new);
+            event.registerEntityRenderer(RBHEntityTypes.BLACK_HOLE_PROJECTILE.get(), BlackHoleRenderer::new);
         }
 }

@@ -1,0 +1,117 @@
+package com.mod.rbh.entity;
+
+import com.mod.rbh.shaders.PostEffectRegistry;
+import com.mojang.logging.LogUtils;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.slf4j.Logger;
+
+public abstract class BlackHole extends Entity implements IBlackHole {
+
+    private static final EntityDataAccessor<Float> SIZE =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> EFFECT_SIZE =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> RAINBOW =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.BOOLEAN);
+
+    public static final int RENDER_DISTANCE = 120;
+    public static final Logger LOGGER = LogUtils.getLogger();
+
+    @OnlyIn(Dist.CLIENT) public PostEffectRegistry.HoleEffectInstance effectInstance;
+
+    public BlackHole(Vec3 pos, Level level, float size, float effectSize, EntityType<? extends BlackHole> pEntityType) {
+        this(pEntityType, level);
+        this.setPos(pos);
+        this.setSize(size);
+        this.setEffectSize(effectSize);
+    }
+
+    public BlackHole(Vec3 pos, Level level, float size, float effectSize, boolean rainbow, EntityType<? extends BlackHole> pEntityType) {
+        this(pos, level, size, effectSize, pEntityType);
+        this.setRainbow(rainbow);
+    }
+
+    public BlackHole(EntityType<? extends BlackHole> pEntityType, Level pLevel) {
+        super(pEntityType, pLevel);
+        if (this.level().isClientSide) clientInit();
+        this.setNoGravity(true);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    void clientInit() {
+        effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
+    }
+
+    @Override
+    public boolean shouldRenderAtSqrDistance(double pDistance) {
+        return pDistance < RENDER_DISTANCE * RENDER_DISTANCE;
+    }
+
+    @Override
+    public boolean isNoGravity() {
+        return true;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        this.entityData.define(SIZE, 0.5f);
+        this.entityData.define(EFFECT_SIZE, 2.0f);
+        this.entityData.define(RAINBOW, false);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        tag.putFloat("Size", getSize());
+        tag.putFloat("EffectSize", getEffectSize());
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.contains("Size")) {
+            setSize(tag.getFloat("Size"));
+        }
+        if (tag.contains("EffectSize")) {
+            setEffectSize(tag.getFloat("EffectSize"));
+        }
+    }
+
+    /**
+     * Called to update the entity's position/logic.
+     */
+    public void tick() {
+        super.tick();
+    }
+
+    public void setSize(float value) {
+        this.entityData.set(SIZE, value);
+    }
+
+    public float getSize() {
+        return this.entityData.get(SIZE);
+    }
+
+    public void setEffectSize(float value) {
+        this.entityData.set(EFFECT_SIZE, value);
+    }
+
+    public float getEffectSize() {
+        return this.entityData.get(EFFECT_SIZE);
+    }
+
+    public void setRainbow(boolean value) {
+        this.entityData.set(RAINBOW, value);
+    }
+
+    public boolean shouldBeRainbow() {
+        return this.entityData.get(RAINBOW);
+    }
+}
