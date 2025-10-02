@@ -57,7 +57,7 @@ public class DyeRifleRecipe extends CustomRecipe {
     private static int rgbFromDye(ItemStack dyeStack) {
         // Vanilla dye → DyeColor
         DyeColor dc = DyeColor.getColor(dyeStack);
-        return (dc != null ? VANILLA_RGB.get(dc) : 0xFFFFFF);
+        return (dc != null ? dc.getTextColor() : 0xFFFFFF);
     }
 
     private static final Map<DyeColor,Integer> VANILLA_RGB = Map.ofEntries(
