@@ -20,6 +20,10 @@ public abstract class BlackHole extends Entity implements IBlackHole {
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> EFFECT_SIZE =
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> EFFECT_EXPONENT =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> COLOR =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> RAINBOW =
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.BOOLEAN);
 
@@ -65,6 +69,8 @@ public abstract class BlackHole extends Entity implements IBlackHole {
     protected void defineSynchedData() {
         this.entityData.define(SIZE, 0.5f);
         this.entityData.define(EFFECT_SIZE, 2.0f);
+        this.entityData.define(EFFECT_EXPONENT, 4.0f);
+        this.entityData.define(COLOR, 0xFFFF00);
         this.entityData.define(RAINBOW, false);
     }
 
@@ -75,6 +81,11 @@ public abstract class BlackHole extends Entity implements IBlackHole {
     }
 
     @Override
+    public PostEffectRegistry.HoleEffectInstance getEffectInstance() {
+        return effectInstance;
+    }
+
+    @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         if (tag.contains("Size")) {
             setSize(tag.getFloat("Size"));
@@ -82,13 +93,6 @@ public abstract class BlackHole extends Entity implements IBlackHole {
         if (tag.contains("EffectSize")) {
             setEffectSize(tag.getFloat("EffectSize"));
         }
-    }
-
-    /**
-     * Called to update the entity's position/logic.
-     */
-    public void tick() {
-        super.tick();
     }
 
     public void setSize(float value) {
@@ -105,6 +109,22 @@ public abstract class BlackHole extends Entity implements IBlackHole {
 
     public float getEffectSize() {
         return this.entityData.get(EFFECT_SIZE);
+    }
+
+    public void setEffectExponent(float value) {
+        this.entityData.set(EFFECT_EXPONENT, value);
+    }
+
+    public float getEffectExponent() {
+        return this.entityData.get(EFFECT_EXPONENT);
+    }
+
+    public void setColor(int value) {
+        this.entityData.set(COLOR, value);
+    }
+
+    public int getColor() {
+        return this.entityData.get(COLOR);
     }
 
     public void setRainbow(boolean value) {

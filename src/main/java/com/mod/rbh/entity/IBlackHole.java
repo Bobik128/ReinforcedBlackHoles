@@ -1,5 +1,6 @@
 package com.mod.rbh.entity;
 
+import com.mod.rbh.shaders.PostEffectRegistry;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -14,7 +15,17 @@ public interface IBlackHole {
 
     float getEffectSize();
 
+    void setEffectExponent(float value);
+
+    float getEffectExponent();
+
+    void setColor(int value);
+
+    int getColor();
+
     void setRainbow(boolean value);
 
     boolean shouldBeRainbow();
+
+    PostEffectRegistry.HoleEffectInstance getEffectInstance();
 }

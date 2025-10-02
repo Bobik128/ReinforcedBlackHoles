@@ -217,13 +217,17 @@ public class FirearmDataUtils {
         return itemStack.getOrCreateTag().getInt("ChargeLevel");
     }
 
-    public static void setStoredChargeLevel(ItemStack itemStack, int time) {
-        itemStack.getOrCreateTag().putInt("StoredChargeLevel", time);
+    public static void setColor(ItemStack itemStack, int time) {
+        itemStack.getOrCreateTag().putInt("Color", time);
     }
 
-    public static int getStoredChargeLevel(ItemStack itemStack) {
-        return itemStack.getOrCreateTag().getInt("StoredChargeLevel");
+    public static int getColor(ItemStack itemStack) {
+        if (!itemStack.getOrCreateTag().contains("Color")) {
+            return SingularityRifle.BASE_COLOR;
+        }
+        return itemStack.getOrCreateTag().getInt("Color");
     }
+
 
     private FirearmDataUtils() {
     }

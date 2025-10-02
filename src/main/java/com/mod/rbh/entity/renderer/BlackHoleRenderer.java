@@ -1,7 +1,9 @@
 package com.mod.rbh.entity.renderer;
 
 import com.mod.rbh.api.IGameRenderer;
+import com.mod.rbh.entity.BlackHole;
 import com.mod.rbh.entity.BlackHoleProjectile;
+import com.mod.rbh.entity.IBlackHole;
 import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
@@ -24,10 +26,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 
+import javax.swing.text.html.parser.Entity;
 import java.awt.*;
 import java.lang.Math;
 
-public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
+public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     public static final ResourceLocation NETHERITE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/netherite_block.png");
     private static Logger LOGGER = LogUtils.getLogger();
 
@@ -36,19 +39,18 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
     }
 
     @Override
-    public void render(@NotNull BlackHoleProjectile entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
-        if (entity.effectInstance == null) return;
-        renderBlackHole(poseStack, entity.effectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize(), entity.shouldBeRainbow());
+    public ResourceLocation getTextureLocation(@NotNull T pEntity) {
+        return null;
+    }
+
+    @Override
+    public void render(@NotNull T entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
+        if (entity.getEffectInstance() == null) return;
+        renderBlackHole(poseStack, entity.getEffectInstance(), PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize(), entity.shouldBeRainbow(), entity.getColor(), entity.getEffectExponent());
     }
 
     private static void uniformSetter(PostPass pass, Matrix4f normalProj, Vector3fc camRel, Vector2f screenPos,
-                               float radius, float holeRadius, float distFromCam, int color, float exponent) {
-
-        // Extract RGBA from int color
-        float a = ((color >> 24) & 0xFF) / 255f;
-        float r = ((color >> 16) & 0xFF) / 255f;
-        float g = ((color >> 8)  & 0xFF) / 255f;
-        float b = (color & 0xFF) / 255f;
+                               float radius, float holeRadius, float distFromCam, float r, float g, float b, float a, float exponent) {
 
         // Precompute constants
         float fov = (float) Math.toRadians(IGameRenderer.get().getFovPublic());
@@ -102,8 +104,15 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
             int pPackedLight,
             float effectRadius,
             float holeRadius,
-            boolean rainbow
+            boolean rainbow,
+            int color,
+            float effectExponent
     ) {
+        // Extract RGBA from int color
+        float r = (float) ((color >> 16) & 0xFF) / 255;
+        float g = (float) ((color >> 8) & 0xFF) / 255;
+        float b = (float) (color & 0xFF) / 255;
+
         FboGuard mainGuard = new FboGuard();
         mainGuard.save();
 
@@ -178,9 +187,19 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
             RenderSystem.defaultBlendFunc();
         });
 
+        if (rainbow) {
+            float[] rgb = glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f);
+            r = rgb[0];
+            g = rgb[1];
+            b = rgb[2];
+        }
+
+        float finalG = g;
+        float finalR = r;
+        float finalB = b;
         effectInstance.uniformSetter = (pass) ->
                 uniformSetter(pass, preBobProjection, cameraRelativePos, screenPos,
-                        effectRadius, holeRadius, distFromCam, rainbow ? glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f) : 0xFFFFFF00, 4.0f);
+                        effectRadius, holeRadius, distFromCam, finalR, finalG, finalB, 1f, 4.0f);
 
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
@@ -189,15 +208,8 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
         mainGuard.restore();
     }
 
-
-    @Override
-    public ResourceLocation getTextureLocation(BlackHoleProjectile pEntity) {
-        return null;
-    }
-
-    public static int glowColor(long nowMs, float cycleSeconds, float sat, float baseBright, float pulseSeconds) {
-        float tCycle = (nowMs % (long)(cycleSeconds * 1000f)) / (cycleSeconds * 1000f);
-        float hue = tCycle; // 0..1 wraps every cycleSeconds
+    public static float[] glowColor(long nowMs, float cycleSeconds, float sat, float baseBright, float pulseSeconds) {
+        float hue = (nowMs % (long)(cycleSeconds * 1000f)) / (cycleSeconds * 1000f); // 0..1 wraps every cycleSeconds
 
         float bright = baseBright;
         if (pulseSeconds > 0f) {
@@ -210,7 +222,13 @@ public class BlackHoleRenderer extends EntityRenderer<BlackHoleProjectile> {
 
         int rgb = Color.HSBtoRGB(hue, clamp01(sat), clamp01(bright));
         // force full alpha
-        return 0xFF000000 | (rgb & 0x00FFFFFF);
+        int hex = 0xFF000000 | (rgb & 0x00FFFFFF);
+
+        float r = (float) ((hex >> 16) & 0xFF) / 255;
+        float g = (float) ((hex >> 8) & 0xFF) / 255;
+        float b = (float) (hex & 0xFF) / 255;
+
+        return new float[]{r, g, b};
     }
 
     private static float clamp01(float v) { return Math.max(0f, Math.min(1f, v)); }

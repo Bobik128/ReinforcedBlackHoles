@@ -17,10 +17,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
@@ -51,6 +48,9 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     private static final RawAnimation RELOAD_BAT_1 = RawAnimation.begin().thenPlay("animation.rifle.reload_bat_1");
     private static final RawAnimation RELOAD_BAT_2 = RawAnimation.begin().thenPlay("animation.rifle.reload_bat_2");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+//    public static final int BASE_COLOR = 0x0A6EA5;
+    public static final int BASE_COLOR = 0xFF0000;
 
     public static float MAX_SIZE = 0.075f;
     public static float MAX_EFFECT_SIZE = 0.2f;

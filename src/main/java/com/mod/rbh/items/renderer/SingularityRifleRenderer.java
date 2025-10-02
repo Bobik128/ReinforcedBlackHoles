@@ -40,6 +40,7 @@ import java.util.Objects;
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
 
     private static boolean lastTimeShadersEnabled = false;
+    private int cachedColor = 0x000000;
 
     public SingularityRifleRenderer() {
         super(new SingularityRifleModel());
@@ -50,7 +51,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
     @Override
     public RenderType getRenderType(SingularityRifle animatable, ResourceLocation texture, @Nullable MultiBufferSource bufferSource, float partialTick) {
-        return RenderType.entityTranslucentCull(texture);
+        return RenderType.entityCutout(texture);
     }
 
     @Override
@@ -59,6 +60,8 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
         model.getBone("L_ARM").ifPresent(b -> b.setHidden(true));
         model.getBone("R_ARM").ifPresent(b -> b.setHidden(true));
+
+        cachedColor = FirearmDataUtils.getColor(currentItemStack);
     }
 
     public ItemDisplayContext getRenderPerspective() {return renderPerspective;}
@@ -71,6 +74,19 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
             Matrix4f poseState = new Matrix4f(poseStack.last().pose());
             bone.setModelSpaceMatrix(RenderUtils.invertAndMultiplyMatrices(poseState, this.modelRenderTranslations));
             bone.setLocalSpaceMatrix(RenderUtils.invertAndMultiplyMatrices(poseState, this.itemRenderTranslations));
+        }
+
+        if (isGlowingPart(bone.getName())) {
+            if (((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack)) {
+                float[] rgb = BlackHoleRenderer.glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f);
+                red = rgb[0];
+                green = rgb[1];
+                blue = rgb[2];
+            } else {
+                red = (float) ((cachedColor >> 16) & 0xFF) / 255;
+                green = (float) ((cachedColor >> 8) & 0xFF) / 255;
+                blue = (float) (cachedColor & 0xFF) / 255;
+            }
         }
 
         poseStack.pushPose();
@@ -125,7 +141,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                     poseStack.translate(bone.getPosX() / 16, bone.getPosY() / 16, bone.getPosZ() / 16);
                     PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
                     if (holeEffectInstance != null)
-                        BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack));
+                        BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
                 }
                 if (shadersEnabled && !lastTimeShadersEnabled) {
                     Minecraft.getInstance().player.displayClientMessage(Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
@@ -136,10 +152,6 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                 poseStack.popPose();
 
             }
-        }
-
-        if (bone.getName().toUpperCase().endsWith("_EMISSIVE")) {
-            //TODO emmisive textures handling
         }
     }
 
