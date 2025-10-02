@@ -6,6 +6,7 @@ import com.mod.rbh.items.RBHCreativeModeTab;
 import com.mod.rbh.items.RBHItems;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.network.RBHNetwork;
+import com.mod.rbh.recipe.RBHRecipes;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -43,6 +44,7 @@ public class ReinforcedBlackHoles
         RBHItems.register(modEventBus);
         RBHCreativeModeTab.register(modEventBus);
         RBHEntityTypes.register(modEventBus);
+        RBHRecipes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
