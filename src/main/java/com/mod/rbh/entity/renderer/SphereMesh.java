@@ -10,9 +10,7 @@ public class SphereMesh {
     public static void render(PoseStack poseStack, VertexConsumer buffer, float radius, int latBands, int longBands, int light, int overlay, boolean renderInverted) {
         poseStack.pushPose();
         PoseStack.Pose pose = poseStack.last();
-        if (renderInverted) {
-            pose.pose().rotate(pose.pose().getNormalizedRotation(chcedQuat).invert());
-        }
+        pose.pose().rotate(pose.pose().getNormalizedRotation(chcedQuat).invert());
 
         for (int latNumber = 0; latNumber < latBands; latNumber++) {
             float theta1 = (float) (Math.PI * latNumber / latBands);

@@ -17,9 +17,9 @@ public final class LightningRenderUtil {
     public static class Params {
         public int recursionDepth = 4;        // detail of the jaggedness
         public int platesAround   = 6;        // number of quads around axis
-        public float widthStart   = 0.10f;    // thickness at start
-        public float widthEnd     = 0.06f;    // thickness at end
-        public float displaceScale= 0.20f;    // how “wild” the offsets are
+        public float widthStart   = 0.05f;    // thickness at start
+        public float widthEnd     = 0.02f;    // thickness at end
+        public float displaceScale= 0.15f;    // how “wild” the offsets are
         public int r0=120,g0=180,b0=255,a0=220; // color/alpha at start
         public int r1=120,g1=220,b1=255,a1= 80; // color/alpha at end
         public long seed = 0L;                // stable per-bolt seed

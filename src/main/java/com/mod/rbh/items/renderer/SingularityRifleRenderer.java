@@ -5,37 +5,36 @@ import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
 import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
-import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import com.mod.rbh.utils.FirearmDataUtils;
+import com.mod.rbh.utils.LightningRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.RenderUtils;
 
 import java.awt.*;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 // TODO fix not rendering in hand when there is black hole
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
 
@@ -57,7 +56,6 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
     @Override
     public void preRender(PoseStack poseStack, SingularityRifle animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
-
         model.getBone("L_ARM").ifPresent(b -> b.setHidden(true));
         model.getBone("R_ARM").ifPresent(b -> b.setHidden(true));
 
@@ -257,5 +255,49 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         }
 
         return null;
+    }
+
+    @Override
+    public void postRender(PoseStack poseStack, SingularityRifle animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        super.postRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+
+        var p = new LightningRenderUtil.Params();
+        p.worldSpace = false;
+        p.seed = (System.nanoTime() >> 16);
+        p.recursionDepth = 2;
+
+        float k = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+        if (k <= 0) return;
+
+        p.widthStart = 0.03f * k;
+        p.widthEnd = 0.01f * k;
+
+        poseStack.pushPose();
+
+        Optional<GeoBone> bone = model.getBone("rifle");
+        bone.ifPresent((b) -> {
+            poseStack.translate((b.getPivotX() + b.getPosX()) / 16, (b.getPivotY() + b.getPosY()) / 16, (b.getPivotZ() + b.getPosZ()) / 16);
+            Quaternionf q = new Quaternionf();
+            q.rotationYXZ(b.getRotY(), b.getRotX(), b.getRotZ());
+            poseStack.mulPose(q);
+            poseStack.translate(-(b.getPivotX()) / 16, -(b.getPivotY()) / 16, -(b.getPivotZ()) / 16);
+        });
+
+        Vector3f start = new Vector3f();
+        Optional<GeoBone> bone1 = model.getBone("holeInjector");
+        bone1.ifPresent((b) -> {
+            start.set((b.getPivotX() + b.getPosX())/16, (b.getPivotY() + b.getPosY())/16, (b.getPivotZ() + b.getPosZ())/16);
+        });
+
+        Vector3f end = new Vector3f();
+        Optional<GeoBone> bone2 = model.getBone("blackHoleLocatorPre");
+        bone2.ifPresent((b) -> {
+            end.set((b.getPivotX() + b.getPosX())/16, (b.getPivotY() + b.getPosY())/16, (b.getPivotZ() + b.getPosZ())/16);
+        });
+
+        LightningRenderUtil.renderLightning(poseStack, bufferSource, new Vec3(start), new Vec3(end), p);
+        LightningRenderUtil.renderLightning(poseStack, bufferSource, new Vec3(start), new Vec3(end), p);
+
+        poseStack.popPose();
     }
 }

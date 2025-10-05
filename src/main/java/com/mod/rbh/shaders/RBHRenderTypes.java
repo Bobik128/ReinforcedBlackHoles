@@ -30,7 +30,7 @@ public class RBHRenderTypes extends RenderType {
                 DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true,
                 CompositeState.builder()
                         .setShaderState(RENDERTYPE_BLACK_HOLE_SHADER)
-                        .setCullState(RenderStateShard.CULL)
+                        .setCullState(RenderStateShard.NO_CULL)
                         .setTextureState(new TextureStateShard(tex, false, false))
                         .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                         .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
