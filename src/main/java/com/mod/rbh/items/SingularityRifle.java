@@ -49,8 +49,7 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
     private static final RawAnimation RELOAD_BAT_2 = RawAnimation.begin().thenPlay("animation.rifle.reload_bat_2");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-//    public static final int BASE_COLOR = 0x0A6EA5;
-    public static final int BASE_COLOR = 0xFF0000;
+    public static final int BASE_COLOR = 0x0A6EA5;
 
     public static float MAX_SIZE = 0.075f;
     public static float MAX_EFFECT_SIZE = 0.2f;
