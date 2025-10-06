@@ -1,5 +1,6 @@
 package com.mod.rbh.utils;
 
+import com.mod.rbh.ClientConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -8,9 +9,14 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 
 public final class LightningRenderUtil {
+
+    private static int lightningCounter = 0;
+    private static double lastRenderTime = 0.0;
 
     private LightningRenderUtil() {}
 
@@ -35,11 +41,23 @@ public final class LightningRenderUtil {
      * - worldSpace=true  -> provide world positions; we’ll subtract camera.
      * - worldSpace=false -> provide local/model positions; no camera offset.
      */
+    @OnlyIn(Dist.CLIENT)
     public static void renderLightning(PoseStack pose,
                                        MultiBufferSource buffers,
                                        Vec3 start, Vec3 end,
                                        Params p) {
         if (start == null || end == null) return;
+
+        long tick = Minecraft.getInstance().level.getGameTime();
+        float partialTick = Minecraft.getInstance().getPartialTick();
+        if (lastRenderTime < tick + partialTick) {
+            lastRenderTime = tick + partialTick;
+            lightningCounter = 0;
+        }
+
+        lightningCounter++;
+
+        if (lightningCounter > ClientConfig.maxLightningsRendering) return;
 
         pose.pushPose();
 

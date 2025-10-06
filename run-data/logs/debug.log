@@ -1030,7 +1030,7 @@ java.lang.NullPointerException: Cannot invoke "net.minecraft.client.Minecraft.ge
 [30Sep2025 20:09:18.935] [modloading-worker-0/DEBUG] [com.tterrag.registrate.AbstractRegistrate/REGISTRATE.REGISTER]: Captured registration for entry nixie_tube of type create:display_target
 [30Sep2025 20:09:18.941] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.config.ConfigTracker/CONFIG]: Config file rbh-common.toml for rbh tracking
 [30Sep2025 20:09:18.944] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Attempting to inject @EventBusSubscriber classes into the eventbus for rbh
-[30Sep2025 20:09:18.944] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing com.mod.rbh.CommonConfig to MOD
+[30Sep2025 20:09:18.944] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing com.mod.rbh.ClientConfig to MOD
 [30Sep2025 20:09:18.944] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing com.mod.rbh.entity.renderer.RendererRegistry to MOD
 [30Sep2025 20:09:18.945] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing com.mod.rbh.shaders.RBInternalShaders to MOD
 [30Sep2025 20:09:18.946] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing com.mod.rbh.ReinforcedBlackHoles$ClientModEvents to MOD

@@ -16,7 +16,8 @@
     "client.PlayerRendererMixin",
     "client.PostChainMixin",
     "client.PostPassMixin",
-    "client.ShaderInstanceMixin"
+    "client.ShaderInstanceMixin",
+    "client.ArrowRendererMixin"
   ],
   "server": [],
   "refmap": "rbh.refmap.json",

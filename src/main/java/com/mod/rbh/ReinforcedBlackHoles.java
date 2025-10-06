@@ -48,7 +48,7 @@ public class ReinforcedBlackHoles
 
         MinecraftForge.EVENT_BUS.register(this);
 
-        context.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC);
+        context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> RBHClientForge.init(modEventBus, forgeBus));
     }
