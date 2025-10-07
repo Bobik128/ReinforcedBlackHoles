@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 public abstract class BlackHole extends Entity implements IBlackHole {
@@ -22,6 +23,10 @@ public abstract class BlackHole extends Entity implements IBlackHole {
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> EFFECT_EXPONENT =
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> STRETCH_STRENGTH =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Vector3f> STRETCH_DIR =
+            SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> COLOR =
             SynchedEntityData.defineId(BlackHole.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> RAINBOW =
@@ -67,9 +72,11 @@ public abstract class BlackHole extends Entity implements IBlackHole {
 
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(SIZE, 0.5f);
-        this.entityData.define(EFFECT_SIZE, 2.0f);
-        this.entityData.define(EFFECT_EXPONENT, 4.0f);
+        this.entityData.define(SIZE, 0.4f);
+        this.entityData.define(EFFECT_SIZE, 1.0f);
+        this.entityData.define(EFFECT_EXPONENT, 3.6f);
+        this.entityData.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
+        this.entityData.define(STRETCH_STRENGTH, 1.7f);
         this.entityData.define(COLOR, 0xFFFF00);
         this.entityData.define(RAINBOW, false);
     }
@@ -117,6 +124,26 @@ public abstract class BlackHole extends Entity implements IBlackHole {
 
     public float getEffectExponent() {
         return this.entityData.get(EFFECT_EXPONENT);
+    }
+
+    @Override
+    public void setStretchStrength(float value) {
+        this.entityData.set(STRETCH_STRENGTH, value);
+    }
+
+    @Override
+    public float getStretchStrength() {
+        return this.entityData.get(STRETCH_STRENGTH);
+    }
+
+    @Override
+    public void setStretchDir(Vector3f value) {
+        this.entityData.set(STRETCH_DIR, value);
+    }
+
+    @Override
+    public Vector3f getStretchDir() {
+        return this.entityData.get(STRETCH_DIR);
     }
 
     public void setColor(int value) {
