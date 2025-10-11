@@ -76,7 +76,7 @@ public abstract class BlackHole extends Entity implements IBlackHole {
         this.entityData.define(EFFECT_SIZE, 1.0f);
         this.entityData.define(EFFECT_EXPONENT, 3.6f);
         this.entityData.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
-        this.entityData.define(STRETCH_STRENGTH, 1.7f);
+        this.entityData.define(STRETCH_STRENGTH, 0.0f);
         this.entityData.define(COLOR, 0xFFFF00);
         this.entityData.define(RAINBOW, false);
     }

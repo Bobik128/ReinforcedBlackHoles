@@ -4,11 +4,10 @@ import com.google.gson.JsonSyntaxException;
 import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.api.IPostChain;
 import com.mod.rbh.api.IPostPass;
+import com.mod.rbh.compat.ShaderCompat;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
@@ -31,6 +30,19 @@ public class PostEffectRegistry {
 
     private static final Map<ResourceLocation, PostEffect> postEffects = new HashMap<>();
     private static final Map<ResourceLocation, MutablePostEffect> mutablePostEffects = new HashMap<>();
+
+    private static double lastFrameTime = 0.0;
+
+    protected static void changeFrame() {
+        if (Minecraft.getInstance().level == null) return;
+        double nowFrame = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
+        if (nowFrame != lastFrameTime) {
+            lastFrameTime = nowFrame;
+            for (MutablePostEffect fx : mutablePostEffects.values()) {
+                fx.resetFrame();
+            }
+        }
+    }
 
     public static void clear() {
         for (PostEffect postEffect : postEffects.values())
@@ -124,12 +136,6 @@ public class PostEffectRegistry {
     }
 
     public static void blitEffects() {
-//        RenderSystem.enableBlend();
-//        RenderSystem.enableDepthTest();
-//        RenderSystem.blendFuncSeparate(
-//                GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE,
-//                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-
         for (PostEffect fx : postEffects.values()) {
             if (fx.postChain != null && fx.isEnabled()) {
 //                fx.getRenderTarget().blitToScreen(Minecraft.getInstance().getWindow().getWidth(),
@@ -145,10 +151,9 @@ public class PostEffectRegistry {
                 fx.wipe();
                 // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
                 fx.setEnabled(false);
+//                fx.passedOnce = false;
             }
         }
-        RenderSystem.disableBlend();
-        RenderSystem.defaultBlendFunc();
     }
 
     public static void clearAndBindWrite(RenderTarget mainTarget) {
@@ -158,6 +163,7 @@ public class PostEffectRegistry {
                 // REMOVE: mainTarget.bindWrite(false);
             }
         }
+        changeFrame();
     }
 
     public static void processEffects(RenderTarget mainTarget, float f, RenderPhase phase) {
@@ -171,9 +177,11 @@ public class PostEffectRegistry {
             }
             for (MutablePostEffect fx : mutablePostEffects.values()) {
                 if (fx.isEnabled() && fx.postChain != null) {
-                    fx.process(phase);
-                    if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
-                        fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                    if (true || !ShaderCompat.shadersEnabled()) {
+                        fx.process(phase);
+                        if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
+                            fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                    }
                 }
             }
         });
@@ -181,6 +189,8 @@ public class PostEffectRegistry {
 
     public static class MutablePostEffect extends PostEffect {
         protected final Map<HoleEffectInstance, Integer> holes = new HashMap<>();
+        public int ranTimeAfterLevel = 0;
+        public int ranTimeAfterArm = 0;
 
         public MutablePostEffect(PostChain postChain, boolean enabled) {
             super(postChain, null, enabled);
@@ -189,18 +199,6 @@ public class PostEffectRegistry {
         @Override
         public RenderTarget getRenderTarget() {
             return null;
-        }
-
-        public void blitAll() {
-//            holes.stream()
-//                    .sorted((a, b) -> Float.compare(b.dist, a.dist)) // furthest first
-//                    .forEach(entry -> {
-//                        entry.main.blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
-//                    });
-
-//            for (HoleEffectInstance hole : holes) {
-//                hole.main.blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
-//            }
         }
 
         @Override
@@ -213,6 +211,11 @@ public class PostEffectRegistry {
 
         private final List<HoleEffectInstance> toRemove = new ArrayList<>();
         public void process(RenderPhase phase) {
+            switch (phase) {
+                case AFTER_LEVEL -> ranTimeAfterLevel++;
+                case AFTER_ARM -> ranTimeAfterArm++;
+            }
+
             Map<HoleEffectInstance, Integer> resolvedPasses = new WeakHashMap<>();
             List<PostPass> passes = IPostChain.fromPostChain(this.postChain).getPostPasses();
             passes.clear();
@@ -264,6 +267,11 @@ public class PostEffectRegistry {
                 IPostPass.fromPostPass(hole.passes.get(0)).toRunOnProcess(hole.uniformSetter);
             }
             holes.put(hole, 4);
+        }
+
+        public void resetFrame() {
+            ranTimeAfterLevel = 0;
+            ranTimeAfterArm = 0;
         }
     }
 

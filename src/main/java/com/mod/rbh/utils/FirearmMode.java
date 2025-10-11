@@ -352,7 +352,7 @@ public class FirearmMode {
 //                Vec3 additionalOffset = lookVector.multiply(0.5f, 0.5f, 0.5f);
                 BlackHoleProjectile hole = new BlackHoleProjectile(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier, ((SingularityRifle) itemStack.getItem()).shouldBeColorful(itemStack));
                 entity.level().addFreshEntity(hole);
-                hole.shoot(lookVector.x, lookVector.y, lookVector.z, 2.2f, 0.01f);
+                hole.shoot(lookVector.x, lookVector.y, lookVector.z, 6.0f, 0.01f);
                 FirearmDataUtils.setChargeLevel(itemStack, 0);
             }
         }

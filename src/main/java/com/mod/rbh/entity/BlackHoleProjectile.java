@@ -1,5 +1,6 @@
 package com.mod.rbh.entity;
 
+import com.ibm.icu.impl.Pair;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mojang.logging.LogUtils;
@@ -26,6 +27,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
+
+import java.util.List;
 
 public class BlackHoleProjectile extends Projectile implements IBlackHole {
     private static final EntityDataAccessor<Float> SIZE =
@@ -89,7 +92,7 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
         this.entityData.define(SIZE, 0.5f);
         this.entityData.define(EFFECT_SIZE, 2.0f);
         this.entityData.define(EFFECT_EXPONENT, 4.0f);
-        this.entityData.define(STRETCH_DIR, new Vector3f());
+        this.entityData.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
         this.entityData.define(STRETCH_STRENGTH, 0.0f);
         this.entityData.define(COLOR, 0xFFFF00);
         this.entityData.define(RAINBOW, false);
@@ -115,18 +118,24 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
 
     @Override
     public boolean shouldRender(double pX, double pY, double pZ) {
-        return life > 2 && super.shouldRender(pX, pY, pZ);
+        return life > 1 && super.shouldRender(pX, pY, pZ);
     }
 
-    /**
-     * Called to update the entity's position/logic.
-     */
+    private Vec3 lastDeltaDir = new Vec3(1.0, 0.0, 0.0);
     public void tick() {
         super.tick();
 
         Vec3 vec33 = this.getDeltaMovement();
         this.move(MoverType.SELF, vec33);
         this.setDeltaMovement(vec33);
+
+        if (!this.level().isClientSide) {
+            if (!lastDeltaDir.equals(vec33)) {
+                this.setStretchDir(vec33.toVector3f().normalize());
+                this.setStretchStrength((float) vec33.length() * 3);
+            }
+            lastDeltaDir = vec33;
+        }
 
         HitResult hitresult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
         if (!this.noPhysics) {
@@ -233,6 +242,7 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
     @Override
     public void setStretchDir(Vector3f value) {
         this.entityData.set(STRETCH_DIR, value);
+
     }
 
     @Override

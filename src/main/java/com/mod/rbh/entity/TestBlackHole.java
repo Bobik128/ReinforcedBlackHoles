@@ -13,6 +13,11 @@ public class TestBlackHole extends BlackHole{
         super(pos, level, size, effectSize, rainbow, RBHEntityTypes.TEST_BLACK_HOLE.get());
     }
 
+    @Override
+    public boolean shouldRender(double pX, double pY, double pZ) {
+        return super.shouldRender(pX, pY, pZ);
+    }
+
     public TestBlackHole(EntityType<? extends BlackHole> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }

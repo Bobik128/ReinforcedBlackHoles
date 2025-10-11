@@ -30,7 +30,7 @@ import java.lang.Math;
 public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     public static final ResourceLocation NETHERITE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/netherite_block.png");
     private static Logger LOGGER = LogUtils.getLogger();
-    private static final Vector3f NEUTRAL_STRETCH_VEC = new Vector3f();
+    private static final Vector3f NEUTRAL_STRETCH_VEC = new Vector3f(1.0f, 0.0f, 0.0f);
 
     public BlackHoleRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
@@ -127,6 +127,10 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
             Vector3f stretchDir,
             float stretchStrength
     ) {
+        if (!stretchDir.isFinite()) {
+            stretchDir = new Vector3f(1.0f, 0.0f, 0.0f);
+            stretchStrength = 0.0f;
+        }
         // Extract RGBA from int color
         float r = (float) ((color >> 16) & 0xFF) / 255;
         float g = (float) ((color >> 8) & 0xFF) / 255;
@@ -172,6 +176,7 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         Vector3f stretchDirView = new Vector3f(stretchDir);
         stretchDirView.set(poseStack.last().pose().transformDirection(stretchDirView).normalize());
 
+        float finalStretchStrength = stretchStrength;
         effectInstance.setRenderFunc(() -> {
             effectInstance.dist = distFromCam;
 
@@ -187,13 +192,15 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
             BufferBuilder bb = new BufferBuilder(256 * 1024);
             MultiBufferSource.BufferSource local = MultiBufferSource.immediate(bb);
 
+
+
             RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);
             VertexConsumer vc = local.getBuffer(rt);
 
             SphereMesh.render(rawPoseStack, vc, effectRadius, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY, true,
-                    new Vector3f(stretchDirView), stretchStrength);
+                    new Vector3f(stretchDirView), finalStretchStrength);
             SphereMesh.render(rawPoseStack, vc, holeRadius,   8,  8, pPackedLight, OverlayTexture.NO_OVERLAY, true,
-                    new Vector3f(stretchDirView), stretchStrength);
+                    new Vector3f(stretchDirView), finalStretchStrength);
 
             local.endBatch();
 
@@ -228,7 +235,7 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         effectInstance.uniformSetter = (pass) ->
                 uniformSetter(pass, preBobProjection, cameraRelativePos, screenPos,
                         effectRadius, holeRadius, distFromCam, finalR, finalG, finalB, 1f, effectExponent,
-                        stretchDirView, stretchStrength);
+                        stretchDirView, finalStretchStrength);
 
 
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
