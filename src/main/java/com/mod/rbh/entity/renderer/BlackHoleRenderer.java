@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.*;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 
@@ -30,7 +31,7 @@ import java.lang.Math;
 public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     public static final ResourceLocation NETHERITE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/netherite_block.png");
     private static Logger LOGGER = LogUtils.getLogger();
-    private static final Vector3f NEUTRAL_STRETCH_VEC = new Vector3f(1.0f, 0.0f, 0.0f);
+    private static final Vector3f NEUTRAL_STRETCH_VEC = new Vector3f();
 
     public BlackHoleRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
@@ -44,14 +45,26 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     @Override
     public void render(@NotNull T entity, float pEntityYaw, float pPartialTick, @NotNull PoseStack poseStack, MultiBufferSource buffer, int pPackedLight) {
         if (entity.getEffectInstance() == null) return;
-        renderBlackHoleElliptical(poseStack, entity.getEffectInstance(), PostEffectRegistry.RenderPhase.AFTER_LEVEL, pPackedLight, entity.getEffectSize(), entity.getSize(), entity.shouldBeRainbow(), entity.getColor(), entity.getEffectExponent(), entity.getStretchDir(), entity.getStretchStrength());
+        renderBlackHoleElliptical(
+                poseStack,
+                entity.getEffectInstance(),
+                PostEffectRegistry.RenderPhase.AFTER_LEVEL,
+                pPackedLight,
+                entity.getEffectSize(),
+                entity.getSize(),
+                entity.shouldBeRainbow(),
+                entity.getColor(),
+                entity.getEffectExponent(),
+                entity.getStretchDir(),
+                entity.getStretchStrength()
+        );
     }
 
     private static void uniformSetter(PostPass pass, Matrix4f normalProj, Vector3fc camRel, Vector2f screenPos,
                                       float radius, float holeRadius, float distFromCam,
                                       float r, float g, float b, float a, float exponent,
                                       Vector3f stretchDirView, float stretchStrength) {
-        // Precompute constants
+
         float fov = (float) Math.toRadians(IGameRenderer.get().getFovPublic());
         float effectFraction = radius / ((float) Math.tan(fov * 0.5f) * distFromCam);
         float expScale = 1.0f / (float) (Math.exp(5.0) - 1.0);
@@ -59,7 +72,6 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
 
         effectFraction *= radius * 3;
 
-        // Set uniforms
         pass.getEffect().safeGetUniform("InverseProjection").set(new Matrix4f(normalProj).invert());
         pass.getEffect().safeGetUniform("Projection").set(normalProj);
 
@@ -80,24 +92,10 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     }
 
     private static Vector2f getScreenSpace(Vector3fc camRelPos, Matrix4f projMatrix) {
-        Vector4f pos4 = new Vector4f(
-                camRelPos.x(),
-                camRelPos.y(),
-                camRelPos.z(),
-                1.0f
-        );
-
-        pos4.mul(projMatrix);
-
-        // If behind camera, still produce coords but they will be flipped
-        float ndcX = pos4.x / pos4.w; // -1 to 1
-        float ndcY = pos4.y / pos4.w; // -1 to 1
-
-        // Normalize to 0–1
-        float normX = ndcX * 0.5f + 0.5f;
-        float normY = (ndcY * 0.5f + 0.5f);
-
-        return new Vector2f(normX, normY);
+        Vector4f pos4 = new Vector4f(camRelPos.x(), camRelPos.y(), camRelPos.z(), 1.0f).mul(projMatrix);
+        float ndcX = pos4.x / pos4.w;
+        float ndcY = pos4.y / pos4.w;
+        return new Vector2f(ndcX * 0.5f + 0.5f, ndcY * 0.5f + 0.5f);
     }
 
     public static void renderBlackHole(
@@ -127,11 +125,6 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
             Vector3f stretchDir,
             float stretchStrength
     ) {
-        if (!stretchDir.isFinite()) {
-            stretchDir = new Vector3f(1.0f, 0.0f, 0.0f);
-            stretchStrength = 0.0f;
-        }
-        // Extract RGBA from int color
         float r = (float) ((color >> 16) & 0xFF) / 255;
         float g = (float) ((color >> 8) & 0xFF) / 255;
         float b = (float) (color & 0xFF) / 255;
@@ -146,24 +139,19 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         RenderTarget finalTarget = holePostPass.inTarget;
         RenderTarget swapTarget = holePostPass.outTarget;
 
-        // ===== Save GL state =====
         RenderTarget mainTarget = Minecraft.getInstance().getMainRenderTarget();
 
-        // ===== Ensure correct target sizes (should be done on resize, not here) =====
         Window window = Minecraft.getInstance().getWindow();
         if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
             finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
             swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
         }
 
-        // ===== Prepare post-effect uniforms =====
-
         Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
 
         PoseStack rawPoseStack = new PoseStack();
         rawPoseStack.mulPoseMatrix(poseStack.last().pose());
 
-        // ===== Apply post effect without breaking rest of pipeline =====
         effectInstance.renderPhase = phase;
 
         Matrix4f preBobProjection = Minecraft.getInstance().gameRenderer.getProjectionMatrix(
@@ -176,44 +164,51 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         Vector3f stretchDirView = new Vector3f(stretchDir);
         stretchDirView.set(poseStack.last().pose().transformDirection(stretchDirView).normalize());
 
-        float finalStretchStrength = stretchStrength;
         effectInstance.setRenderFunc(() -> {
             effectInstance.dist = distFromCam;
 
             // --- Save current state ---
             int prevDrawFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
             int prevReadFbo = GL30.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
-            int prevFbo     = GL30.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING); // safety for packs using GL_FRAMEBUFFER
+            int prevFbo     = GL30.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
             int[] vp = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
             boolean hadScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
             int[] sc = new int[4]; if (hadScissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
+
+            // --- Begin occlusion query ---
+            int q = GL15.glGenQueries();
+            GL15.glBeginQuery(org.lwjgl.opengl.GL33.GL_ANY_SAMPLES_PASSED, q);
 
             // --- Draw spheres into your offscreen RT via RenderType ---
             BufferBuilder bb = new BufferBuilder(256 * 1024);
             MultiBufferSource.BufferSource local = MultiBufferSource.immediate(bb);
 
-
-
             RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);
             VertexConsumer vc = local.getBuffer(rt);
 
             SphereMesh.render(rawPoseStack, vc, effectRadius, 10, 10, pPackedLight, OverlayTexture.NO_OVERLAY, true,
-                    new Vector3f(stretchDirView), finalStretchStrength);
+                    new Vector3f(stretchDirView), stretchStrength);
             SphereMesh.render(rawPoseStack, vc, holeRadius,   8,  8, pPackedLight, OverlayTexture.NO_OVERLAY, true,
-                    new Vector3f(stretchDirView), finalStretchStrength);
+                    new Vector3f(stretchDirView), stretchStrength);
 
             local.endBatch();
+
+            // --- End occlusion query & read result (simple, may sync a bit) ---
+            GL15.glEndQuery(org.lwjgl.opengl.GL33.GL_ANY_SAMPLES_PASSED);
+            int[] result = new int[1];
+            GL15.glGetQueryObjectiv(q, GL15.GL_QUERY_RESULT, result);
+            effectInstance.drewPixelsThisFrame = (result[0] != 0);
+            GL15.glDeleteQueries(q);
 
             // --- Restore framebuffer and raster state exactly as found ---
             GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevDrawFbo);
             GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, prevReadFbo);
-            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, prevFbo); // belt & suspenders
+            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, prevFbo);
 
             GL11.glViewport(vp[0], vp[1], vp[2], vp[3]);
             if (hadScissor) { GL11.glEnable(GL11.GL_SCISSOR_TEST); GL11.glScissor(sc[0], sc[1], sc[2], sc[3]); }
             else GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-            // Re-assert vanilla-ish defaults expected by Iris hand pass
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(true);
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
@@ -223,48 +218,38 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
 
         if (rainbow) {
             float[] rgb = glowColor(System.currentTimeMillis(), 6.0f, 1.0f, 0.9f, 2.0f);
-            r = rgb[0];
-            g = rgb[1];
-            b = rgb[2];
+            r = rgb[0]; g = rgb[1]; b = rgb[2];
         }
+        final float finalR = r, finalG = g, finalB = b;
 
-        float finalG = g;
-        float finalR = r;
-        float finalB = b;
-
+        // Uniforms read after render(), so they see drewPixelsThisFrame from this frame
         effectInstance.uniformSetter = (pass) ->
                 uniformSetter(pass, preBobProjection, cameraRelativePos, screenPos,
                         effectRadius, holeRadius, distFromCam, finalR, finalG, finalB, 1f, effectExponent,
-                        stretchDirView, finalStretchStrength);
+                        stretchDirView, stretchStrength);
 
-
-        PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
-        PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
+        if (effectInstance.drewPixelsThisFrame) {
+            PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
+            PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
+        }
 
         mainTarget.bindWrite(true);
         mainGuard.restore();
     }
 
     public static float[] glowColor(long nowMs, float cycleSeconds, float sat, float baseBright, float pulseSeconds) {
-        float hue = (nowMs % (long)(cycleSeconds * 1000f)) / (cycleSeconds * 1000f); // 0..1 wraps every cycleSeconds
-
+        float hue = (nowMs % (long)(cycleSeconds * 1000f)) / (cycleSeconds * 1000f);
         float bright = baseBright;
         if (pulseSeconds > 0f) {
             double phase = (nowMs % (long)(pulseSeconds * 1000f)) / (pulseSeconds * 1000.0);
-            // pulse in [ -1, 1 ] -> remap to [0,1], then scale
             float pulse = (float)(0.5 + 0.5 * Math.sin(2.0 * Math.PI * phase));
-            // allow brightness to breathe around baseBright
             bright = clamp01(baseBright * 0.7f + pulse * baseBright * 0.3f);
         }
-
         int rgb = Color.HSBtoRGB(hue, clamp01(sat), clamp01(bright));
-        // force full alpha
         int hex = 0xFF000000 | (rgb & 0x00FFFFFF);
-
-        float r = (float) ((hex >> 16) & 0xFF) / 255;
-        float g = (float) ((hex >> 8) & 0xFF) / 255;
-        float b = (float) (hex & 0xFF) / 255;
-
+        float r = ((hex >> 16) & 0xFF) / 255f;
+        float g = ((hex >> 8) & 0xFF) / 255f;
+        float b = (hex & 0xFF) / 255f;
         return new float[]{r, g, b};
     }
 
