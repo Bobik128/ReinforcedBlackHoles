@@ -123,6 +123,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                             || renderPerspective == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
                             || renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
                             || renderPerspective == ItemDisplayContext.GROUND
+                            || renderPerspective == ItemDisplayContext.FIXED
             ) {
                 boolean isFirstPerson = renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                         || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;

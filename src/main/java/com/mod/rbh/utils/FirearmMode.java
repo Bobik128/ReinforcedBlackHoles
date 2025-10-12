@@ -5,6 +5,7 @@ import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -233,7 +234,12 @@ public class FirearmMode {
                     FirearmDataUtils.setAction(itemStack, SingularityRifle.Action.RELOAD);
                     FirearmDataUtils.setActionTime(itemStack, reloadTime);
 
-                    ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "reload", reloading1 ? "reload1" : "reload2");
+                    long id;
+                    if (entity.level() instanceof ServerLevel sl) {
+                        id = GeoItem.getOrAssignId(itemStack, sl);
+                    } else id = GeoItem.getId(itemStack);
+
+                    ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, id, "reload", reloading1 ? "reload1" : "reload2");
                 }
                 case RELOAD -> {
 
@@ -274,8 +280,12 @@ public class FirearmMode {
 
                     FirearmDataUtils.setAction(itemStack, null);
 
-                    ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload1");
-                    ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload2");
+                    long id;
+                    if (entity.level() instanceof ServerLevel sl) {
+                        id = GeoItem.getOrAssignId(itemStack, sl);
+                    } else id = GeoItem.getId(itemStack);
+                    ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload1");
+                    ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload2");
                 }
             }
         }
@@ -304,6 +314,9 @@ public class FirearmMode {
     }
 
     public void onTick(ItemStack itemStack, LivingEntity entity, boolean isSelected) {
+        if (entity.level() instanceof ServerLevel sl)
+            GeoItem.getOrAssignId(itemStack, sl);
+
         if (this.isAiming(itemStack, entity) && !this.canAim(itemStack, entity)) {
             this.stopAiming(itemStack, entity);
         }
@@ -314,9 +327,12 @@ public class FirearmMode {
         }
 
         if (!isSelected && FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD) {
-            FirearmDataUtils.cancelReload(itemStack);
-            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload1");
-            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "reload", "reload2");
+            FirearmDataUtils.cancelReload(itemStack);long id;
+            if (entity.level() instanceof ServerLevel sl) {
+                id = GeoItem.getOrAssignId(itemStack, sl);
+            } else id = GeoItem.getId(itemStack);
+            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload1");
+            ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload2");
         }
 
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
