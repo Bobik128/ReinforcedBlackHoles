@@ -3,6 +3,8 @@ package com.mod.rbh.utils;
 import com.mod.rbh.entity.BlackHoleProjectile;
 import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
+import com.mod.rbh.network.RBHNetwork;
+import com.mod.rbh.network.packet.ClientboundShootPacket;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -360,20 +362,21 @@ public class FirearmMode {
             this.setRTime(itemStack, entity, runningTime);
         }
 
-        if (FirearmDataUtils.isHoldingAttackKey(itemStack)) {
+        if (FirearmDataUtils.isHoldingAttackKey(itemStack) && !entity.level().isClientSide) {
             int power = FirearmDataUtils.getChargeLevel(itemStack);
             if (power != 0) {
                 float modifier = (float) FirearmDataUtils.getChargeLevel(itemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
                 Vec3 lookVector = entity.getLookAngle();
 //                Vec3 additionalOffset = lookVector.multiply(0.5f, 0.5f, 0.5f);
-                BlackHoleProjectile hole = new BlackHoleProjectile(entity.getEyePosition(), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier, ((SingularityRifle) itemStack.getItem()).shouldBeColorful(itemStack));
+                BlackHoleProjectile hole = new BlackHoleProjectile(entity.getEyePosition().add(entity.getLookAngle().scale(0.5f)), entity.level(), SingularityRifle.MAX_SIZE * modifier, SingularityRifle.MAX_EFFECT_SIZE * modifier, ((SingularityRifle) itemStack.getItem()).shouldBeColorful(itemStack));
                 entity.level().addFreshEntity(hole);
                 hole.shoot(lookVector.x, lookVector.y, lookVector.z, 6.0f, 0.01f);
+                if (entity.level() instanceof ServerLevel) RBHNetwork.sendToAllInDimension(new ClientboundShootPacket(GeoItem.getId(itemStack), FirearmDataUtils.getChargeLevel(itemStack)), entity.level());
                 FirearmDataUtils.setChargeLevel(itemStack, 0);
             }
         }
 
-        if (FirearmDataUtils.isCharging(itemStack) && !FirearmDataUtils.isHoldingAttackKey(itemStack)) {
+        if (FirearmDataUtils.isCharging(itemStack) && !FirearmDataUtils.isHoldingAttackKey(itemStack) && !entity.level().isClientSide) {
             if (isSelected) {
                 int nowChargeLevel = FirearmDataUtils.getChargeLevel(itemStack);
 

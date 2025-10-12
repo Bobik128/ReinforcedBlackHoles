@@ -1,5 +1,6 @@
 package com.mod.rbh.items.renderer;
 
+import com.ibm.icu.impl.Pair;
 import com.mod.rbh.client.RifleIcons;
 import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
@@ -20,6 +21,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -31,6 +33,8 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.RenderUtils;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 // TODO fix not rendering in hand when there is black hole
