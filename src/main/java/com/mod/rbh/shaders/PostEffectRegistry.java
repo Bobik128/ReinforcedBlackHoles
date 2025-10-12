@@ -282,7 +282,6 @@ public class PostEffectRegistry {
         public float dist;
         public RenderPhase renderPhase;
         private @Nullable Runnable renderFunc = () -> {};
-        public boolean drewPixelsThisFrame = false;
 
         private Matrix4f shaderOrthoMatrix;
         private int screenWidth;
