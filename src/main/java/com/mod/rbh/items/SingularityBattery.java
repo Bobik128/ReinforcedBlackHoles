@@ -1,5 +1,8 @@
 package com.mod.rbh.items;
 
+import com.mod.rbh.utils.FirearmDataUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -7,9 +10,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class SingularityBattery extends Item {
     public static final String ENERGY_TAG = "Energy";
@@ -26,6 +32,17 @@ public class SingularityBattery extends Item {
             setEnergy(stack, MAX_ENERGY);
         }
         return Math.max(0, Math.min(MAX_ENERGY, tag.getInt(ENERGY_TAG)));
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level pLevel, @NotNull List<Component> tooltip, @NotNull TooltipFlag pIsAdvanced) {
+
+        int chargeLevel = getEnergy(stack);
+
+        tooltip.add(Component.translatable("battery.charge_level")
+                .append(": ").withStyle(ChatFormatting.BLUE)
+                .append(Component.literal(chargeLevel + "/" + MAX_ENERGY).withStyle(ChatFormatting.WHITE)));
+
     }
 
     public static void setEnergy(ItemStack stack, int value) {

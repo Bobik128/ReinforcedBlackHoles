@@ -6,6 +6,7 @@ import com.mod.rbh.items.renderer.SingularityRifleRenderer;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.FirearmMode;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -83,6 +85,27 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
                 return this.renderer;
             }
         });
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level pLevel, @NotNull List<Component> tooltip, @NotNull TooltipFlag pIsAdvanced) {
+
+        int bat1Eng = FirearmDataUtils.getBattery1Energy(stack);
+        int bat2Eng = FirearmDataUtils.getBattery2Energy(stack);
+
+        int chargeLevel = FirearmDataUtils.getChargeLevel(stack);
+
+        tooltip.add(Component.translatable("rifle.charge_level")
+                .append(": ").withStyle(ChatFormatting.BLUE)
+                .append(Component.literal(chargeLevel + "/" + MAX_CHARGE_LEVEL).withStyle(ChatFormatting.WHITE)));
+
+        tooltip.add(Component.translatable("rifle.bat1_charge")
+                .append(": ").withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(bat1Eng + "/" + SingularityBattery.MAX_ENERGY).withStyle(ChatFormatting.WHITE)));
+
+        tooltip.add(Component.translatable("rifle.bat2_charge")
+                .append(": ").withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(bat2Eng + "/" + SingularityBattery.MAX_ENERGY).withStyle(ChatFormatting.WHITE)));
     }
 
     @Override

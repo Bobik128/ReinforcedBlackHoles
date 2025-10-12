@@ -4,5 +4,9 @@
 
   "item.rbh.singularity_rifle": "Singularity Rifle",
   "item.rbh.singularity_battery": "Singularity Battery",
-  "item.rbh.singularity_battery_empty": "Empty Singularity Battery"
+  "item.rbh.singularity_battery_empty": "Empty Singularity Battery",
+  "rifle.charge_level": "Charge level",
+  "rifle.bat1_charge": "Battery 1 power",
+  "rifle.bat2_charge": "Battery 2 power",
+  "battery.charge_level": "Power level"
 }
