@@ -18,8 +18,10 @@ import java.util.Map;
 
 public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifle> {
     private static final float MAX_ANGLE = 16.0f;
+    private static final float SHOOT_ANIM_DURATION = 8.0f;
+    private static final Map<Long, Pair<Double, Float>> shootTriggered = new HashMap<>(); // <item, <trigger tick, start modifier>>
+
     public SingularityRifleRenderer renderer;
-    private static final Map<Long, Pair<Double, Float>> shootTriggered = new HashMap<>(); // <item, <trigger tick, start angle>>
 
     public SingularityRifleModel() {
         super(ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID, "singularity_rifle"));
@@ -43,29 +45,31 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
             if (RifleShootAnimHelper.rifleShooting(stack) && Minecraft.getInstance().level != null) {
                 modifier = (float) RifleShootAnimHelper.getChargeLevel(stack) / SingularityRifle.MAX_CHARGE_LEVEL;
                 modifier = modifier * modifier;
-                angle = (float) Math.toRadians(modifier * MAX_ANGLE);
 
-                shootTriggered.put(stackId, Pair.of((double) (Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime()), angle));
+                shootTriggered.put(stackId, Pair.of((double) (Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime()), modifier));
                 RifleShootAnimHelper.remove(stack);
             } else {
                 modifier = (float) FirearmDataUtils.getChargeLevel(stack) / SingularityRifle.MAX_CHARGE_LEVEL;
                 modifier = modifier * modifier;
-                angle = (float) Math.toRadians(modifier * MAX_ANGLE);
             }
 
             if (shootTriggered.containsKey(stackId) && Minecraft.getInstance().level != null) {
                 double startTick = shootTriggered.get(stackId).first;
-                float startAngle = shootTriggered.get(stackId).second;
+                float modifier1 = shootTriggered.get(stackId).second;
 
                 double nowTick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
-                float customAngle = (float) (startAngle - (nowTick - startTick) * 0.001f) + 0.01f;
+                float linear = (float) ((nowTick - startTick) / SHOOT_ANIM_DURATION);
 
-                if (customAngle >= angle) {
-                    angle = customAngle;
+                float customModifier = (1.0f - overshootEaseOutPunchy(linear)) * modifier1;
+
+                if (customModifier >= modifier || (nowTick - startTick) <= 2) {
+                    modifier = customModifier;
                 } else {
                     shootTriggered.remove(stackId);
                 }
             }
+
+            angle = (float) Math.toRadians(modifier * MAX_ANGLE);
 
             lowerHinge.updateRotation(-angle, 0, 0);
             lowerHinge2.updateRotation(angle, 0, 0);
@@ -75,5 +79,22 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
 
             holeInjector.updatePosition(0, 0, modifier * 1);
         }
+    }
+
+    private static float overshootEaseOutPunchy(float x) {
+        x = Math.max(0f, Math.min(1f, x));
+        float s = 8.0f;
+
+        float easeInOvershoot = x * x * ((s + 1f) * x - s);
+        float easeOutSmooth = (float) Math.sin((x * Math.PI) / 2f);
+
+        // Sharper, quicker start — most motion happens early
+        float earlyKick = (float) Math.pow(x, 0.6f);
+        easeInOvershoot *= earlyKick;
+
+        // Later blend transition -> snappy start, smooth finish
+        float blend = (float) Math.pow(x, 1.0f);
+
+        return (1f - blend) * easeInOvershoot + blend * easeOutSmooth;
     }
 }
