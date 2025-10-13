@@ -49,6 +49,8 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
 
     private static final RawAnimation RELOAD_BAT_1 = RawAnimation.begin().thenPlay("animation.rifle.reload_bat_1");
     private static final RawAnimation RELOAD_BAT_2 = RawAnimation.begin().thenPlay("animation.rifle.reload_bat_2");
+
+    private static final RawAnimation SHOOT_ANIM = RawAnimation.begin().thenPlay("animation.rifle.shoot");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public static final int BASE_COLOR = 0x0A6EA5;
@@ -133,7 +135,12 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
         controllerRegistrar.add(
                 new AnimationController<>(this, "main", 0, (state) -> state.setAndContinue(IDLE_ANIM_SPIN)),
                 new AnimationController<>(this, "move", 0, (state) -> PlayState.STOP).triggerableAnim("equip", EQUIP_ANIM).triggerableAnim("unequip", UNEQUIP_ANIM).triggerableAnim("idle", IDLE_ANIM),
-                new AnimationController<>(this, "reload", 0, (state) -> PlayState.STOP).triggerableAnim("reload1", RELOAD_BAT_1).triggerableAnim("reload2", RELOAD_BAT_2)
+                new AnimationController<>(this, "reload", 0, (state) -> PlayState.STOP).triggerableAnim("reload1", RELOAD_BAT_1).triggerableAnim("reload2", RELOAD_BAT_2),
+                new AnimationController<>(this, "shoot", 0, (state) -> {
+                    if (state.getController().hasAnimationFinished())
+                        state.resetCurrentAnimation();
+                    return PlayState.STOP;
+                }).triggerableAnim("shoot", SHOOT_ANIM)
         );
     }
 

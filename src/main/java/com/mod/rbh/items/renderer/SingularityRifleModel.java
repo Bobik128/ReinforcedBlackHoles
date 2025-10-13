@@ -20,8 +20,8 @@ import java.util.Map;
 public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifle> {
     private static final float MAX_ANGLE = 16.0f;
     private static final float SHOOT_ANIM_DURATION = 8.0f;
-    private static final ShootAnimFunction.Compiled ease = new ShootAnimFunction.Compiled(0.81f, 0.96f, 0.99f, 0.48f, 1.8f);
-    private static final Map<Long, Pair<Double, Float>> shootTriggered = new HashMap<>(); // <item, <trigger tick, start modifier>>
+    private static final ShootAnimFunction.Compiled ease = new ShootAnimFunction.Compiled(0.81f, 0.96f, 0.99f, 0.72f, 1.8f);
+    public static final Map<Long, Pair<Double, Float>> shootTriggered = new HashMap<>(); // <item, <trigger tick, start modifier>>
 
     public SingularityRifleRenderer renderer;
 
@@ -46,10 +46,13 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
 
             if (RifleShootAnimHelper.rifleShooting(stack) && Minecraft.getInstance().level != null) {
                 modifier = (float) RifleShootAnimHelper.getChargeLevel(stack) / SingularityRifle.MAX_CHARGE_LEVEL;
-                modifier = modifier * modifier;
 
                 shootTriggered.put(stackId, Pair.of((double) (Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime()), modifier));
                 RifleShootAnimHelper.remove(stack);
+
+                modifier = modifier * modifier;
+
+                ((SingularityRifle) stack.getItem()).triggerAnim(Minecraft.getInstance().player, GeoItem.getId(stack), "shoot", "shoot");
             } else {
                 modifier = (float) FirearmDataUtils.getChargeLevel(stack) / SingularityRifle.MAX_CHARGE_LEVEL;
                 modifier = modifier * modifier;
@@ -57,7 +60,7 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
 
             if (shootTriggered.containsKey(stackId) && Minecraft.getInstance().level != null) {
                 double startTick = shootTriggered.get(stackId).first;
-                float modifier1 = shootTriggered.get(stackId).second;
+                float modifier1 = (float) Math.pow(shootTriggered.get(stackId).second, 2);
 
                 double nowTick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
                 float linear = (float) ((nowTick - startTick) / SHOOT_ANIM_DURATION);
@@ -81,5 +84,19 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
 
             holeInjector.updatePosition(0, 0, modifier * 1);
         }
+    }
+
+    /**
+     * Ease-out with overshoot (0..1 input -> 0..1+overshoot output)
+     *
+     * @param t Input time in range [0, 1]
+     * @param overshoot How much it overshoots beyond 1 (e.g. 1.2 for mild overshoot)
+     * @return Output value
+     */
+    public static float easeOutOvershoot(float t, float overshoot) {
+        t = Math.min(Math.max(t, 0f), 1f); // clamp between 0 and 1
+        float s = overshoot * 1.70158f; // overshoot factor
+        t = t - 1f;
+        return (t * t * ((s + 1f) * t + s) + 1f);
     }
 }

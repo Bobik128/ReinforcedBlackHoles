@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -36,6 +37,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.mod.rbh.items.renderer.SingularityRifleModel.shootTriggered;
 
 // TODO fix not rendering in hand when there is black hole
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
@@ -270,6 +273,16 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         p.recursionDepth = 2;
 
         float k = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+
+        long stackId = GeoItem.getId(currentItemStack);
+        if (shootTriggered.containsKey(stackId)) {
+            double startTick = shootTriggered.get(stackId).first;
+            float modifier1 = shootTriggered.get(stackId).second;
+
+            double nowTick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
+            if (nowTick - startTick < 3) k = modifier1;
+        }
+
         if (k <= 0) return;
 
         p.widthStart = 0.03f * k;

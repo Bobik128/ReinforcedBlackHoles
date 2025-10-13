@@ -37,7 +37,8 @@
 							"vector": [0, 0, 0]
 						},
 						"1.0": {
-							"vector": [357.5, 0, 0]
+							"vector": [357.5, 0, 0],
+							"easing": "linear"
 						}
 					}
 				}
@@ -73,6 +74,64 @@
 		},
 		"animation.rifle.idle": {
 			"animation_length": 0.0417
+		},
+		"animation.rifle.shoot": {
+			"animation_length": 0.3333,
+			"bones": {
+				"rifle": {
+					"rotation": {
+						"0.0417": {
+							"vector": [0, 0, 0]
+						},
+						"0.2083": {
+							"vector": [-5, 0, 0],
+							"easing": "easeOutBack"
+						},
+						"0.3333": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.1667": {
+							"vector": [0, 0, 3],
+							"easing": "easeOutBack"
+						},
+						"0.3333": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"blackHoleLocatorPre": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.0417": {
+							"vector": [0, -0.03, -8.34]
+						},
+						"0.0833": {
+							"vector": [0, -2.06, -16.67]
+						},
+						"0.125": {
+							"vector": [0, -3.47, -25.01]
+						},
+						"0.1667": {
+							"vector": [0, -3.96, -33.34]
+						},
+						"0.2083": {
+							"vector": [0, -4.33, -41.67]
+						},
+						"0.25": {
+							"vector": [0, -4, -50]
+						}
+					}
+				}
+			}
 		},
 		"animation.rifle.reload_bat_1": {
 			"animation_length": 3,
