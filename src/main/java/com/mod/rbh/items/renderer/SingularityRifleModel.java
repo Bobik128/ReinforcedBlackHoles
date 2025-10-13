@@ -5,6 +5,7 @@ import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.client.RifleShootAnimHelper;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.utils.FirearmDataUtils;
+import com.mod.rbh.utils.math.ShootAnimFunction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifle> {
     private static final float MAX_ANGLE = 16.0f;
     private static final float SHOOT_ANIM_DURATION = 8.0f;
+    private static final ShootAnimFunction.Compiled ease = new ShootAnimFunction.Compiled(0.81f, 0.96f, 0.99f, 0.48f, 1.8f);
     private static final Map<Long, Pair<Double, Float>> shootTriggered = new HashMap<>(); // <item, <trigger tick, start modifier>>
 
     public SingularityRifleRenderer renderer;
@@ -60,7 +62,7 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
                 double nowTick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
                 float linear = (float) ((nowTick - startTick) / SHOOT_ANIM_DURATION);
 
-                float customModifier = (1.0f - overshootEaseOutPunchy(linear)) * modifier1;
+                float customModifier = (1.0f - ease.value(linear)) * modifier1;
 
                 if (customModifier >= modifier || (nowTick - startTick) <= 2) {
                     modifier = customModifier;
@@ -79,22 +81,5 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
 
             holeInjector.updatePosition(0, 0, modifier * 1);
         }
-    }
-
-    private static float overshootEaseOutPunchy(float x) {
-        x = Math.max(0f, Math.min(1f, x));
-        float s = 8.0f;
-
-        float easeInOvershoot = x * x * ((s + 1f) * x - s);
-        float easeOutSmooth = (float) Math.sin((x * Math.PI) / 2f);
-
-        // Sharper, quicker start — most motion happens early
-        float earlyKick = (float) Math.pow(x, 0.6f);
-        easeInOvershoot *= earlyKick;
-
-        // Later blend transition -> snappy start, smooth finish
-        float blend = (float) Math.pow(x, 1.0f);
-
-        return (1f - blend) * easeInOvershoot + blend * easeOutSmooth;
     }
 }
