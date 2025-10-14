@@ -85,18 +85,4 @@ public class SingularityRifleModel extends DefaultedItemGeoModel<SingularityRifl
             holeInjector.updatePosition(0, 0, modifier * 1);
         }
     }
-
-    /**
-     * Ease-out with overshoot (0..1 input -> 0..1+overshoot output)
-     *
-     * @param t Input time in range [0, 1]
-     * @param overshoot How much it overshoots beyond 1 (e.g. 1.2 for mild overshoot)
-     * @return Output value
-     */
-    public static float easeOutOvershoot(float t, float overshoot) {
-        t = Math.min(Math.max(t, 0f), 1f); // clamp between 0 and 1
-        float s = overshoot * 1.70158f; // overshoot factor
-        t = t - 1f;
-        return (t * t * ((s + 1f) * t + s) + 1f);
-    }
 }

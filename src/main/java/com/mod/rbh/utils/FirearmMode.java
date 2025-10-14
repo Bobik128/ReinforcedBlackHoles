@@ -315,6 +315,10 @@ public class FirearmMode {
         return entity.isSprinting();
     }
 
+    public static float getVolume(ItemStack stack) {
+        return (float) FirearmDataUtils.getChargeLevel(stack) / SingularityRifle.MAX_CHARGE_LEVEL;
+    }
+
     public void onTick(ItemStack itemStack, LivingEntity entity, boolean isSelected) {
         if (entity.level() instanceof ServerLevel sl)
             GeoItem.getOrAssignId(itemStack, sl);

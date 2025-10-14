@@ -2,8 +2,10 @@ package com.mod.rbh.entity;
 
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.entity.ItemEntity.SingularityRifleItemEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -22,6 +24,13 @@ public class RBHEntityTypes {
             ENTITY_TYPES.register("test_black_hole", () -> EntityType.Builder.<TestBlackHole>of(TestBlackHole::new, MobCategory.MISC)
                     .sized(0.2f, 0.2f)
                     .build("test_black_hole"));
+
+    public static final RegistryObject<EntityType<SingularityRifleItemEntity>> RIFLE_ITEM =
+            ENTITY_TYPES.register("rifle_item", () -> EntityType.Builder.<SingularityRifleItemEntity>of(SingularityRifleItemEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(6)
+                    .updateInterval(20)
+                    .build("rifle_item"));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

@@ -2,6 +2,7 @@ package com.mod.rbh.items;
 
 import com.mod.rbh.api.FovModifyingItem;
 import com.mod.rbh.api.HoldAttackKeyInteraction;
+import com.mod.rbh.entity.ItemEntity.SingularityRifleItemEntity;
 import com.mod.rbh.items.renderer.SingularityRifleRenderer;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.utils.FirearmDataUtils;
@@ -17,6 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
@@ -124,6 +126,18 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
 
         if (entity instanceof LivingEntity living)
             this.mode.onTick(itemStack, living, isSelected);
+    }
+
+    @Override
+    public boolean hasCustomEntity(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public @Nullable Entity createEntity(Level level, Entity location, ItemStack stack) {
+        if (location instanceof ItemEntity e)
+            return new SingularityRifleItemEntity(e);
+        return null;
     }
 
     public boolean isEquiped(ItemStack stack, LivingEntity entity) {

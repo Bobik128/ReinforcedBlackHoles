@@ -3,6 +3,7 @@ package com.mod.rbh;
 import com.mod.rbh.client.RifleShootAnimHelper;
 import com.mod.rbh.items.renderer.ExtendedRifleItemRenderer;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
+import com.mod.rbh.sound.ClientSoundHandler;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
@@ -55,5 +56,6 @@ public class RBHClientForge {
         ExtendedRifleItemRenderer.tick();
         if (event.phase == TickEvent.Phase.START)
             RifleShootAnimHelper.tick();
+        ClientSoundHandler.onClientTick(event);
     }
 }

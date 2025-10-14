@@ -1,0 +1,20 @@
+{
+  "electric_buzz": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "rbh:electric_buzz",
+        "stream": true
+      }
+    ]
+  },
+  "electric_buzz_mono": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "rbh:electric_buzz_mono",
+        "stream": true
+      }
+    ]
+  }
+}
