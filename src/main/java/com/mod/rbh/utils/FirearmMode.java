@@ -5,7 +5,11 @@ import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.network.RBHNetwork;
 import com.mod.rbh.network.packet.ClientboundShootPacket;
+import com.mod.rbh.sound.EntityBoundSound;
+import com.mod.rbh.sound.RBHSounds;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.sounds.EntityBoundSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +22,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animation.RawAnimation;
 
@@ -27,6 +33,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FirearmMode {
+    @OnlyIn(Dist.CLIENT)
+    private static final HashMap<Long, EntityBoundSound> reloadSounds = new HashMap<>();
 
     private final ItemStack ammoItem;
 
@@ -332,23 +340,37 @@ public class FirearmMode {
             this.setAimingTime(itemStack, entity, aimingTime);
         }
 
+        long id = GeoItem.getId(itemStack);
         if (!isSelected && FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD) {
-            FirearmDataUtils.cancelReload(itemStack);long id;
+            FirearmDataUtils.cancelReload(itemStack);
             if (entity.level() instanceof ServerLevel sl) {
                 id = GeoItem.getOrAssignId(itemStack, sl);
             } else id = GeoItem.getId(itemStack);
             ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload1");
             ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload2");
+            if (entity.level().isClientSide && reloadSounds.get(id) != null) {
+                reloadSounds.get(id).remove();
+                reloadSounds.remove(id);
+            }
         }
+        if (reloadSounds.get(id) != null && reloadSounds.get(id).isStopped()) reloadSounds.remove(id);
 
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
         if (actionTime > 0) {
             --actionTime;
             if (FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD) {
                 tryRunningReloadAction(itemStack, entity, actionTime > 0 ? ReloadPhaseType.RELOAD : ReloadPhaseType.FINISH, false, false);
+                if (entity.level().isClientSide && reloadSounds.containsKey(id))
+                    reloadSounds.get(id).enabled = true;
             }
             entity.setSprinting(false);
             FirearmDataUtils.setActionTime(itemStack, actionTime);
+        }
+
+        if (entity.level().isClientSide && FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD && !reloadSounds.containsKey(id)) {
+            EntityBoundSound si = new EntityBoundSound(RBHSounds.RIFLE_RELOAD.get(), SoundSource.NEUTRAL, entity, 1.0f);
+            reloadSounds.put(GeoItem.getId(itemStack), si);
+            Minecraft.getInstance().getSoundManager().play(si);
         }
 
         int equipTime = this.getEquipTime(itemStack, entity);
@@ -397,8 +419,8 @@ public class FirearmMode {
                     } else if (entity instanceof Player plr) {
                         plr.displayClientMessage(Component.literal("No energy!"), true);
                     }
-                    if (entity instanceof Player plr && (bat1HasEnergy || bat2HasEnergy))
-                        plr.displayClientMessage(Component.literal("Rifle charge level is: " + FirearmDataUtils.getChargeLevel(itemStack)), true);
+//                    if (entity instanceof Player plr && (bat1HasEnergy || bat2HasEnergy))
+//                        plr.displayClientMessage(Component.literal("Rifle charge level is: " + FirearmDataUtils.getChargeLevel(itemStack)), true);
                 } else {
                     if (entity instanceof Player plr)
                         plr.displayClientMessage(Component.literal("Rifle charge level is at max"), true);

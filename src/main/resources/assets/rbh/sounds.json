@@ -16,5 +16,23 @@
         "stream": true
       }
     ]
+  },
+  "rifle_shoot": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "rbh:rifle_shoot",
+        "stream": true
+      }
+    ]
+  },
+  "reload_full": {
+    "category": "neutral",
+    "sounds": [
+      {
+        "name": "rbh:reload_full",
+        "stream": true
+      }
+    ]
   }
 }

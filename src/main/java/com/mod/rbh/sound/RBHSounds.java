@@ -14,6 +14,8 @@ public class RBHSounds {
 
     public static final RegistryObject<SoundEvent> ELECTRIC_BUZZ_STEREO = registerSoundEvent("electric_buzz");
     public static final RegistryObject<SoundEvent> ELECTRIC_BUZZ_MONO = registerSoundEvent("electric_buzz_mono");
+    public static final RegistryObject<SoundEvent> RIFLE_SHOOT = registerSoundEvent("rifle_shoot");
+    public static final RegistryObject<SoundEvent> RIFLE_RELOAD = registerSoundEvent("reload_full");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID, name);

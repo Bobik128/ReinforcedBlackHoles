@@ -3,6 +3,7 @@ package com.mod.rbh.entity;
 import com.ibm.icu.impl.Pair;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
+import com.mod.rbh.sound.RBHSounds;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -145,7 +146,8 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
 
         this.updateRotation();
         if (this.life == 0 && !this.isSilent()) {
-            this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.AMBIENT, 3.0F, 1.0F);
+            for (int i = 0; i < 2; i++)
+                this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), RBHSounds.RIFLE_SHOOT.get(), SoundSource.AMBIENT, 6.0F, 1.1F);
         }
 
         ++this.life;

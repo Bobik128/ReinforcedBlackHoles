@@ -379,6 +379,20 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.5833": {
+					"effect": "reload1"
+				},
+				"0.7917": {
+					"effect": "reload2"
+				},
+				"1.9167": {
+					"effect": "reload2"
+				},
+				"2.0417": {
+					"effect": "reload1"
+				}
 			}
 		},
 		"animation.rifle.reload_bat_2": {
@@ -625,6 +639,20 @@
 							"easing": "linear"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.5833": {
+					"effect": "reload1"
+				},
+				"0.7917": {
+					"effect": "reload2"
+				},
+				"1.9167": {
+					"effect": "reload2"
+				},
+				"2.0417": {
+					"effect": "reload1"
 				}
 			}
 		}
