@@ -353,7 +353,10 @@ public class FirearmMode {
                 reloadSounds.remove(id);
             }
         }
-        if (reloadSounds.get(id) != null && reloadSounds.get(id).isStopped()) reloadSounds.remove(id);
+        if (reloadSounds.get(id) != null && (reloadSounds.get(id).isStopped() || FirearmDataUtils.getAction(itemStack) != SingularityRifle.Action.RELOAD)) {
+            reloadSounds.get(id).remove();
+            reloadSounds.remove(id);
+        }
 
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
         if (actionTime > 0) {

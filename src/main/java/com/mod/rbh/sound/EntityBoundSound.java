@@ -26,7 +26,6 @@ public class EntityBoundSound extends AbstractTickableSoundInstance {
 
     public void remove() {
         this.stop();
-        entity = null;
     }
 
     @Override
