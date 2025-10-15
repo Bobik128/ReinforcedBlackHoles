@@ -2,25 +2,34 @@ package com.mod.rbh.sound;
 
 import com.mod.rbh.items.RBHItems;
 import com.mod.rbh.items.SingularityRifle;
-import com.mod.rbh.items.renderer.SingularityRifleRenderer;
 import com.mod.rbh.utils.FirearmMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class ClientSoundHandler {
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        List<Long> toRemove = new ArrayList<>();
-        for (Map.Entry<Long, ItemLoopingSound> entry : SingularityRifleRenderer.sounds.entrySet()) {
-            if (entry.getValue().isStopped()) toRemove.add(entry.getKey());
-        }
+    private static ItemHoldLoopingSound currentLoopSound = null;
 
-        for (Long l : toRemove) {
-            SingularityRifleRenderer.sounds.remove(l);
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.ClientTickEvent.Phase.END) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        boolean holding = mc.player.getMainHandItem().getItem() instanceof SingularityRifle;
+        ItemStack stack = mc.player.getMainHandItem();
+
+        if (holding) {
+            if (currentLoopSound == null || currentLoopSound.isStopped()) {
+                currentLoopSound = new ItemHoldLoopingSound(
+                        RBHSounds.ELECTRIC_BUZZ_STEREO.get(), mc.player, RBHItems.SINGULARITY_RIFLE.get(), FirearmMode.getVolume(stack) + 0.01f);
+                mc.getSoundManager().play(currentLoopSound);
+            }
+            currentLoopSound.setVolume(FirearmMode.getVolume(stack));
+        } else {
+            if (currentLoopSound != null && !currentLoopSound.isStopped()) {
+                currentLoopSound.remove();
+                currentLoopSound = null;
+            }
         }
     }
 }

@@ -5,14 +5,18 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemLoopingSound extends AbstractTickableSoundInstance {
-    public boolean enabled = true;
+public class LoopingSound extends AbstractTickableSoundInstance {
+    private final Entity soundSource;
 
-    public ItemLoopingSound(SoundEvent sound, SoundSource category, float volume) {
+    public LoopingSound(SoundEvent sound, SoundSource category, Entity soundSource, float volume) {
         super(sound, category, SoundInstance.createUnseededRandom());
+        this.soundSource = soundSource;
+
+        this.x = (float) soundSource.getX();
+        this.y = (float) soundSource.getY();
+        this.z = (float) soundSource.getZ();
 
         this.looping = true;
         this.delay = 0;
@@ -31,18 +35,18 @@ public class ItemLoopingSound extends AbstractTickableSoundInstance {
         this.stop();
     }
 
-    public void setPos(Vec3 pos) {
-        this.x = pos.x;
-        this.y = pos.y;
-        this.z = pos.z;
-    }
-
     @Override
     public void tick() {
-        if (!enabled) {
+        if (soundSource != null) {
+
+            if (soundSource.isRemoved()) remove();
+
+            this.x = soundSource.position().x;
+            this.y = soundSource.position().y;
+            this.z = soundSource.position().z;
+        } else {
             stop();
         }
-        enabled = false;
     }
 
     @Override
