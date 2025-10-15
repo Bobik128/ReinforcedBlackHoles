@@ -1,6 +1,5 @@
 package com.mod.rbh.items.renderer;
 
-import com.ibm.icu.impl.Pair;
 import com.mod.rbh.client.RifleIcons;
 import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
@@ -9,24 +8,29 @@ import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
+import com.mod.rbh.sound.ItemLoopingSound;
+import com.mod.rbh.sound.RBHSounds;
 import com.mod.rbh.utils.FirearmDataUtils;
+import com.mod.rbh.utils.FirearmMode;
 import com.mod.rbh.utils.LightningRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -44,6 +48,7 @@ import static com.mod.rbh.items.renderer.SingularityRifleModel.shootTriggered;
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
 
     private static boolean lastTimeShadersEnabled = false;
+    public static Map<Long, ItemLoopingSound> sounds = new HashMap<>();
     private int cachedColor = 0x000000;
 
     public SingularityRifleRenderer() {
@@ -65,6 +70,37 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         model.getBone("R_ARM").ifPresent(b -> b.setHidden(true));
 
         cachedColor = FirearmDataUtils.getColor(currentItemStack);
+
+        manageSound(poseStack);
+    }
+
+    private Vec3 worldPosFromPoseStack(PoseStack poseStack) {
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Vec3 camPos = camera.getPosition();
+
+        // extract the translation from the PoseStack
+        Matrix4f matrix = poseStack.last().pose();
+        Vector4f origin = new Vector4f(0, 0, 0, 1);
+        origin.mul(matrix);
+
+        // the poseStack is in camera space, so add the camera position
+        return new Vec3(origin.x(), origin.y(), origin.z()).add(camPos);
+    }
+
+    private void manageSound(PoseStack stack) {
+        long id = GeoItem.getId(currentItemStack);
+        ItemLoopingSound itemSound = sounds.get(id);
+        Minecraft mc = Minecraft.getInstance();
+        float volume = FirearmMode.getVolume(currentItemStack);
+        if (itemSound == null || itemSound.isStopped()) {
+            itemSound = new ItemLoopingSound(RBHSounds.ELECTRIC_BUZZ_MONO.get(), SoundSource.NEUTRAL, volume + 0.01f);
+            mc.getSoundManager().play(itemSound);
+        }
+        itemSound.setVolume(volume);
+        itemSound.enabled = true;
+
+        itemSound.setPos(worldPosFromPoseStack(stack));
+//        sounds.put(id, itemSound);
     }
 
     public ItemDisplayContext getRenderPerspective() {return renderPerspective;}

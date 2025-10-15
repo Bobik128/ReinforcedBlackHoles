@@ -130,7 +130,7 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
 
     @Override
     public boolean hasCustomEntity(ItemStack stack) {
-        return true;
+        return false;
     }
 
     @Override
