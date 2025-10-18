@@ -72,8 +72,8 @@ public abstract class BlackHole extends Entity implements IBlackHole {
 
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(SIZE, 0.4f);
-        this.entityData.define(EFFECT_SIZE, 1.0f);
+        this.entityData.define(SIZE, 0.6f);
+        this.entityData.define(EFFECT_SIZE, 1.6f);
         this.entityData.define(EFFECT_EXPONENT, 3.6f);
         this.entityData.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
         this.entityData.define(STRETCH_STRENGTH, 0.0f);

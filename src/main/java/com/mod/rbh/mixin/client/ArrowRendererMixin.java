@@ -26,7 +26,7 @@ public class ArrowRendererMixin<T extends AbstractArrow> {
     @Unique
     private static long reinforcedBlackHoles$lastTick = 0;
 
-    @Inject(method = "render(Lnet/minecraft/world/entity/projectile/AbstractArrow;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/world/entity/projectile/AbstractArrow;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"), cancellable = true)
     private void renderLightning(T pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight, CallbackInfo ci) {
         if (ClientConfig.debugLightning && pEntity instanceof SpectralArrow) {
 
@@ -67,6 +67,7 @@ public class ArrowRendererMixin<T extends AbstractArrow> {
 
                 i++;
             }
+            if (ClientConfig.invisSpecArrow) ci.cancel();
         }
     }
 }

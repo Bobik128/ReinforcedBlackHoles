@@ -58,7 +58,6 @@ public class ReinforcedBlackHoles
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             RBHNetwork.init();
-            CreateCompat.init();
         });
     }
 

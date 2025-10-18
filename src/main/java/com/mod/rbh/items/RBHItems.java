@@ -1,6 +1,7 @@
 package com.mod.rbh.items;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.compat.CreateCompat;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
@@ -27,7 +28,7 @@ public class RBHItems {
         ITEMS.register(eventBus);
 
         // Optional Create mod integration
-        if (ModList.get().isLoaded("create")) {
+        if (CreateCompat.isCreateLoaded()) {
             registerCreateItems();
         }
     }

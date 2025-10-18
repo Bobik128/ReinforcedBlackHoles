@@ -25,11 +25,16 @@ public class ClientConfig
             .comment("Spectral arrows lightning strikes debug options")
             .define("debug_lightning", false);
 
+    private static final ForgeConfigSpec.BooleanValue INVIS_SPEC_ARROW = BUILDER
+            .comment("make spectral arrows invisible")
+            .define("invis_spec_arrow", false);
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static int maxLightningsRendering;
     public static int maxLightningsPerArrow;
     public static boolean debugLightning;
+    public static boolean invisSpecArrow;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -38,6 +43,7 @@ public class ClientConfig
             maxLightningsRendering = MAX_LIGHTNINGS.get();
             maxLightningsPerArrow = MAX_LIGHTNINGS_PER_ARROW.get();
             debugLightning = DEBUG_LIGHTNINGS.get();
+            invisSpecArrow = INVIS_SPEC_ARROW.get();
         }
     }
 }
