@@ -43,6 +43,10 @@ import static com.mod.rbh.items.renderer.SingularityRifleModel.shootTriggered;
 
 // TODO fix not rendering in hand when there is black hole
 public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> {
+    // private Matrix4f holePoseStack = new Matrix4f();
+    private final Matrix4f handProj = new Matrix4f();     // projection active while sampling in hand pass
+    private final Vector3f holeViewHand = new Vector3f(); // hand-view-space point at sample time
+    private final Vector3f holeWorld = new Vector3f();    // same point in world space (persistent anchor)
 
     private static boolean lastTimeShadersEnabled = false;
     private int cachedColor = 0x000000;
@@ -130,14 +134,13 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
         if (FirearmDataUtils.getChargeLevel(currentItemStack) <= 0) return;
         if (bone.getName().equals("blackHoleLocatorPre")) {
-            if (
-                    renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
-                            || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                            || renderPerspective == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
-                            || renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
-                            || renderPerspective == ItemDisplayContext.GROUND
-                            || renderPerspective == ItemDisplayContext.FIXED
-            ) {
+            if (renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                    || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+                    || renderPerspective == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+                    || renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
+                    || renderPerspective == ItemDisplayContext.GROUND
+                    || renderPerspective == ItemDisplayContext.FIXED) {
+
                 boolean isFirstPerson = renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                         || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
 
@@ -145,24 +148,42 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
                 boolean shadersEnabled = ShaderCompat.shadersEnabled();
 
-                poseStack.pushPose();poseStack.translate(0, 0.3125f, -0.421f);
+                poseStack.pushPose();
+                poseStack.translate(0, 0.3125f, -0.421f);
                 poseStack.translate(bone.getPosX() / 16, bone.getPosY() / 16, bone.getPosZ() / 16);
+
                 if (shouldRenderHoleNormally()) {
                     PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
                     if (holeEffectInstance != null)
-                        BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
+                        BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance,
+                                isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL,
+                                packedLight,
+                                SingularityRifle.MAX_EFFECT_SIZE * modifier,
+                                SingularityRifle.MAX_SIZE * modifier,
+                                ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack),
+                                Color.YELLOW.getRGB(),
+                                4.0f);
                 }
 
-                holePoseStack.set(poseStack.last().pose());
+                // --- NEW: sample the hand-view-space point and the hand projection
+                // (BlackHoleRenderer later only reads translation, so grab just that)
+                holeViewHand.set(poseStack.last().pose().getTranslation(new Vector3f()));
+                handProj.set(com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix());
+
+                // convert to world now (while still in the same hand frame)
+                var cam = Minecraft.getInstance().gameRenderer.getMainCamera();
+                Quaternionf camRot = new Quaternionf(cam.rotation()); // camera->world
+                Vec3 camPos = cam.getPosition();
+                holeWorld.set(holeViewHand).rotate(camRot)
+                        .add((float) camPos.x, (float) camPos.y, (float) camPos.z);
 
                 if (shadersEnabled && !lastTimeShadersEnabled) {
-                    Minecraft.getInstance().player.displayClientMessage(Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
+                    Minecraft.getInstance().player.displayClientMessage(
+                            Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
                 }
-
                 lastTimeShadersEnabled = shadersEnabled;
 
                 poseStack.popPose();
-
             }
         }
     }
@@ -325,13 +346,40 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         poseStack.popPose();
 
         if (!shouldRenderHoleNormally()) {
-            PoseStack customStack = new PoseStack();
-            customStack.mulPoseMatrix(holePoseStack);
-            float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+            var mc  = Minecraft.getInstance();
+            var cam = mc.gameRenderer.getMainCamera();
 
+            // world -> current view
+            Vector3f relNow = new Vector3f(holeWorld)
+                    .sub((float) cam.getPosition().x, (float) cam.getPosition().y, (float) cam.getPosition().z)
+                    .rotate(new Quaternionf(cam.rotation()).conjugate()); // world->view
+
+            // compensate for hand-projection vs level-projection mismatch
+            Matrix4f levelProj = mc.gameRenderer.getProjectionMatrix(com.mod.rbh.api.IGameRenderer.get().getFovPublic());
+            float m00h = handProj.m00(), m11h = handProj.m11();
+            float m00l = levelProj.m00(), m11l = levelProj.m11();
+            if (Float.isFinite(m00h) && Float.isFinite(m00l) && m00l != 0f) relNow.x *= (m00h / m00l);
+            if (Float.isFinite(m11h) && Float.isFinite(m11l) && m11l != 0f) relNow.y *= (m11h / m11l);
+            // z stays as-is
+
+            PoseStack customStack = new PoseStack();
+            customStack.translate(relNow.x, relNow.y, relNow.z);
+
+            float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
             PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
-            if (holeEffectInstance != null)
-                BlackHoleRenderer.renderBlackHole(customStack, holeEffectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
+            if (holeEffectInstance != null) {
+                BlackHoleRenderer.renderBlackHole(
+                        customStack,
+                        holeEffectInstance,
+                        PostEffectRegistry.RenderPhase.AFTER_LEVEL,
+                        packedLight,
+                        SingularityRifle.MAX_EFFECT_SIZE * modifier,
+                        SingularityRifle.MAX_SIZE * modifier,
+                        ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack),
+                        Color.YELLOW.getRGB(),
+                        4.0f
+                );
+            }
         }
     }
 }
