@@ -46,7 +46,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
     private static boolean lastTimeShadersEnabled = false;
     private int cachedColor = 0x000000;
-    private Vector3f holeRelPos = new Vector3f();
+    private Matrix4f holePoseStack = new Matrix4f();
 
     public SingularityRifleRenderer() {
         super(new SingularityRifleModel());
@@ -153,7 +153,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                         BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
                 }
 
-                holeRelPos = VecFromPoseStack.compute(poseStack);
+                holePoseStack.set(poseStack.last().pose());
 
                 if (shadersEnabled && !lastTimeShadersEnabled) {
                     Minecraft.getInstance().player.displayClientMessage(Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
@@ -326,12 +326,12 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
         if (!shouldRenderHoleNormally()) {
             PoseStack customStack = new PoseStack();
-            customStack.translate(holeRelPos.x, holeRelPos.y, holeRelPos.z);
+            customStack.mulPoseMatrix(holePoseStack);
             float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
 
             PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
             if (holeEffectInstance != null)
-                BlackHoleRenderer.renderBlackHole(customStack, holeEffectInstance, PostEffectRegistry.RenderPhase.AFTER_ARM, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
+                BlackHoleRenderer.renderBlackHole(customStack, holeEffectInstance, PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
         }
     }
 }
