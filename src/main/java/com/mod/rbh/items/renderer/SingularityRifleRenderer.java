@@ -1,6 +1,5 @@
 package com.mod.rbh.items.renderer;
 
-import com.ibm.icu.impl.Pair;
 import com.mod.rbh.client.RifleIcons;
 import com.mod.rbh.compat.ShaderCompat;
 import com.mod.rbh.entity.renderer.BlackHoleRenderer;
@@ -11,7 +10,6 @@ import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.LightningRenderUtil;
-import com.mod.rbh.utils.math.VecFromPoseStack;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -22,7 +20,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -35,8 +32,6 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.RenderUtils;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.mod.rbh.items.renderer.SingularityRifleModel.shootTriggered;
@@ -48,9 +43,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
     private final Vector3f holeViewHand = new Vector3f(); // hand-view-space point at sample time
     private final Vector3f holeWorld = new Vector3f();    // same point in world space (persistent anchor)
 
-    private static boolean lastTimeShadersEnabled = false;
     private int cachedColor = 0x000000;
-    private Matrix4f holePoseStack = new Matrix4f();
 
     public SingularityRifleRenderer() {
         super(new SingularityRifleModel());
@@ -176,12 +169,6 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                 Vec3 camPos = cam.getPosition();
                 holeWorld.set(holeViewHand).rotate(camRot)
                         .add((float) camPos.x, (float) camPos.y, (float) camPos.z);
-
-                if (shadersEnabled && !lastTimeShadersEnabled) {
-                    Minecraft.getInstance().player.displayClientMessage(
-                            Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
-                }
-                lastTimeShadersEnabled = shadersEnabled;
 
                 poseStack.popPose();
             }
