@@ -1,5 +1,6 @@
 package com.mod.rbh.items;
 
+import com.mod.rbh.RBHClient;
 import com.mod.rbh.api.FovModifyingItem;
 import com.mod.rbh.api.HoldAttackKeyInteraction;
 import com.mod.rbh.entity.ItemEntity.SingularityRifleItemEntity;
@@ -9,6 +10,7 @@ import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.FirearmMode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
@@ -97,13 +99,10 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
             }
         });
     }
-
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level pLevel, @NotNull List<Component> tooltip, @NotNull TooltipFlag pIsAdvanced) {
-
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         int bat1Eng = FirearmDataUtils.getBattery1Energy(stack);
         int bat2Eng = FirearmDataUtils.getBattery2Energy(stack);
-
         int chargeLevel = FirearmDataUtils.getChargeLevel(stack);
 
         tooltip.add(Component.translatable("rifle.charge_level")
@@ -117,8 +116,25 @@ public class SingularityRifle extends Item implements GeoItem, FovModifyingItem,
         tooltip.add(Component.translatable("rifle.bat2_charge")
                 .append(": ").withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(bat2Eng + "/" + SingularityBattery.MAX_ENERGY).withStyle(ChatFormatting.WHITE)));
-    }
 
+        tooltip.add(Component.empty());
+
+        // === Show keybind hints ===
+        if (Screen.hasShiftDown()) {
+            tooltip.add(Component.literal("▶ ")
+                    .append(Component.literal("[" + RBHClient.RELOAD_RIFLE.getTranslatedKeyMessage().getString() + "]"))
+                    .append(" Reload")
+                    .withStyle(ChatFormatting.YELLOW));
+
+            tooltip.add(Component.literal("▶ ")
+                    .append(Component.literal("[" + RBHClient.CHARGE_RIFLE.getTranslatedKeyMessage().getString() + "]"))
+                    .append(" Charge")
+                    .withStyle(ChatFormatting.GOLD));
+        } else {
+            tooltip.add(Component.literal("Hold §eShift§r for controls").withStyle(ChatFormatting.DARK_GRAY));
+        }
+
+    }
     @Override
     public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
         return false;

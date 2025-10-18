@@ -148,7 +148,7 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     implementation fg.deobf("curse.maven:geckolib-388172:7020955")
-    compileOnly fg.deobf("curse.maven:create-328085:6641603")
+//    compileOnly fg.deobf("curse.maven:create-328085:6641603")
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}"))
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
