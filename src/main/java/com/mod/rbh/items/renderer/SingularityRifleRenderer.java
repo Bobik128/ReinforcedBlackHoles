@@ -11,6 +11,7 @@ import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mod.rbh.shaders.RifleHoleEffectInstanceHolder;
 import com.mod.rbh.utils.FirearmDataUtils;
 import com.mod.rbh.utils.LightningRenderUtil;
+import com.mod.rbh.utils.math.VecFromPoseStack;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -45,6 +46,7 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
     private static boolean lastTimeShadersEnabled = false;
     private int cachedColor = 0x000000;
+    private Vector3f holeRelPos = new Vector3f();
 
     public SingularityRifleRenderer() {
         super(new SingularityRifleModel());
@@ -65,6 +67,10 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         model.getBone("R_ARM").ifPresent(b -> b.setHidden(true));
 
         cachedColor = FirearmDataUtils.getColor(currentItemStack);
+    }
+
+    public boolean shouldRenderHoleNormally() {
+        return !ShaderCompat.shadersEnabled() || !(renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND);
     }
 
     public ItemDisplayContext getRenderPerspective() {return renderPerspective;}
@@ -139,14 +145,16 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
 
                 boolean shadersEnabled = ShaderCompat.shadersEnabled();
 
-                poseStack.pushPose();
-                if (!shadersEnabled || !(renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)) {
-                    poseStack.translate(0, 0.3125f, -0.421f);
-                    poseStack.translate(bone.getPosX() / 16, bone.getPosY() / 16, bone.getPosZ() / 16);
+                poseStack.pushPose();poseStack.translate(0, 0.3125f, -0.421f);
+                poseStack.translate(bone.getPosX() / 16, bone.getPosY() / 16, bone.getPosZ() / 16);
+                if (shouldRenderHoleNormally()) {
                     PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
                     if (holeEffectInstance != null)
                         BlackHoleRenderer.renderBlackHole(poseStack, holeEffectInstance, isFirstPerson ? PostEffectRegistry.RenderPhase.AFTER_ARM : PostEffectRegistry.RenderPhase.AFTER_LEVEL, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
                 }
+
+                holeRelPos = VecFromPoseStack.compute(poseStack);
+
                 if (shadersEnabled && !lastTimeShadersEnabled) {
                     Minecraft.getInstance().player.displayClientMessage(Component.literal("WARNING: oculus shaders are not fully compatible with Black holes! There may be some visual bugs"), false);
                 }
@@ -315,5 +323,15 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
         LightningRenderUtil.renderLightning(poseStack, bufferSource, new Vec3(start), new Vec3(end), p);
 
         poseStack.popPose();
+
+        if (!shouldRenderHoleNormally()) {
+            PoseStack customStack = new PoseStack();
+            customStack.translate(holeRelPos.x, holeRelPos.y, holeRelPos.z);
+            float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+
+            PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
+            if (holeEffectInstance != null)
+                BlackHoleRenderer.renderBlackHole(customStack, holeEffectInstance, PostEffectRegistry.RenderPhase.AFTER_ARM, packedLight, SingularityRifle.MAX_EFFECT_SIZE * modifier, SingularityRifle.MAX_SIZE * modifier, ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack), Color.YELLOW.getRGB(), 4.0f);
+        }
     }
 }
