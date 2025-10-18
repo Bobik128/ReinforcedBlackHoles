@@ -349,23 +349,31 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
             var mc  = Minecraft.getInstance();
             var cam = mc.gameRenderer.getMainCamera();
 
-            // world -> current view
+            // world -> current view (as you already do)
             Vector3f relNow = new Vector3f(holeWorld)
                     .sub((float) cam.getPosition().x, (float) cam.getPosition().y, (float) cam.getPosition().z)
-                    .rotate(new Quaternionf(cam.rotation()).conjugate()); // world->view
+                    .rotate(new Quaternionf(cam.rotation()).conjugate());
 
-            // compensate for hand-projection vs level-projection mismatch
+            // projection compensation for position (you already had this)
             Matrix4f levelProj = mc.gameRenderer.getProjectionMatrix(com.mod.rbh.api.IGameRenderer.get().getFovPublic());
             float m00h = handProj.m00(), m11h = handProj.m11();
             float m00l = levelProj.m00(), m11l = levelProj.m11();
             if (Float.isFinite(m00h) && Float.isFinite(m00l) && m00l != 0f) relNow.x *= (m00h / m00l);
             if (Float.isFinite(m11h) && Float.isFinite(m11l) && m11l != 0f) relNow.y *= (m11h / m11l);
-            // z stays as-is
+
+            // NEW: scale radii by the FOV ratio so apparent size stays the same
+            float radiusScale = 1.0f;
+            if (Float.isFinite(m11h) && Float.isFinite(m11l) && m11l != 0f) {
+                radiusScale = (m11h / m11l);
+            }
 
             PoseStack customStack = new PoseStack();
             customStack.translate(relNow.x, relNow.y, relNow.z);
 
-            float modifier = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+            float kl = (float) FirearmDataUtils.getChargeLevel(currentItemStack) / SingularityRifle.MAX_CHARGE_LEVEL;
+            float effectRadius = SingularityRifle.MAX_EFFECT_SIZE * kl * radiusScale;
+            float holeRadius   = SingularityRifle.MAX_SIZE        * kl * radiusScale;
+
             PostEffectRegistry.HoleEffectInstance holeEffectInstance = RifleHoleEffectInstanceHolder.getUniqueEffect();
             if (holeEffectInstance != null) {
                 BlackHoleRenderer.renderBlackHole(
@@ -373,8 +381,8 @@ public class SingularityRifleRenderer extends GeoItemRenderer<SingularityRifle> 
                         holeEffectInstance,
                         PostEffectRegistry.RenderPhase.AFTER_LEVEL,
                         packedLight,
-                        SingularityRifle.MAX_EFFECT_SIZE * modifier,
-                        SingularityRifle.MAX_SIZE * modifier,
+                        effectRadius,
+                        holeRadius,
                         ((SingularityRifle) currentItemStack.getItem()).shouldBeColorful(currentItemStack),
                         Color.YELLOW.getRGB(),
                         4.0f
