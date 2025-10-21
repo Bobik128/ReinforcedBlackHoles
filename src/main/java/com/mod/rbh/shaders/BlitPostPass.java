@@ -23,11 +23,12 @@ public class BlitPostPass extends PostPass implements IPostPass {
         reinforcedBreakable$toRun.accept(this);
         super.process(pPartialTicks);
         Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-        RenderSystem.enableBlend();
+//        RenderSystem.enableBlend();
+        RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         outTarget.blitToScreen(Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), false);
-        RenderSystem.disableBlend();
+//        RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -177,11 +178,9 @@ public class PostEffectRegistry {
             }
             for (MutablePostEffect fx : mutablePostEffects.values()) {
                 if (fx.isEnabled() && fx.postChain != null) {
-                    if (true || !ShaderCompat.shadersEnabled()) {
-                        fx.process(phase);
-                        if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
-                            fx.postChain.process(Minecraft.getInstance().getFrameTime());
-                    }
+                    fx.process(phase);
+                    if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
+                        fx.postChain.process(Minecraft.getInstance().getFrameTime());
                 }
             }
         });
@@ -332,6 +331,8 @@ public class PostEffectRegistry {
             RenderTarget swapTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
             BlitPostPass holePass = null;
             try {
+                finalTarget.setFilterMode(GL11.GL_NEAREST);
+                swapTarget.setFilterMode(GL11.GL_NEAREST);
                 holePass = new BlitPostPass(Minecraft.getInstance().getResourceManager(), "rbh:black_hole", finalTarget, swapTarget);
             } catch (IOException e) {
                 LOGGER.warn(e.toString());

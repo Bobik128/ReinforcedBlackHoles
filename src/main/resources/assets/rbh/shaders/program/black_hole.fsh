@@ -68,7 +68,7 @@ vec4 raycast_general(vec3 ro, vec3 rd, vec3 center, float radius2) {
 /* ===================== main ===================== */
 
 void main() {
-    vec4 sampleValue = texture(DiffuseSampler, texCoord);
+    vec4 sampleValue = textureLod(DiffuseSampler, texCoord, 0.0);
     if (sampleValue.a <= 0.1) {
         fragColor = vec4(0.0);
         return;
@@ -145,7 +145,9 @@ void main() {
         vec2 newCoord = texCoord + dirTex * 0.4 * EffectFraction * expFresnel;
         newCoord = clamp(newCoord, 0.0, 1.0);
 
-        fragColor = texture(MainSampler, newCoord);
+        vec4 col = textureLod(MainSampler, newCoord, 0.0);
+        fragColor = vec4(col.rgb, 1.0);
+
         return;
     }
 
