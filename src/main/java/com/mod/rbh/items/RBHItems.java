@@ -25,22 +25,26 @@ public class RBHItems {
             () -> new SingularityRifle(new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
-        ITEMS.register(eventBus);
-
-        // Optional Create mod integration
         if (CreateCompat.isCreateLoaded()) {
             registerCreateItems();
         }
+
+        ITEMS.register(eventBus);
     }
 
     private static void registerCreateItems() {
         try {
-            // Dynamically load class so JVM won’t fail if Create is missing
             Class<?> seqItemClass = Class.forName("com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem");
-            Item item = (Item) seqItemClass
-                    .getConstructor(Item.Properties.class)
-                    .newInstance(new Item.Properties().stacksTo(1));
-            SINGULARITY_BATTERY_INCOMPLETE = ITEMS.register("singularity_battery_incomplete", () -> item);
+            SINGULARITY_BATTERY_INCOMPLETE = ITEMS.register("singularity_battery_incomplete", () -> {
+                try {
+                    return (Item) seqItemClass
+                            .getConstructor(Item.Properties.class)
+                            .newInstance(new Item.Properties().stacksTo(1));
+                } catch (Exception e) {
+                    ReinforcedBlackHoles.LOGGER.warn("Failed to create SequencedAssemblyItem for Create:", e);
+                    return new Item(new Item.Properties().stacksTo(1)); // fallback item
+                }
+            });
         } catch (Exception e) {
             ReinforcedBlackHoles.LOGGER.warn("Create detected, but failed to register SequencedAssemblyItem:", e);
         }

@@ -155,14 +155,14 @@ dependencies {
         jarJar.ranged(it, "[${mixinextras_version},)")
     }
 
-    implementation fg.deobf("curse.maven:jei-238222:6600311")
+//    implementation fg.deobf("curse.maven:jei-238222:6600311")
 
 //    runtimeOnly fg.deobf("curse.maven:spark-361579:4738952") spark is fucked on linux after some update
-    runtimeOnly fg.deobf("curse.maven:sodium-options-api-1103431:6100812")
-    runtimeOnly fg.deobf("curse.maven:dynamiclights-reforged-551736:6044481")
-    runtimeOnly fg.deobf("curse.maven:oculus-581495:6020952")
-    runtimeOnly fg.deobf("curse.maven:embeddium-908741:5681725")
-    runtimeOnly fg.deobf("curse.maven:reforgedplay-mod-1018692:5637596")
+//    runtimeOnly fg.deobf("curse.maven:sodium-options-api-1103431:6100812")
+//    runtimeOnly fg.deobf("curse.maven:dynamiclights-reforged-551736:6044481")
+//    runtimeOnly fg.deobf("curse.maven:oculus-581495:6020952")
+//    runtimeOnly fg.deobf("curse.maven:embeddium-908741:5681725")
+//    runtimeOnly fg.deobf("curse.maven:reforgedplay-mod-1018692:5637596")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

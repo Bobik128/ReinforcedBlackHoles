@@ -5,11 +5,6 @@ import com.mod.rbh.items.SingularityBattery;
 import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.network.RBHNetwork;
 import com.mod.rbh.network.packet.ClientboundShootPacket;
-import com.mod.rbh.sound.EntityBoundSound;
-import com.mod.rbh.sound.RBHSounds;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.resources.sounds.EntityBoundSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.DistExecutor;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animation.RawAnimation;
 
@@ -33,8 +28,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FirearmMode {
-    @OnlyIn(Dist.CLIENT)
-    private static final HashMap<Long, EntityBoundSound> reloadSounds = new HashMap<>();
 
     private final ItemStack ammoItem;
 
@@ -115,7 +108,7 @@ public class FirearmMode {
 
     public void equip(ItemStack itemStack, LivingEntity entity) {
 
-        if (entity.level() instanceof ClientLevel) {
+        if (entity.level().isClientSide) {
             ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, GeoItem.getId(itemStack), "move", "equip");
             ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "move", "equip");
         }
@@ -348,14 +341,6 @@ public class FirearmMode {
             } else id = GeoItem.getId(itemStack);
             ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload1");
             ((SingularityRifle) itemStack.getItem()).stopTriggeredAnim(entity, id, "reload", "reload2");
-            if (entity.level().isClientSide && reloadSounds.get(id) != null) {
-                reloadSounds.get(id).remove();
-                reloadSounds.remove(id);
-            }
-        }
-        if (reloadSounds.get(id) != null && (reloadSounds.get(id).isStopped() || FirearmDataUtils.getAction(itemStack) != SingularityRifle.Action.RELOAD)) {
-            reloadSounds.get(id).remove();
-            reloadSounds.remove(id);
         }
 
         int actionTime = FirearmDataUtils.getActionTime(itemStack);
@@ -363,17 +348,10 @@ public class FirearmMode {
             --actionTime;
             if (FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD) {
                 tryRunningReloadAction(itemStack, entity, actionTime > 0 ? ReloadPhaseType.RELOAD : ReloadPhaseType.FINISH, false, false);
-                if (entity.level().isClientSide && reloadSounds.containsKey(id))
-                    reloadSounds.get(id).enabled = true;
+
             }
             entity.setSprinting(false);
             FirearmDataUtils.setActionTime(itemStack, actionTime);
-        }
-
-        if (entity.level().isClientSide && FirearmDataUtils.getAction(itemStack) == SingularityRifle.Action.RELOAD && !reloadSounds.containsKey(id)) {
-            EntityBoundSound si = new EntityBoundSound(RBHSounds.RIFLE_RELOAD.get(), SoundSource.NEUTRAL, entity, 1.0f);
-            reloadSounds.put(GeoItem.getId(itemStack), si);
-            Minecraft.getInstance().getSoundManager().play(si);
         }
 
         int equipTime = this.getEquipTime(itemStack, entity);
@@ -381,14 +359,8 @@ public class FirearmMode {
         if (equipTime > 0) {
             --equipTime;
             this.setEquipTime(itemStack, entity, equipTime);
-        } else if (entity.level() instanceof ClientLevel && FirearmDataUtils.getAction(itemStack) == null) {
+        } else if (entity.level().isClientSide && FirearmDataUtils.getAction(itemStack) == null) {
             ((SingularityRifle) itemStack.getItem()).triggerAnim(entity, GeoItem.getId(itemStack), "move", "idle");
-        }
-
-        int runningTime = this.getRunTime(itemStack, entity);
-        if (runningTime > 0 && entity.level().isClientSide) {
-            --runningTime;
-            this.setRTime(itemStack, entity, runningTime);
         }
 
         if (FirearmDataUtils.isHoldingAttackKey(itemStack) && !entity.level().isClientSide) {
@@ -435,18 +407,17 @@ public class FirearmMode {
             }
         }
 
+        if (entity.level().isClientSide) {
+            int finalActionTime = actionTime;
+            long finalId = id;
+            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () ->
+                    FirearmModeClient.clientTick(this, itemStack, entity, isSelected, finalId, finalActionTime)
+            );
+        }
+
+
         if (isSelected && !FirearmDataUtils.isEquipped(itemStack)) equip(itemStack, entity);
         if (!isSelected && FirearmDataUtils.isEquipped(itemStack)) unequip(itemStack, entity);
-
-        if (entity.level().isClientSide) {
-            boolean wasRunning = FirearmDataUtils.isRunning(itemStack);
-            boolean isNowRunning = this.isRunning(itemStack, entity);
-
-            if (isNowRunning && !wasRunning)
-                this.startRunning(itemStack, entity);
-            if (!isNowRunning && wasRunning)
-                this.stopRunning(itemStack, entity);
-        }
 
         FirearmDataUtils.setEquipped(itemStack, isSelected);
 //        FirearmDataUtils.setRunning(itemStack, this.isRunning(itemStack, entity));
