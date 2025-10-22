@@ -410,7 +410,7 @@ public class FirearmMode {
         if (entity.level().isClientSide) {
             int finalActionTime = actionTime;
             long finalId = id;
-            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () ->
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                     FirearmModeClient.clientTick(this, itemStack, entity, isSelected, finalId, finalActionTime)
             );
         }
