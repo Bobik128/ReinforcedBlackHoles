@@ -1,11 +1,13 @@
 package com.mod.rbh.shaders;
 
 import com.mod.rbh.ReinforcedBlackHoles;
-import com.mod.rbh.utils.FirearmDataUtils;
 import net.minecraftforge.event.TickEvent;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RifleHoleEffectInstanceHolder {
     private static Map<Integer, PostEffectRegistry.HoleEffectInstance> effects = new HashMap<>();

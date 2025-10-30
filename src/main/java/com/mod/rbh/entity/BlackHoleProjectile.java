@@ -1,15 +1,15 @@
 package com.mod.rbh.entity;
 
 import com.ibm.icu.impl.Pair;
-import com.mod.rbh.items.SingularityRifle;
 import com.mod.rbh.shaders.PostEffectRegistry;
-import com.mod.rbh.sound.RBHSounds;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
@@ -147,7 +147,7 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
         this.updateRotation();
         if (this.life == 0 && !this.isSilent()) {
             for (int i = 0; i < 2; i++)
-                this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), RBHSounds.RIFLE_SHOOT.get(), SoundSource.AMBIENT, 6.0F, 1.1F);
+                this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.FIREWORK_ROCKET_SHOOT, SoundSource.AMBIENT, 6.0F, 1.1F);
         }
 
         ++this.life;
@@ -179,7 +179,7 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
     }
 
     private void explode() {
-        this.level().explode(this, this.getX(), this.getY(), this.getZ(), 8.0F * this.getSize() / SingularityRifle.MAX_SIZE, Level.ExplosionInteraction.TNT);
+        this.level().explode(this, this.getX(), this.getY(), this.getZ(), 8.0F * this.getSize() / 0.075f, Level.ExplosionInteraction.TNT);
         this.discard();
     }
 

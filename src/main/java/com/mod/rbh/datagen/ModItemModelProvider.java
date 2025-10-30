@@ -1,7 +1,6 @@
 package com.mod.rbh.datagen;
 
 import com.mod.rbh.ReinforcedBlackHoles;
-import com.mod.rbh.items.RBHItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -18,10 +17,6 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        simpleItem(RBHItems.SINGULARITY_BATTERY);
-        simpleItem(RBHItems.SINGULARITY_BATTERY_EMPTY);
-        simpleItem(RBHItems.SINGULARITY_BATTERY_INCOMPLETE);
-
 //        withExistingParent(ModItems.KEYCODE_LINK_ITEM.getId().getPath(),
 //                ResourceLocation.fromNamespaceAndPath(ReinforcedBreakable.MOD_ID, "block/keycode_link_off"));
     }
