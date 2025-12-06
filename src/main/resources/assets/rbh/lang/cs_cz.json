@@ -1,0 +1,24 @@
+{
+  "rbh.creativetab.tab": "Zesílené Černé Díry",
+  "key.reinforcedblackholes.category": "Zesílené Černé Díry",
+
+  "item.rbh.singularity_rifle": "Vrhač Singularit",
+  "item.rbh.singularity_battery": "Singularitní Baterie",
+  "item.rbh.singularity_battery_empty": "Prázdná Singularitní Baterie",
+  "rifle.charge_level": "Úroveň nabití",
+  "rifle.bat1_charge": "Energie Baterie 1",
+  "rifle.bat2_charge": "Energie Baterie 2",
+  "battery.charge_level": "Úroveň Energie",
+  "screen.title": "Tester Černých Děr",
+
+  "block.rbh.hole_showcase": "Tester Černých Děr",
+
+  "rbh.slider.size": "Velikost",
+  "rbh.slider.effect_size": "Velikost Efektu",
+  "rbh.slider.color_r": "Červená",
+  "rbh.slider.color_g": "Zelená",
+  "rbh.slider.color_b": "Modrá",
+  "rbh.slider.stretch": "Protáhnutí",
+  "rbh.slider.height": "Oddálení",
+  "rbh.slider.exponent": "Exponent"
+}
