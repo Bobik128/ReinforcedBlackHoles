@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "rbh:block/hole_showcase",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "rbh:block/hole_showcase"
+    },
+    "facing=south": {
+      "model": "rbh:block/hole_showcase",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rbh:block/hole_showcase",
+      "y": 270
+    }
+  }
+}

@@ -1,6 +1,11 @@
 package com.mod.rbh;
 
+import com.mod.rbh.blocks.RBHBlocks;
+import com.mod.rbh.blocks.custom.entity.RBHBlockEntities;
 import com.mod.rbh.entity.RBHEntityTypes;
+import com.mod.rbh.items.RBHCreativeModeTab;
+import com.mod.rbh.items.RBHItems;
+import com.mod.rbh.network.RBHNetwork;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -31,7 +36,11 @@ public class ReinforcedBlackHoles
 
         modEventBus.addListener(this::commonSetup);
 
+        RBHItems.register(modEventBus);
+        RBHCreativeModeTab.register(modEventBus);
+        RBHBlocks.register(modEventBus);
         RBHEntityTypes.register(modEventBus);
+        RBHBlockEntities.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -41,9 +50,7 @@ public class ReinforcedBlackHoles
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-//            RBHNetwork.init();
-        });
+        event.enqueueWork(RBHNetwork::init);
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
