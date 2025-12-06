@@ -10,6 +10,7 @@ public class SimpleSlider extends AbstractSliderButton {
     private final double min;
     private final double max;
     private final DoubleConsumer onValueChanged;
+    private final String name;
 
     /**
      * @param x Screen X
@@ -22,7 +23,7 @@ public class SimpleSlider extends AbstractSliderButton {
      * @param onValueChanged callback when slider value changes
      */
     public SimpleSlider(int x, int y, int width, int height,
-                        double min, double max, double initial,
+                        double min, double max, double initial, String name,
                         DoubleConsumer onValueChanged) {
 
         super(x, y, width, height,
@@ -32,6 +33,7 @@ public class SimpleSlider extends AbstractSliderButton {
         this.min = min;
         this.max = max;
         this.onValueChanged = onValueChanged;
+        this.name = name;
 
         updateMessage();
     }
@@ -39,8 +41,16 @@ public class SimpleSlider extends AbstractSliderButton {
     @Override
     protected void updateMessage() {
         double realValue = getRealValue();
-        this.setMessage(Component.literal(String.format("%.2f", realValue)));
+        this.setMessage(Component.translatable(name).append(": ").append(String.format("%.2f", realValue)));
     }
+
+
+//    @Override
+//    public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
+//        double real = getRealValue();
+//        onValueChanged.accept(real);
+//        return super.mouseReleased(pMouseX, pMouseY, pButton);
+//    }
 
     @Override
     protected void applyValue() {

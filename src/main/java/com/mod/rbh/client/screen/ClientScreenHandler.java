@@ -7,10 +7,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ClientScreenHandler {
-    public static void openHoleShowcaseGui(BlockPos pos) {
+    public static void openHoleShowcaseGui(BlockPos pos, HoleShowcaseBlockEntity.HoleShowcaseConfig config) {
         BlockEntity be = getClientLevel().getBlockEntity(pos);
         if (be instanceof HoleShowcaseBlockEntity hsbe) {
-            Minecraft.getInstance().setScreen(new HoleShowcaseScreen(hsbe));
+            Minecraft.getInstance().setScreen(new HoleShowcaseScreen(hsbe, config));
         }
     }
 

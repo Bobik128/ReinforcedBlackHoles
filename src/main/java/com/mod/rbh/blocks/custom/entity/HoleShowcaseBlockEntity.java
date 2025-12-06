@@ -35,7 +35,7 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
             4.0f,        // effectExponent
             new Vec3(1, 0, 0), // stretchDir
             0.0f,        // stretchStrength
-            2.0f         // height
+            0.0f         // height
     );
 
     public HoleShowcaseBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -43,7 +43,7 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
     }
 
     public void openGUI(Level level, BlockPos pos, Player player) {
-        RBHNetwork.sendToPlayer(new ClientBoundOpenGuiPacket(pos), (ServerPlayer) player);
+        RBHNetwork.sendToPlayer(new ClientBoundOpenGuiPacket(pos, config), (ServerPlayer) player);
     }
 
     public void remove() {
@@ -130,24 +130,28 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
                 }
             }
 
+            if (blackHole != null)
+                config.applyValues(blackHole, pPos);
+
             if (blackHole == null) {
-                blackHole = new TestBlackHole(pPos.getCenter().add(0, config.height, 0), this.level, config.holeRadius, config.effectRadius);
+                blackHole = new TestBlackHole(pPos.getCenter().add(0, config.height + 2, 0), this.level, config.holeRadius, config.effectRadius);
                 config.applyValues(blackHole, pPos);
                 level.addFreshEntity(blackHole);
                 this.holeUUID = blackHole.getUUID();
+                this.setChanged();
             }
         }
     }
 
     public static class HoleShowcaseConfig {
-        public final float effectRadius;
-        public final float holeRadius;
-        public final boolean rainbow;
-        public final int color;
-        public final float effectExponent;
-        public final Vec3 stretchDir;
-        public final float stretchStrength;
-        public final float height;
+        public float effectRadius;
+        public float holeRadius;
+        public boolean rainbow;
+        public int color;
+        public float effectExponent;
+        public Vec3 stretchDir;
+        public float stretchStrength;
+        public float height;
 
         // Main constructor
         public HoleShowcaseConfig(
@@ -178,11 +182,15 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
             hole.setEffectExponent(effectExponent);
             hole.setStretchDir(stretchDir.toVector3f());
             hole.setStretchStrength(stretchStrength);
-            hole.setPos(pos.getCenter().add(0, height, 0));
+            hole.setPos(pos.getCenter().add(0, height + 2, 0));
         }
 
         // Network helpers
         public HoleShowcaseConfig(FriendlyByteBuf buf) {
+            this.setFromBuf(buf);
+        }
+
+        public void setFromBuf(FriendlyByteBuf buf) {
             this.effectRadius     = buf.readFloat();
             this.holeRadius       = buf.readFloat();
             this.rainbow          = buf.readBoolean();
