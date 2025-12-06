@@ -4,6 +4,7 @@ import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.blocks.custom.entity.HoleShowcaseBlockEntity;
 import com.mod.rbh.network.RBHNetwork;
 import com.mod.rbh.network.packet.ServerBoundUpdateHoleShowcasePacket;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -120,9 +121,15 @@ public class HoleShowcaseScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {this.renderBackground(guiGraphics);
+
+        // enable transparency
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
         guiGraphics.blit(BASE_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawString(this.font, this.title, this.width / 2 - this.font.width(this.title) / 2, this.topPos + 6, textColor, false);
     }

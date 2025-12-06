@@ -1,6 +1,8 @@
 package com.mod.rbh.entity.renderer;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.blocks.custom.entity.RBHBlockEntities;
+import com.mod.rbh.client.HoleShowcaseRenderer;
 import com.mod.rbh.entity.ItemEntity.SingularityRifleItemEntity;
 import com.mod.rbh.entity.RBHEntityTypes;
 import com.mod.rbh.entity.TestBlackHole;
@@ -18,5 +20,6 @@ public class RendererRegistry {
             event.registerEntityRenderer(RBHEntityTypes.BLACK_HOLE_PROJECTILE.get(), BlackHoleProjectileRenderer::new);
             event.registerEntityRenderer(RBHEntityTypes.TEST_BLACK_HOLE.get(), BlackHoleRenderer::new);
             event.registerEntityRenderer(RBHEntityTypes.RIFLE_ITEM.get(), ItemEntityRenderer::new);
+            event.registerBlockEntityRenderer(RBHBlockEntities.HOLE_SHOWCASE_BE.get(), HoleShowcaseRenderer::new);
         }
 }
