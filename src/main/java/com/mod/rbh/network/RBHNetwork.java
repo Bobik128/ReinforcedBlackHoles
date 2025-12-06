@@ -1,6 +1,7 @@
 package com.mod.rbh.network;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.network.packet.ClientBoundOpenGuiPacket;
 import com.mod.rbh.network.packet.ClientboundShootPacket;
 import com.mod.rbh.network.packet.ServerboundFirearmActionPacket;
 import com.mod.rbh.network.packet.ServerboundSetAttackKeyPacket;
@@ -33,6 +34,7 @@ public class RBHNetwork {
         buildMessage(network, id++, ServerboundSetAttackKeyPacket.class, ServerboundSetAttackKeyPacket::new);
         buildMessage(network, id++, ServerboundFirearmActionPacket.class, ServerboundFirearmActionPacket::new);
         buildMessage(network, id++, ClientboundShootPacket.class, ClientboundShootPacket::new);
+        buildMessage(network, id++, ClientBoundOpenGuiPacket.class, ClientBoundOpenGuiPacket::new);
 
         return network;
     }

@@ -32,6 +32,35 @@ public class ModBlockStateProvider extends BlockStateProvider {
         facingBlock(blockRegistryObject, cubeAll(blockRegistryObject.get()));
     }
 
+    private void facingBlockCustomAllSides(RegistryObject<Block> blockRegistryObject) {
+        ModelFile model = models().getExistingFile(
+                ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID, "block/" + name(blockRegistryObject.get()))
+        );
+
+        getVariantBuilder(blockRegistryObject.get()).forAllStates(state -> {
+            Direction facing = state.getValue(BlockStateProperties.FACING);
+
+            int xRot = switch (facing) {
+                case UP -> 0;
+                case DOWN -> 180;
+                case NORTH, SOUTH, EAST, WEST -> 90;
+            };
+
+            int yRot = switch (facing) {
+                case SOUTH -> 180;
+                case EAST -> 90;
+                case WEST -> 270;
+                default -> 0;
+            };
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationX(xRot)
+                    .rotationY(yRot)
+                    .build();
+        });
+    }
+
     private void facingBlockCustom(RegistryObject<Block> blockRegistryObject, String modelName) {
         ModelFile model = models().getExistingFile(
                 ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID, "block/" + modelName)
