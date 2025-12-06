@@ -7,6 +7,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,14 +26,17 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
 
     @Nullable
     public UUID holeUUID = null;
-    public float effectRadius = 1.0f;
-    public float holeRadius = 0.5f;
-    public boolean rainbow = false;
-    public int color = 0xFFFF00;
-    public float effectExponent = 4.0f;
-    public Vec3 stretchDir = new Vec3(1.0, 0.0,0.0);
-    public float stretchStrength = 0.0f;
-    public float height = 2.0f;
+
+    public HoleShowcaseConfig config = new HoleShowcaseConfig(
+            1.0f,        // effectRadius
+            0.5f,        // holeRadius
+            false,       // rainbow
+            0xFFFF00,    // color
+            4.0f,        // effectExponent
+            new Vec3(1, 0, 0), // stretchDir
+            0.0f,        // stretchStrength
+            2.0f         // height
+    );
 
     public HoleShowcaseBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(RBHBlockEntities.HOLE_SHOWCASE_BE.get(), pPos, pBlockState);
@@ -58,21 +62,23 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
         }
 
         // Floats
-        tag.putFloat("EffectRadius", effectRadius);
-        tag.putFloat("HoleRadius", holeRadius);
-        tag.putFloat("EffectExponent", effectExponent);
-        tag.putFloat("StretchStrength", stretchStrength);
+        tag.putFloat("EffectRadius", config.effectRadius);
+        tag.putFloat("HoleRadius", config.holeRadius);
+        tag.putFloat("EffectExponent", config.effectExponent);
+        tag.putFloat("StretchStrength", config.stretchStrength);
 
         // Boolean
-        tag.putBoolean("Rainbow", rainbow);
+        tag.putBoolean("Rainbow", config.rainbow);
 
         // Int
-        tag.putInt("Color", color);
+        tag.putInt("Color", config.color);
 
         // Vec3
-        tag.putDouble("StretchDirX", stretchDir.x);
-        tag.putDouble("StretchDirY", stretchDir.y);
-        tag.putDouble("StretchDirZ", stretchDir.z);
+        tag.putDouble("StretchDirX", config.stretchDir.x);
+        tag.putDouble("StretchDirY", config.stretchDir.y);
+        tag.putDouble("StretchDirZ", config.stretchDir.z);
+
+        tag.putFloat("Height", config.height);
     }
 
 
@@ -87,25 +93,30 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
             holeUUID = null;
         }
 
-        // Floats
-        effectRadius = tag.getFloat("EffectRadius");
-        holeRadius = tag.getFloat("HoleRadius");
-        effectExponent = tag.getFloat("EffectExponent");
-        stretchStrength = tag.getFloat("StretchStrength");
+        float effectRadius     = tag.getFloat("EffectRadius");
+        float holeRadius       = tag.getFloat("HoleRadius");
+        float effectExponent   = tag.getFloat("EffectExponent");
+        float stretchStrength  = tag.getFloat("StretchStrength");
+        boolean rainbow        = tag.getBoolean("Rainbow");
+        int color              = tag.getInt("Color");
+        float height           = tag.getFloat("Height");
 
-        // Boolean
-        rainbow = tag.getBoolean("Rainbow");
-
-        // Int
-        color = tag.getInt("Color");
-
-        // Vec3
         double x = tag.getDouble("StretchDirX");
         double y = tag.getDouble("StretchDirY");
         double z = tag.getDouble("StretchDirZ");
-        stretchDir = new Vec3(x, y, z);
-    }
+        Vec3 stretchDir = new Vec3(x, y, z);
 
+        this.config = new HoleShowcaseConfig(
+                effectRadius,
+                holeRadius,
+                rainbow,
+                color,
+                effectExponent,
+                stretchDir,
+                stretchStrength,
+                height
+        );
+    }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         if (!this.level.isClientSide()) {
@@ -120,15 +131,86 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
             }
 
             if (blackHole == null) {
-                blackHole = new TestBlackHole(pPos.getCenter().add(0, height, 0), this.level, holeRadius, effectRadius);
-                blackHole.setColor(color);
-                blackHole.setRainbow(rainbow);
-                blackHole.setStretchDir(stretchDir.toVector3f());
-                blackHole.setEffectExponent(effectExponent);
-                blackHole.setStretchStrength(stretchStrength);
+                blackHole = new TestBlackHole(pPos.getCenter().add(0, config.height, 0), this.level, config.holeRadius, config.effectRadius);
+                config.applyValues(blackHole, pPos);
                 level.addFreshEntity(blackHole);
                 this.holeUUID = blackHole.getUUID();
             }
+        }
+    }
+
+    public static class HoleShowcaseConfig {
+        public final float effectRadius;
+        public final float holeRadius;
+        public final boolean rainbow;
+        public final int color;
+        public final float effectExponent;
+        public final Vec3 stretchDir;
+        public final float stretchStrength;
+        public final float height;
+
+        // Main constructor
+        public HoleShowcaseConfig(
+                float effectRadius,
+                float holeRadius,
+                boolean rainbow,
+                int color,
+                float effectExponent,
+                Vec3 stretchDir,
+                float stretchStrength,
+                float height
+        ) {
+            this.effectRadius = effectRadius;
+            this.holeRadius = holeRadius;
+            this.rainbow = rainbow;
+            this.color = color;
+            this.effectExponent = effectExponent;
+            this.stretchDir = stretchDir;
+            this.stretchStrength = stretchStrength;
+            this.height = height;
+        }
+
+        public void applyValues(TestBlackHole hole, BlockPos pos) {
+            hole.setEffectSize(effectRadius);
+            hole.setSize(holeRadius);
+            hole.setRainbow(rainbow);
+            hole.setColor(color);
+            hole.setEffectExponent(effectExponent);
+            hole.setStretchDir(stretchDir.toVector3f());
+            hole.setStretchStrength(stretchStrength);
+            hole.setPos(pos.getCenter().add(0, height, 0));
+        }
+
+        // Network helpers
+        public HoleShowcaseConfig(FriendlyByteBuf buf) {
+            this.effectRadius     = buf.readFloat();
+            this.holeRadius       = buf.readFloat();
+            this.rainbow          = buf.readBoolean();
+            this.color            = buf.readInt();
+            this.effectExponent   = buf.readFloat();
+
+            double x = buf.readDouble();
+            double y = buf.readDouble();
+            double z = buf.readDouble();
+            this.stretchDir       = new Vec3(x, y, z);
+
+            this.stretchStrength  = buf.readFloat();
+            this.height           = buf.readFloat();
+        }
+
+        public void toBytes(FriendlyByteBuf buf) {
+            buf.writeFloat(effectRadius);
+            buf.writeFloat(holeRadius);
+            buf.writeBoolean(rainbow);
+            buf.writeInt(color);
+            buf.writeFloat(effectExponent);
+
+            buf.writeDouble(stretchDir.x);
+            buf.writeDouble(stretchDir.y);
+            buf.writeDouble(stretchDir.z);
+
+            buf.writeFloat(stretchStrength);
+            buf.writeFloat(height);
         }
     }
 }

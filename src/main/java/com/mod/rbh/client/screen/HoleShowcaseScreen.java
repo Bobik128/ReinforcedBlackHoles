@@ -31,6 +31,20 @@ public class HoleShowcaseScreen extends Screen {
         super.init();
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
+
+        this.addRenderableWidget(new SimpleSlider(
+                this.width / 2 - 50,  // x
+                this.height / 2 + 40, // y
+                100,                  // width
+                20,                   // height
+                0,                    // min
+                100,                  // max
+                50,                   // initial
+                (val) -> {
+                    // Callback when slider value changes
+                    System.out.println("Slider value = " + val);
+                }
+        ));
     }
 
     @Override
