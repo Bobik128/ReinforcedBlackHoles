@@ -1,6 +1,7 @@
 package com.mod.rbh.items;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.blocks.RBHBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -21,6 +22,8 @@ public class RBHCreativeModeTab {
                         pOutput.accept(RBHItems.SINGULARITY_RIFLE.get());
                         pOutput.accept(RBHItems.SINGULARITY_BATTERY.get());
                         pOutput.accept(RBHItems.SINGULARITY_BATTERY_EMPTY.get());
+
+                        pOutput.accept(RBHBlocks.HOLE_SHOWCASE.get().asItem());
                     })
                     .build());
 

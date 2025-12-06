@@ -1,5 +1,7 @@
 package com.mod.rbh;
 
+import com.mod.rbh.blocks.RBHBlocks;
+import com.mod.rbh.blocks.custom.entity.RBHBlockEntities;
 import com.mod.rbh.compat.CreateCompat;
 import com.mod.rbh.entity.RBHEntityTypes;
 import com.mod.rbh.items.RBHCreativeModeTab;
@@ -44,7 +46,9 @@ public class ReinforcedBlackHoles
 
         RBHItems.register(modEventBus);
         RBHCreativeModeTab.register(modEventBus);
+        RBHBlocks.register(modEventBus);
         RBHEntityTypes.register(modEventBus);
+        RBHBlockEntities.register(modEventBus);
         RBHRecipes.register(modEventBus);
         RBHSounds.register(modEventBus);
 

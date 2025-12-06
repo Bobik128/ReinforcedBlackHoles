@@ -1,6 +1,7 @@
 package com.mod.rbh.datagen;
 
 import com.mod.rbh.ReinforcedBlackHoles;
+import com.mod.rbh.blocks.RBHBlocks;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -24,10 +25,37 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
+        facingBlockCustom(RBHBlocks.HOLE_SHOWCASE, "hole_showcase");
     }
 
     private void facingBlock(RegistryObject<Block> blockRegistryObject) {
         facingBlock(blockRegistryObject, cubeAll(blockRegistryObject.get()));
+    }
+
+    private void facingBlockCustom(RegistryObject<Block> blockRegistryObject, String modelName) {
+        ModelFile model = models().getExistingFile(
+                ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID, "block/" + modelName)
+        );
+
+        getVariantBuilder(blockRegistryObject.get()).forAllStates(state -> {
+            Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+
+            int yRot = switch (facing) {
+                case SOUTH -> 180;
+                case WEST -> 270;
+                case EAST -> 90;
+                default -> 0;
+            };
+
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY(yRot)
+                    .build();
+        });
+
+        // item model
+        itemModels().getBuilder(blockRegistryObject.getId().getPath())
+                .parent(model);
     }
 
     private void facingBlock(RegistryObject<Block> blockRegistryObject, ModelFile modelFile) {
