@@ -9,5 +9,5 @@ public interface IShaderInstance {
         return (IShaderInstance) shader;
     }
 
-    void setBlackHoleCenter(Vec3 center);
+    void reinforcedBlackHoles$setBlackHoleCenter(Vec3 center);
 }

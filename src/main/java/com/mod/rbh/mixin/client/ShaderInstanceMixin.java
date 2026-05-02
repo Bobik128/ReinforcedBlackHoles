@@ -34,7 +34,7 @@ public abstract class ShaderInstanceMixin implements IShaderInstance {
 
     @Unique
     @Override
-    public void setBlackHoleCenter(Vec3 center) {
+    public void reinforcedBlackHoles$setBlackHoleCenter(Vec3 center) {
         if (BLACK_HOLE_CENTER == null) return;
         BLACK_HOLE_CENTER.set((float) center.x, (float) center.y, (float) center.z);
     }
