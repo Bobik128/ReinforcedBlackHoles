@@ -43,14 +43,15 @@ public class BlitPostPass extends PostPass implements IPostPass {
 
         minecraft.getMainRenderTarget().bindWrite(false);
 
-        RenderSystem.disableBlend();
-        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
 
         RenderSystem.blendFuncSeparate(
                 GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
                 GlStateManager.SourceFactor.ONE,
-                GlStateManager.DestFactor.ZERO
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
         );
 
         this.outTarget.blitToScreen(
@@ -59,7 +60,12 @@ public class BlitPostPass extends PostPass implements IPostPass {
                 false
         );
 
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
+
+        minecraft.getMainRenderTarget().bindWrite(false);
     }
 
     @Override

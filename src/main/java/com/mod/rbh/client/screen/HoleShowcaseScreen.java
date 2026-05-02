@@ -36,7 +36,7 @@ public class HoleShowcaseScreen extends Screen {
     private static final double BETWEEN_SLIDERS = 0.06; // % of image width
 
     protected HoleShowcaseScreen(HoleShowcaseBlockEntity be, HoleShowcaseBlockEntity.HoleShowcaseConfig config) {
-        super(Component.translatable("screen.title"));
+        super(Component.translatable("screen.rbh.hole_showcase"));
         showcaseBlockEntity = be;
         this.config = config;
     }
@@ -44,6 +44,10 @@ public class HoleShowcaseScreen extends Screen {
     public boolean isPauseScreen() {
         return false;
     }
+
+    @Override
+    protected void renderBlurredBackground(float partialTick) {}
+
     @Override
     public void init() {
         super.init();
@@ -122,17 +126,34 @@ public class HoleShowcaseScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTransparentBackground(guiGraphics);
 
-        // enable transparency
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+//        RenderSystem.enableBlend();
+//        RenderSystem.defaultBlendFunc();
+//        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-        guiGraphics.blit(BASE_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+        guiGraphics.blit(
+                BASE_TEXTURE,
+                this.leftPos,
+                this.topPos,
+                0,
+                0,
+                this.imageWidth,
+                this.imageHeight,
+                256,
+                256
+        );
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawString(this.font, this.title, this.width / 2 - this.font.width(this.title) / 2, this.topPos + 6, textColor, false);
+
+        guiGraphics.drawString(
+                this.font,
+                this.title,
+                this.width / 2 - this.font.width(this.title) / 2,
+                this.topPos + 6,
+                textColor,
+                false
+        );
     }
 
     private enum SliderNames {

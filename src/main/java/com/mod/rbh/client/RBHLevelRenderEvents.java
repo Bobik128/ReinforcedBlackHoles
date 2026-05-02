@@ -14,7 +14,7 @@ public final class RBHLevelRenderEvents {
 
     private static void onRenderLevelStage(final RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
-            PostEffectRegistry.blitEffects();
+//            PostEffectRegistry.blitEffects();
         }
     }
 }
