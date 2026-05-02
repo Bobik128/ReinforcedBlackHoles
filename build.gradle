@@ -5,6 +5,7 @@ plugins {
     id 'eclipse'
     id 'idea'
 }
+// test commit
 
 tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
