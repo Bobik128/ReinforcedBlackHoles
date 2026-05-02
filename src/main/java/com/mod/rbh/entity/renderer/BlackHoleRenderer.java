@@ -303,12 +303,44 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
 
             try {
                 modelViewStack.pushMatrix();
-                modelViewStack.set(capturedModelView);
+                modelViewStack.identity();
+                modelViewStack.mul(capturedModelView);
                 RenderSystem.applyModelViewMatrix();
 
                 RenderSystem.setProjectionMatrix(capturedProjection, VertexSorting.DISTANCE_TO_ORIGIN);
 
+                /*
+                 * Important order:
+                 *
+                 * 1. Bind mask target.
+                 * 2. Clear COLOR ONLY, not depth.
+                 * 3. Copy current world depth from main target.
+                 * 4. Bind mask target again.
+                 * 5. Draw sphere mask with LEQUAL depth test.
+                 *
+                 * This prevents stale mask pixels from previous frames while preserving
+                 * proper world occlusion.
+                 */
+                finalTarget.bindWrite(true);
+
+                RenderSystem.colorMask(true, true, true, true);
+                RenderSystem.clearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, Minecraft.ON_OSX);
+
+                if (PostEffectRegistry.PhaseScope.current() == PostEffectRegistry.RenderPhase.AFTER_LEVEL) {
+                    finalTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                }
+
+                finalTarget.bindWrite(false);
+
+                RenderSystem.enableDepthTest();
+                RenderSystem.depthFunc(GL11.GL_LEQUAL);
+                RenderSystem.depthMask(true);
+                RenderSystem.colorMask(true, true, true, true);
+                RenderSystem.disableBlend();
+
                 byteBufferBuilder = new ByteBufferBuilder(256 * 1024);
+
                 MultiBufferSource.BufferSource localBufferSource =
                         MultiBufferSource.immediate(byteBufferBuilder);
 
@@ -375,6 +407,7 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
                     GL11.glDisable(GL11.GL_SCISSOR_TEST);
                 }
 
+                RenderSystem.colorMask(true, true, true, true);
                 RenderSystem.enableDepthTest();
                 RenderSystem.depthMask(true);
                 RenderSystem.depthFunc(GL11.GL_LEQUAL);

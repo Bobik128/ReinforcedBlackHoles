@@ -126,6 +126,9 @@ dependencies {
         }
     }
 
+    implementation "curse.maven:sodium-394468:6382651"
+    implementation "curse.maven:irisshaders-455508:6661598"
+
     // Optional examples, update CurseMaven IDs/versions for 1.21.1 NeoForge-compatible jars:
     // compileOnly "curse.maven:jei-238222:<file_id>"
     // localRuntime "curse.maven:jei-238222:<file_id>"

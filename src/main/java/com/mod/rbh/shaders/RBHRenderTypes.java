@@ -23,36 +23,45 @@ public class RBHRenderTypes extends RenderType {
     public RBHRenderTypes(String pName, VertexFormat pFormat, VertexFormat.Mode pMode, int pBufferSize, boolean pAffectsCrumbling, boolean pSortOnUpload, Runnable pSetupState, Runnable pClearState) {
         super(pName, pFormat, pMode, pBufferSize, pAffectsCrumbling, pSortOnUpload, pSetupState, pClearState);
     }
-    public static RenderType getBlackHole(ResourceLocation tex, @Nullable RenderTarget rt) {
-        final FboGuard guard = new FboGuard(); // your class
 
-        return (RenderType) create("black_hole",
-                DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 256, false, true,// not sure about that, was POSITION_COLOR_TEX
+    public static RenderType getBlackHole(ResourceLocation tex, @Nullable RenderTarget rt) {
+        final FboGuard guard = new FboGuard();
+
+        return RenderType.create(
+                "black_hole_mask",
+                DefaultVertexFormat.POSITION_TEX_COLOR,
+                VertexFormat.Mode.QUADS,
+                256 * 1024,
+                false,
+                false,
                 CompositeState.builder()
                         .setShaderState(RENDERTYPE_BLACK_HOLE_SHADER)
-                        .setCullState(RenderStateShard.NO_CULL)
                         .setTextureState(new TextureStateShard(tex, false, false))
-                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(RenderStateShard.NO_CULL)
+                        .setTransparencyState(RenderStateShard.NO_TRANSPARENCY)
                         .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
-                        .setOutputState(new OutputStateShard("black_hole_target",
+                        .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                        .setOutputState(new OutputStateShard(
+                                "black_hole_target",
                                 () -> {
-                                    if (rt == null) return;
-                                    guard.save();
-                                    // *** Critical: skip depth copy in hand phase ***
-                                    if (PostEffectRegistry.PhaseScope.current() != PostEffectRegistry.RenderPhase.AFTER_ARM || !ShaderCompat.shadersEnabled()) {
-                                        // safe only in world phase
-                                        rt.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                                    if (rt == null) {
+                                        return;
                                     }
+
+                                    guard.save();
                                     rt.bindWrite(false);
                                 },
                                 () -> {
-                                    if (rt == null) return;
-                                    // restore previous FBO + viewport/scissor, NOT main
-                                    guard.restore();
-                                }))
-                        .createCompositeState(false));
-    }
+                                    if (rt == null) {
+                                        return;
+                                    }
 
+                                    guard.restore();
+                                }
+                        ))
+                        .createCompositeState(false)
+        );
+    }
 
 //    public static RenderType getBlackHole(ResourceLocation locationIn, @Nullable RenderTarget renderTarget) {
 //        return (RenderType)create("black_hole", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true, CompositeState.builder()
