@@ -4,7 +4,7 @@
     "srcrgb": "one",
     "dstrgb": "zero"
   },
-  "vertex": "position_color_tex",
+  "vertex": "position_tex_color",
   "fragment": "rbh:rendertype_black_hole",
   "attributes": [
     "Position",

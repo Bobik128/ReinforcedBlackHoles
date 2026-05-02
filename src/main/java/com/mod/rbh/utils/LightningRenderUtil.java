@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 
 public final class LightningRenderUtil {
@@ -48,8 +48,11 @@ public final class LightningRenderUtil {
                                        Params p) {
         if (start == null || end == null) return;
 
+        assert Minecraft.getInstance().level != null;
         long tick = Minecraft.getInstance().level.getGameTime();
-        float partialTick = Minecraft.getInstance().getPartialTick();
+        Minecraft minecraft = Minecraft.getInstance();
+
+        float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
         if (lastRenderTime < tick + partialTick) {
             lastRenderTime = tick + partialTick;
             lightningCounter = 0;
@@ -159,8 +162,8 @@ public final class LightningRenderUtil {
     }
 
     private static void put(VertexConsumer vc, Matrix4f m, Vec3 p, int r, int g, int b, int a) {
-        vc.vertex(m, (float)p.x, (float)p.y, (float)p.z).color(r, g, b, a).endVertex();
+        vc.addVertex(m, (float)p.x, (float)p.y, (float)p.z).setColor(r, g, b, a);
     }
 
-    private static int clamp255(int x){ return Math.max(0, Math.min(255, x)); }
+    private static int clamp255(int x){ return Math.clamp(x, 0, 255); }
 }

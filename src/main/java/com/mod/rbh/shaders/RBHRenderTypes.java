@@ -27,7 +27,7 @@ public class RBHRenderTypes extends RenderType {
         final FboGuard guard = new FboGuard(); // your class
 
         return (RenderType) create("black_hole",
-                DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true,
+                DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 256, false, true,// not sure about that, was POSITION_COLOR_TEX
                 CompositeState.builder()
                         .setShaderState(RENDERTYPE_BLACK_HOLE_SHADER)
                         .setCullState(RenderStateShard.NO_CULL)

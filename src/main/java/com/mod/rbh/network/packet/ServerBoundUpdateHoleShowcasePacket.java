@@ -1,53 +1,89 @@
 package com.mod.rbh.network.packet;
 
+import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.blocks.custom.entity.HoleShowcaseBlockEntity;
-import com.mod.rbh.network.RBHPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.concurrent.Executor;
+public record ServerBoundUpdateHoleShowcasePacket(
+        BlockPos pos,
+        HoleShowcaseBlockEntity.HoleShowcaseConfig config,
+        ResourceKey<Level> levelKey
+) implements CustomPacketPayload {
 
-public class ServerBoundUpdateHoleShowcasePacket implements RBHPacket {
-    private final ResourceKey<Level> levelKey;
-    private BlockPos pos;
-    private HoleShowcaseBlockEntity.HoleShowcaseConfig config;
+    public static final Type<ServerBoundUpdateHoleShowcasePacket> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(
+                    ReinforcedBlackHoles.MODID,
+                    "update_hole_showcase"
+            ));
 
-    public ServerBoundUpdateHoleShowcasePacket(FriendlyByteBuf buf) {
-        this(buf.readBlockPos(), new HoleShowcaseBlockEntity.HoleShowcaseConfig(buf), ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation()));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ServerBoundUpdateHoleShowcasePacket> STREAM_CODEC =
+            StreamCodec.of(
+                    ServerBoundUpdateHoleShowcasePacket::encode,
+                    ServerBoundUpdateHoleShowcasePacket::decode
+            );
+
+    private static void encode(RegistryFriendlyByteBuf buf, ServerBoundUpdateHoleShowcasePacket packet) {
+        buf.writeBlockPos(packet.pos);
+        packet.config.toBytes(buf);
+        buf.writeResourceLocation(packet.levelKey.location());
     }
 
-    public ServerBoundUpdateHoleShowcasePacket(BlockPos pos, HoleShowcaseBlockEntity.HoleShowcaseConfig config, ResourceKey<Level> levelKey) {
-        this.pos = pos;
-        this.config = config;
-        this.levelKey = levelKey;
+    private static ServerBoundUpdateHoleShowcasePacket decode(RegistryFriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+
+        HoleShowcaseBlockEntity.HoleShowcaseConfig config =
+                new HoleShowcaseBlockEntity.HoleShowcaseConfig(buf);
+
+        ResourceKey<Level> levelKey = ResourceKey.create(
+                Registries.DIMENSION,
+                buf.readResourceLocation()
+        );
+
+        return new ServerBoundUpdateHoleShowcasePacket(pos, config, levelKey);
     }
 
-    @Override
-    public void rootEncode(FriendlyByteBuf buf) {
-        buf.writeBlockPos(pos);
-        config.toBytes(buf);
-        buf.writeResourceLocation(levelKey.location());
-    }
+    public static void handle(ServerBoundUpdateHoleShowcasePacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer sender)) {
+                return;
+            }
 
-    @Override
-    public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
-        exec.execute(() -> {
-            ServerLevel level = sender.server.getLevel(levelKey);
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof HoleShowcaseBlockEntity hsbe) {
-                hsbe.config = config;
-                hsbe.setChanged();
+            ServerLevel level = sender.server.getLevel(packet.levelKey);
+
+            if (level == null) {
+                return;
+            }
+
+            BlockEntity blockEntity = level.getBlockEntity(packet.pos);
+
+            if (blockEntity instanceof HoleShowcaseBlockEntity holeShowcase) {
+                holeShowcase.config = packet.config;
+                holeShowcase.setChanged();
+
+                // Optional but usually useful if clients need to see the updated BE data.
+                level.sendBlockUpdated(
+                        packet.pos,
+                        holeShowcase.getBlockState(),
+                        holeShowcase.getBlockState(),
+                        3
+                );
             }
         });
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

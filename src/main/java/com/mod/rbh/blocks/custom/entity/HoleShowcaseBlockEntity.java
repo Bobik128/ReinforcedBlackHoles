@@ -6,6 +6,7 @@ import com.mod.rbh.network.packet.ClientBoundOpenGuiPacket;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -53,8 +54,8 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
 
         // UUID
         if (holeUUID != null) {
@@ -81,25 +82,23 @@ public class HoleShowcaseBlockEntity extends BlockEntity {
         tag.putFloat("Height", config.height);
     }
 
-
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
 
-        // UUID
         if (tag.hasUUID("HoleUUID")) {
             holeUUID = tag.getUUID("HoleUUID");
         } else {
             holeUUID = null;
         }
 
-        float effectRadius     = tag.getFloat("EffectRadius");
-        float holeRadius       = tag.getFloat("HoleRadius");
-        float effectExponent   = tag.getFloat("EffectExponent");
-        float stretchStrength  = tag.getFloat("StretchStrength");
-        boolean rainbow        = tag.getBoolean("Rainbow");
-        int color              = tag.getInt("Color");
-        float height           = tag.getFloat("Height");
+        float effectRadius = tag.getFloat("EffectRadius");
+        float holeRadius = tag.getFloat("HoleRadius");
+        float effectExponent = tag.getFloat("EffectExponent");
+        float stretchStrength = tag.getFloat("StretchStrength");
+        boolean rainbow = tag.getBoolean("Rainbow");
+        int color = tag.getInt("Color");
+        float height = tag.getFloat("Height");
 
         double x = tag.getDouble("StretchDirX");
         double y = tag.getDouble("StretchDirY");

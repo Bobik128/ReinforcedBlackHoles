@@ -1,67 +1,53 @@
 package com.mod.rbh.network;
 
 import com.mod.rbh.ReinforcedBlackHoles;
-import com.mod.rbh.network.packet.*;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import com.mod.rbh.network.packet.ClientBoundOpenGuiPacket;
+import com.mod.rbh.network.packet.ServerBoundUpdateHoleShowcasePacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class RBHNetwork {
-
-    private static SimpleChannel NETWORK = construct();
     public static final String VERSION = "1.0.0";
 
-    private static SimpleChannel construct() {
-        SimpleChannel network = NetworkRegistry.ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(ReinforcedBlackHoles.MODID,"network"))
-                .clientAcceptedVersions(VERSION::equals)
-                .serverAcceptedVersions(VERSION::equals)
-                .networkProtocolVersion(() -> VERSION)
-                .simpleChannel();
-
-        int id = 0;
-
-        buildMessage(network, id++, ClientBoundOpenGuiPacket.class, ClientBoundOpenGuiPacket::new);
-        buildMessage(network, id++, ServerBoundUpdateHoleShowcasePacket.class, ServerBoundUpdateHoleShowcasePacket::new);
-
-        return network;
+    public static void register(IEventBus modBus) {
+        modBus.addListener(RBHNetwork::registerPayloads);
     }
 
-    private static <MSG extends RBHPacket> void buildMessage(SimpleChannel network, int id, Class<MSG> msg, Function<FriendlyByteBuf, MSG> decoder) {
-        network.messageBuilder(msg, id)
-                .decoder(decoder)
-                .encoder(RBHPacket::rootEncode)
-                .consumerMainThread(RBHNetwork::consumeRBHPacket)
-                .add();
+    private static void registerPayloads(final RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(ReinforcedBlackHoles.MODID)
+                .versioned(VERSION);
+
+        registrar.playToClient(
+                ClientBoundOpenGuiPacket.TYPE,
+                ClientBoundOpenGuiPacket.STREAM_CODEC,
+                ClientBoundOpenGuiPacket::handle
+        );
+
+        registrar.playToServer(
+                ServerBoundUpdateHoleShowcasePacket.TYPE,
+                ServerBoundUpdateHoleShowcasePacket.STREAM_CODEC,
+                ServerBoundUpdateHoleShowcasePacket::handle
+        );
     }
 
-    private static <MSG extends RBHPacket> void consumeRBHPacket(MSG packet, Supplier<NetworkEvent.Context> sup) {
-        NetworkEvent.Context ctx = sup.get();
-        packet.handle(ctx::enqueueWork, ctx.getNetworkManager().getPacketListener(), ctx.getSender());
-        ctx.setPacketHandled(true);
+    public static void sendToServer(ServerBoundUpdateHoleShowcasePacket packet) {
+        PacketDistributor.sendToServer(packet);
     }
 
-    public static <MSG extends RBHPacket> void sendToServer(MSG msg) { NETWORK.sendToServer(msg); }
-
-    public static <MSG extends RBHPacket> void sendToPlayer(MSG msg, ServerPlayer player) {
-        NETWORK.send(PacketDistributor.PLAYER.with(() -> player), msg);
+    public static void sendToPlayer(ClientBoundOpenGuiPacket packet, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, packet);
     }
 
-    public static <MSG extends RBHPacket> void sendToAll(MSG msg) {
-        NETWORK.send(PacketDistributor.SERVER.noArg(), msg);
+    public static void sendToAll(ClientBoundOpenGuiPacket packet) {
+        PacketDistributor.sendToAllPlayers(packet);
     }
 
-    public static <MSG extends RBHPacket> void sendToAllInDimension(MSG msg, Level level) {
-        NETWORK.send(PacketDistributor.DIMENSION.with(level::dimension), msg);
+    public static void sendToAllInDimension(ClientBoundOpenGuiPacket packet, ServerLevel level) {
+        PacketDistributor.sendToPlayersInDimension(level, packet);
     }
-
-    public static void init() {}
-
 }

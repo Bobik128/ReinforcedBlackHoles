@@ -1,38 +1,53 @@
 package com.mod.rbh.network.packet;
 
+import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.blocks.custom.entity.HoleShowcaseBlockEntity;
 import com.mod.rbh.client.screen.ClientScreenHandler;
-import com.mod.rbh.network.RBHPacket;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketListener;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.concurrent.Executor;
+public record ClientBoundOpenGuiPacket(
+        BlockPos pos,
+        HoleShowcaseBlockEntity.HoleShowcaseConfig config
+) implements CustomPacketPayload {
 
-public class ClientBoundOpenGuiPacket implements RBHPacket {
-    private BlockPos pos;
-    private HoleShowcaseBlockEntity.HoleShowcaseConfig config;
+    public static final Type<ClientBoundOpenGuiPacket> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(
+                    ReinforcedBlackHoles.MODID,
+                    "open_hole_showcase_gui"
+            ));
 
-    public ClientBoundOpenGuiPacket(FriendlyByteBuf buf) {
-        this(buf.readBlockPos(), new HoleShowcaseBlockEntity.HoleShowcaseConfig(buf));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientBoundOpenGuiPacket> STREAM_CODEC =
+            StreamCodec.of(
+                    ClientBoundOpenGuiPacket::encode,
+                    ClientBoundOpenGuiPacket::decode
+            );
+
+    private static void encode(RegistryFriendlyByteBuf buf, ClientBoundOpenGuiPacket packet) {
+        buf.writeBlockPos(packet.pos);
+        packet.config.toBytes(buf);
     }
 
-    public ClientBoundOpenGuiPacket(BlockPos pos, HoleShowcaseBlockEntity.HoleShowcaseConfig config) {
-        this.pos = pos;
-        this.config = config;
+    private static ClientBoundOpenGuiPacket decode(RegistryFriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        HoleShowcaseBlockEntity.HoleShowcaseConfig config =
+                new HoleShowcaseBlockEntity.HoleShowcaseConfig(buf);
+
+        return new ClientBoundOpenGuiPacket(pos, config);
+    }
+
+    public static void handle(ClientBoundOpenGuiPacket packet, IPayloadContext context) {
+        context.enqueueWork(() ->
+                ClientScreenHandler.openHoleShowcaseGui(packet.pos, packet.config)
+        );
     }
 
     @Override
-    public void rootEncode(FriendlyByteBuf buf) {
-        buf.writeBlockPos(pos);
-        config.toBytes(buf);
-    }
-
-    @Override
-    public void handle(Executor exec, PacketListener listener, @Nullable ServerPlayer sender) {
-        exec.execute(() -> ClientScreenHandler.openHoleShowcaseGui(pos, config));
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

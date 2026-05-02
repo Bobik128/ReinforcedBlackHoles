@@ -24,8 +24,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
@@ -89,14 +89,14 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(SIZE, 0.5f);
-        this.entityData.define(EFFECT_SIZE, 2.0f);
-        this.entityData.define(EFFECT_EXPONENT, 4.0f);
-        this.entityData.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
-        this.entityData.define(STRETCH_STRENGTH, 0.0f);
-        this.entityData.define(COLOR, 0xFFFF00);
-        this.entityData.define(RAINBOW, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(SIZE, 0.5f);
+        builder.define(EFFECT_SIZE, 2.0f);
+        builder.define(EFFECT_EXPONENT, 4.0f);
+        builder.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
+        builder.define(STRETCH_STRENGTH, 0.0f);
+        builder.define(COLOR, 0xFFFF00);
+        builder.define(RAINBOW, false);
     }
 
     @Override

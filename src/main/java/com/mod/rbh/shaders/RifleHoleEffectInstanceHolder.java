@@ -1,7 +1,7 @@
 package com.mod.rbh.shaders;
 
 import com.mod.rbh.ReinforcedBlackHoles;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -10,39 +10,49 @@ import java.util.List;
 import java.util.Map;
 
 public class RifleHoleEffectInstanceHolder {
-    private static Map<Integer, PostEffectRegistry.HoleEffectInstance> effects = new HashMap<>();
-    private static Map<Integer, Integer> timers = new HashMap<>();
+    private static final Map<Integer, PostEffectRegistry.HoleEffectInstance> effects = new HashMap<>();
+    private static final Map<Integer, Integer> timers = new HashMap<>();
 
-    private static final List<Integer> toRemove = new ArrayList<>();// caching it for effectivity
+    // Cached list to avoid allocating every tick.
+    private static final List<Integer> toRemove = new ArrayList<>();
+
+    private static int effectCounter = 0;
+
     public static void clientTick() {
         for (Map.Entry<Integer, PostEffectRegistry.HoleEffectInstance> entry : effects.entrySet()) {
-            if (timers.get(entry.getKey()) <= 0) {
+            Integer timer = timers.get(entry.getKey());
+
+            if (timer == null || timer <= 0) {
                 toRemove.add(entry.getKey());
                 continue;
             }
-            timers.put(entry.getKey(), timers.get(entry.getKey()) - 1);
+
+            timers.put(entry.getKey(), timer - 1);
         }
 
-        for (Integer stack : toRemove) {
-            effects.remove(stack);
-            timers.remove(stack);
+        for (Integer id : toRemove) {
+            effects.remove(id);
+            timers.remove(id);
         }
 
         toRemove.clear();
     }
 
-    private static int effectCounter = 0;
-
-    public static void resetEffectCounter(TickEvent.RenderTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) effectCounter = 0;
+    public static void resetEffectCounter(RenderFrameEvent.Post event) {
+        effectCounter = 0;
     }
 
     public static @Nullable PostEffectRegistry.HoleEffectInstance getUniqueEffect() {
         if (effects.size() < 40) {
             effectCounter++;
             timers.put(effectCounter, 30);
-            return effects.computeIfAbsent(effectCounter, (itemId) -> PostEffectRegistry.HoleEffectInstance.createEffectInstance());
+
+            return effects.computeIfAbsent(
+                    effectCounter,
+                    id -> PostEffectRegistry.HoleEffectInstance.createEffectInstance()
+            );
         }
+
         ReinforcedBlackHoles.LOGGER.warn("Too many rifle effects registered, skipping!");
         return null;
     }

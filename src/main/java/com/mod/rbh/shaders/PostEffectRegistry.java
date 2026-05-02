@@ -35,10 +35,18 @@ public class PostEffectRegistry {
     private static double lastFrameTime = 0.0;
 
     protected static void changeFrame() {
-        if (Minecraft.getInstance().level == null) return;
-        double nowFrame = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
+        Minecraft minecraft = Minecraft.getInstance();
+
+        if (minecraft.level == null) {
+            return;
+        }
+
+        double nowFrame = minecraft.level.getGameTime()
+                + minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+
         if (nowFrame != lastFrameTime) {
             lastFrameTime = nowFrame;
+
             for (MutablePostEffect fx : mutablePostEffects.values()) {
                 fx.resetFrame();
             }
@@ -172,7 +180,7 @@ public class PostEffectRegistry {
             if (phase == RenderPhase.AFTER_LEVEL) {
                 for (PostEffect fx : postEffects.values()) {
                     if (fx.isEnabled() && fx.postChain != null) {
-                        fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                        fx.postChain.process(f);
                     }
                 }
             }
@@ -180,7 +188,7 @@ public class PostEffectRegistry {
                 if (fx.isEnabled() && fx.postChain != null) {
                     fx.process(phase);
                     if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
-                        fx.postChain.process(Minecraft.getInstance().getFrameTime());
+                        fx.postChain.process(f);
                 }
             }
         });

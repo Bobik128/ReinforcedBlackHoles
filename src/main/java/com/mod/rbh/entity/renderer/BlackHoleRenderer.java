@@ -1,6 +1,6 @@
 package com.mod.rbh.entity.renderer;
 
-import com.mod.rbh.api.IGameRenderer;
+import com.mod.rbh.client.RBHCameraInfo;
 import com.mod.rbh.entity.BlackHole;
 import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
@@ -8,7 +8,7 @@ import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
@@ -37,8 +37,8 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(@NotNull T pEntity) {
-        return null;
+    public @NotNull ResourceLocation getTextureLocation(@NotNull T pEntity) {
+        return NETHERITE;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
                                       float r, float g, float b, float a, float exponent,
                                       Vector3f stretchDirView, float stretchStrength) {
         // Precompute constants
-        float fov = (float) Math.toRadians(IGameRenderer.get().getFovPublic());
+        float fov = (float) Math.toRadians(RBHCameraInfo.getFov());
         float effectFraction = radius / ((float) Math.tan(fov * 0.5f) * distFromCam);
         float expScale = 1.0f / (float) (Math.exp(5.0) - 1.0);
         float effectOffset = holeRadius / radius;
@@ -161,13 +161,13 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         Vector3fc cameraRelativePos = poseStack.last().pose().getTranslation(new Vector3f());
 
         PoseStack rawPoseStack = new PoseStack();
-        rawPoseStack.mulPoseMatrix(poseStack.last().pose());
+        rawPoseStack.mulPose(poseStack.last().pose());
 
         // ===== Apply post effect without breaking rest of pipeline =====
         effectInstance.renderPhase = phase;
 
         Matrix4f preBobProjection = Minecraft.getInstance().gameRenderer.getProjectionMatrix(
-                IGameRenderer.get().getFovPublic()
+                RBHCameraInfo.getFov()
         );
 
         Vector2f screenPos = getScreenSpace(cameraRelativePos, preBobProjection);
@@ -189,10 +189,8 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
             int[] sc = new int[4]; if (hadScissor) GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, sc);
 
             // --- Draw spheres into your offscreen RT via RenderType ---
-            BufferBuilder bb = new BufferBuilder(256 * 1024);
+            ByteBufferBuilder bb = new ByteBufferBuilder(256 * 1024);
             MultiBufferSource.BufferSource local = MultiBufferSource.immediate(bb);
-
-
 
             RenderType rt = RBHRenderTypes.getBlackHole(NETHERITE, finalTarget);
             VertexConsumer vc = local.getBuffer(rt);

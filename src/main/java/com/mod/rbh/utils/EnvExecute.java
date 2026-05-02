@@ -1,16 +1,13 @@
 package com.mod.rbh.utils;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-
-import java.util.function.Supplier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLLoader;
 
 public class EnvExecute {
 
-    // TODO non-forge
-    public static void runOnClient(Supplier<Runnable> toRun) {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, toRun);
+    public static void runOnClient(Runnable toRun) {
+        if (FMLLoader.getDist() == Dist.CLIENT) {
+            toRun.run();
+        }
     }
-
 }
-

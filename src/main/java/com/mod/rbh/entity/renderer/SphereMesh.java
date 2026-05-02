@@ -109,14 +109,12 @@ public class SphereMesh {
     }
 
     private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, Vec3 pos, int light, int overlay) {
-        buffer.vertex(pose.pose(), (float) pos.x, (float) pos.y, (float) pos.z)
-                .color(255, 255, 255, 255)
-                .uv(0, 0)
-                .overlayCoords(overlay)
-                .uv2(light)
-                // normals are irrelevant for your depth-only pass (and you’re overriding anyway)
-                .normal(pose.normal(), 0, 1, 0)
-                .endVertex();
+        buffer.addVertex(pose, (float) pos.x, (float) pos.y, (float) pos.z)
+                .setColor(255, 255, 255, 255)
+                .setUv(0.0f, 0.0f)
+                .setOverlay(overlay)
+                .setLight(light)
+                .setNormal(pose, 0.0f, 1.0f, 0.0f);
     }
 
     /**

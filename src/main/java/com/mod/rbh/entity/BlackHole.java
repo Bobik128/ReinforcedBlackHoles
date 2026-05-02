@@ -10,8 +10,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
@@ -71,14 +71,14 @@ public abstract class BlackHole extends Entity implements IBlackHole {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(SIZE, 0.6f);
-        this.entityData.define(EFFECT_SIZE, 1.6f);
-        this.entityData.define(EFFECT_EXPONENT, 3.6f);
-        this.entityData.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
-        this.entityData.define(STRETCH_STRENGTH, 0.0f);
-        this.entityData.define(COLOR, 0xFFFF00);
-        this.entityData.define(RAINBOW, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(SIZE, 0.6f);
+        builder.define(EFFECT_SIZE, 1.6f);
+        builder.define(EFFECT_EXPONENT, 3.6f);
+        builder.define(STRETCH_DIR, new Vector3f(1.0f, 0.0f, 0.0f));
+        builder.define(STRETCH_STRENGTH, 0.0f);
+        builder.define(COLOR, 0xFFFF00);
+        builder.define(RAINBOW, false);
     }
 
     @Override
