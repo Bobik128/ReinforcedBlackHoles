@@ -128,6 +128,8 @@ dependencies {
 
     implementation "curse.maven:sodium-394468:6382651"
     implementation "curse.maven:irisshaders-455508:6661598"
+    implementation "curse.maven:create-328085:7963363"
+    // aeronautics and sable are in mods folder
 
     // Optional examples, update CurseMaven IDs/versions for 1.21.1 NeoForge-compatible jars:
     // compileOnly "curse.maven:jei-238222:<file_id>"
