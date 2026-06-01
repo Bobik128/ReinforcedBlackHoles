@@ -5,7 +5,6 @@ plugins {
     id 'eclipse'
     id 'idea'
 }
-// test commit
 
 tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
@@ -47,6 +46,7 @@ repositories {
         dir 'libs'
     }
 }
+
 neoForge {
     version = project.neo_version
 
@@ -58,17 +58,20 @@ neoForge {
     runs {
         client {
             client()
+            gameDirectory = project.file('run')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
+            gameDirectory = project.file('run')
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         gameTestServer {
             type = 'gameTestServer'
+            gameDirectory = project.file('run')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
@@ -85,12 +88,10 @@ neoForge {
         }
 
         configureEach {
-            gameDirectory = project.file('run')
-
             systemProperty 'forge.logging.markers', 'REGISTRIES'
-            systemProperty 'forge.logging.console.level', 'debug'
+            systemProperty 'forge.logging.console.level', 'info'
 
-            logLevel = org.slf4j.event.Level.DEBUG
+            logLevel = org.slf4j.event.Level.INFO
         }
     }
 
@@ -99,12 +100,6 @@ neoForge {
             sourceSet sourceSets.main
         }
     }
-}
-
-// Used for optional runtime-only mod dependencies in dev.
-// Prefer localRuntime instead of runtimeOnly for mods you do not want published as required dependencies.
-configurations {
-    runtimeClasspath.extendsFrom localRuntime
 }
 
 dependencies {
@@ -116,8 +111,8 @@ dependencies {
 
     /*
      * MixinExtras:
-     * NeoForge 20.2.84+ already includes MixinExtras.
-     * Keep this only if you specifically want to bundle/control your own version.
+     * NeoForge already includes MixinExtras in modern versions.
+     * Keep this only if your mod directly needs this specific bundled version.
      */
     implementation(jarJar("io.github.llamalad7:mixinextras-neoforge:${mixinextras_version}")) {
         version {
@@ -126,17 +121,29 @@ dependencies {
         }
     }
 
-    implementation "curse.maven:sodium-394468:6382651"
-    implementation "curse.maven:irisshaders-455508:6661598"
-    implementation "curse.maven:create-328085:7963363"
-    // aeronautics and sable are in mods folder
+    /*
+     * Create:
+     * compileOnly = your code can compile against Create APIs.
+     * localRuntime = Create is loaded only in dev runtime runs.
+     *
+     * Do not use implementation for optional Create, otherwise it becomes
+     * part of normal runtime/datagen classpath.
+     */
+    compileOnly "curse.maven:create-328085:7963363"
+//    localRuntime "curse.maven:create-328085:7963363"
 
-    // Optional examples, update CurseMaven IDs/versions for 1.21.1 NeoForge-compatible jars:
-    // compileOnly "curse.maven:jei-238222:<file_id>"
-    // localRuntime "curse.maven:jei-238222:<file_id>"
-
-    // Local jar example:
-    // implementation "blank:coolmod-${minecraft_version}:${coolmod_version}"
+    /*
+     * Do NOT put Sodium/Iris/Veil/Sable/Simulated here.
+     *
+     * These were the reason runData loaded shader/client mixins and appeared stuck.
+     * If you want them for normal client testing, put their jars manually into:
+     *
+     * run/mods/
+     *
+     * Keep this empty:
+     *
+     * run-data/mods/
+     */
 }
 
 // Expands properties in resource files.
@@ -163,7 +170,7 @@ tasks.named('processResources', ProcessResources).configure {
             'META-INF/neoforge.mods.toml',
             'pack.mcmeta'
     ]) {
-        expand replaceProperties// + [project: project]
+        expand replaceProperties
     }
 }
 

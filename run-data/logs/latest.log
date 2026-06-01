@@ -1,43 +1,45 @@
-[06Dec2025 23:34:18.943] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, /home/tomas/.gradle/caches/forge_gradle/assets, --gameDir, ., --fml.forgeVersion, 47.4.6, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources, --mixin.config, rbh.mixins.json]
-[06Dec2025 23:34:18.945] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.15 by Eclipse Adoptium; OS Linux arch amd64 version 6.17.9-300.fc43.x86_64
-[06Dec2025 23:34:19.002] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[06Dec2025 23:34:19.027] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/home/tomas/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23116!/ Service=ModLauncher Env=CLIENT
-[06Dec2025 23:34:19.192] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/javafmllanguage/1.20.1-47.4.6/9e86bf67e222253576e982856d9958695725adb5/javafmllanguage-1.20.1-47.4.6.jar is missing mods.toml file
-[06Dec2025 23:34:19.193] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/lowcodelanguage/1.20.1-47.4.6/56100545804adc991cc48ab68b86ba46c5873246/lowcodelanguage-1.20.1-47.4.6.jar is missing mods.toml file
-[06Dec2025 23:34:19.194] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/mclanguage/1.20.1-47.4.6/fd228d7d879a9da774eda022ea3092cedb5178f1/mclanguage-1.20.1-47.4.6.jar is missing mods.toml file
-[06Dec2025 23:34:19.195] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/tomas/.gradle/caches/modules-2/files-2.1/net.minecraftforge/fmlcore/1.20.1-47.4.6/cefc55ada370ce2f23f92834530eb967c0de1fdd/fmlcore-1.20.1-47.4.6.jar is missing mods.toml file
-[06Dec2025 23:34:19.272] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 1 dependencies adding them to mods collection
-[06Dec2025 23:34:19.961] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by rbh.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[06Dec2025 23:34:19.961] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[06Dec2025 23:34:19.965] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, /home/tomas/.gradle/caches/forge_gradle/assets, --assetIndex, 5, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources]
-[06Dec2025 23:34:19.979] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[06Dec2025 23:34:19.980] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[06Dec2025 23:34:19.983] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[06Dec2025 23:34:19.983] [main/INFO] [mixin/]: Selecting config rbh.mixins.json
-[06Dec2025 23:34:19.985] [main/WARN] [mixin/]: Reference map 'rbh.refmap.json' for rbh.mixins.json could not be read. If this is a development environment you can ignore this message
-[06Dec2025 23:34:19.986] [main/INFO] [mixin/]: Selecting config mixinextras.init.mixins.json
-[06Dec2025 23:34:20.073] [main/INFO] [mixin/]: Preparing rbh.mixins.json (7)
-[06Dec2025 23:34:20.143] [main/INFO] [mixin/]: Preparing mixinextras.init.mixins.json (0)
-[06Dec2025 23:34:20.377] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [rbh]
-[06Dec2025 23:34:22.367] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.6, for MC 1.20.1 with MCP 20230612.114412
-[06Dec2025 23:34:22.367] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.6 Initialized
-[06Dec2025 23:34:22.395] [modloading-worker-0/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
-[06Dec2025 23:34:22.406] [modloading-worker-0/INFO] [mixin/]: Mixing client.ShaderInstanceMixin from rbh.mixins.json into net.minecraft.client.renderer.ShaderInstance
-[06Dec2025 23:34:22.618] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1/forge-1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1-recomp.jar%23181!/assets/.mcassetsroot' uses unexpected schema
-[06Dec2025 23:34:22.618] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1/forge-1.20.1-47.4.6_mapped_parchment_2023.08.06-1.20.1-recomp.jar%23181!/data/.mcassetsroot' uses unexpected schema
-[06Dec2025 23:34:22.715] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[06Dec2025 23:34:22.717] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 1 ms
-[06Dec2025 23:34:22.717] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: rbh
-[06Dec2025 23:34:22.791] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: rbh finished after 73 ms
-[06Dec2025 23:34:22.791] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: rbh
-[06Dec2025 23:34:22.791] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: rbh finished after 0 ms
-[06Dec2025 23:34:22.791] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id rbh
-[06Dec2025 23:34:22.816] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id rbh finished after 24 ms
-[06Dec2025 23:34:22.816] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id rbh
-[06Dec2025 23:34:22.817] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id rbh finished after 0 ms
-[06Dec2025 23:34:22.817] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : rbh
-[06Dec2025 23:34:22.819] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : rbh finished after 1 ms
-[06Dec2025 23:34:22.819] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:point_of_interest_type mod id rbh
-[06Dec2025 23:34:22.826] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:point_of_interest_type mod id rbh finished after 7 ms
-[06Dec2025 23:34:22.826] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 111 ms
-[06Dec2025 23:34:22.828] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 4, old count: 2, new count: 5, removed stale: 0, written: 2
+[01Jun2026 16:25:48.930] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatadev, --assetIndex, 17, --assetsDir, /home/tomas/.gradle/caches/neoformruntime/assets, --gameDir, ., --fml.fmlVersion, 4.0.42, --fml.mcVersion, 1.21.1, --fml.neoForgeVersion, 21.1.228, --fml.neoFormVersion, 20240808.144430, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources]
+[01Jun2026 16:25:48.931] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.11+10-LTS
+[01Jun2026 16:25:48.932] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 11.0.5+main.901c6ea8 starting: java version 21.0.11 by Eclipse Adoptium; OS Linux arch amd64 version 7.0.10-201.fc44.x86_64
+[01Jun2026 16:25:48.979] [main/WARN] [net.neoforged.fml.loading.FMLConfig/CORE]: Configuration file /home/tomas/IdeaProjects/ReinforcedBlackHoles/run-data/config/fml.toml is not correct. Correcting
+[01Jun2026 16:25:48.995] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatadev
+[01Jun2026 16:25:49.017] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/home/tomas/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar%23126!/ Service=ModLauncher Env=CLIENT
+[01Jun2026 16:25:49.021] [main/WARN] [net.neoforged.fml.loading.FMLConfig/CORE]: Configuration file /home/tomas/IdeaProjects/ReinforcedBlackHoles/run-data/config/fml.toml is not correct. Correcting
+[01Jun2026 16:25:49.170] [main/WARN] [net.neoforged.jarjar.selection.JarSelector/]: Attempted to select a dependency jar for JarJar which was passed in as source: library:mixinextras.neoforge. Using Mod File: /home/tomas/.gradle/caches/modules-2/files-2.1/io.github.llamalad7/mixinextras-neoforge/0.5.0/d734b83ce6542bb70ea31755c1595b88992dbe65/mixinextras-neoforge-0.5.0.jar
+[01Jun2026 16:25:49.170] [main/INFO] [net.neoforged.fml.loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 1 dependencies adding them to mods collection
+[01Jun2026 16:25:49.171] [main/INFO] [net.neoforged.fml.loading.moddiscovery.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		Minecraft 1.21.1 (minecraft)
+		NeoForge 21.1.228 (neoforge)
+		Reinforced Black Holes 1.1.2 (rbh)
+[01Jun2026 16:25:49.613] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by rbh.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[01Jun2026 16:25:49.620] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[01Jun2026 16:25:49.624] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatadev' with arguments [--gameDir, ., --assetsDir, /home/tomas/.gradle/caches/neoformruntime/assets, --assetIndex, 17, --mod, rbh, --all, --output, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/generated/resources, --existing, /home/tomas/IdeaProjects/ReinforcedBlackHoles/src/main/resources]
+[01Jun2026 16:25:49.663] [main/WARN] [mixin/]: Reference map 'rbh.refmap.json' for rbh.mixins.json could not be read. If this is a development environment you can ignore this message
+[01Jun2026 16:25:49.925] [main/INFO] [net.neoforged.neoforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [rbh]
+[01Jun2026 16:25:49.939] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
+[01Jun2026 16:25:53.278] [modloading-worker-0/INFO] [net.neoforged.neoforge.common.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.1.228, for MC 1.21.1
+[01Jun2026 16:25:53.384] [modloading-worker-0/INFO] [mixin/]: Mixing client.ShaderInstanceMixin from rbh.mixins.json into net.minecraft.client.renderer.ShaderInstance
+[01Jun2026 16:25:53.385] [modloading-worker-0/WARN] [mixin/]: rbh.mixins.json:client.ShaderInstanceMixin from mod rbh: Class version 65 required is higher than the class version supported by the current version of Mixin (JAVA_17 supports class version 61)
+[01Jun2026 16:25:53.556] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/IdeaProjects/ReinforcedBlackHoles/build/moddev/artifacts/neoforge-21.1.228.jar%23177!/assets/.mcassetsroot' uses unexpected schema
+[01Jun2026 16:25:53.557] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/tomas/IdeaProjects/ReinforcedBlackHoles/build/moddev/artifacts/neoforge-21.1.228.jar%23177!/data/.mcassetsroot' uses unexpected schema
+[01Jun2026 16:25:53.769] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[01Jun2026 16:25:53.772] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 1 ms
+[01Jun2026 16:25:53.772] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[01Jun2026 16:25:53.794] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 21 ms
+[01Jun2026 16:25:53.794] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id rbh
+[01Jun2026 16:25:53.798] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id rbh finished after 4 ms
+[01Jun2026 16:25:53.799] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id rbh
+[01Jun2026 16:25:53.799] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id rbh finished after 0 ms
+[01Jun2026 16:25:53.799] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : rbh
+[01Jun2026 16:25:53.802] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : rbh finished after 2 ms
+[01Jun2026 16:25:53.802] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:point_of_interest_type mod id rbh
+[01Jun2026 16:25:53.804] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:point_of_interest_type mod id rbh finished after 1 ms
+[01Jun2026 16:25:53.804] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: rbh
+[01Jun2026 16:25:53.816] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: rbh finished after 11 ms
+[01Jun2026 16:25:53.816] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: rbh
+[01Jun2026 16:25:53.817] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: rbh finished after 0 ms
+[01Jun2026 16:25:53.817] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 47 ms
+[01Jun2026 16:25:53.820] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 6, old count: 6, new count: 7, removed stale: 0, written: 0

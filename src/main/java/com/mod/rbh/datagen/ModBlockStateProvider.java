@@ -15,6 +15,7 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class ModBlockStateProvider extends BlockStateProvider {
+
     public ModBlockStateProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, ReinforcedBlackHoles.MODID, existingFileHelper);
     }
@@ -29,12 +30,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     }
 
     private void facingBlockCustomAllSides(DeferredBlock<? extends Block> block) {
-        ModelFile model = models().getExistingFile(
-                ResourceLocation.fromNamespaceAndPath(
-                        ReinforcedBlackHoles.MODID,
-                        "block/" + name(block.get())
-                )
-        );
+        ModelFile model = uncheckedBlockModel(name(block.get()));
 
         getVariantBuilder(block.get()).forAllStates(state -> {
             Direction facing = state.getValue(BlockStateProperties.FACING);
@@ -61,12 +57,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     }
 
     private void facingBlockCustom(DeferredBlock<? extends Block> block, String modelName) {
-        ModelFile model = models().getExistingFile(
-                ResourceLocation.fromNamespaceAndPath(
-                        ReinforcedBlackHoles.MODID,
-                        "block/" + modelName
-                )
-        );
+        ModelFile model = uncheckedBlockModel(modelName);
 
         getVariantBuilder(block.get()).forAllStates(state -> {
             Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -116,6 +107,15 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     private void blockWithItem(DeferredBlock<? extends Block> block) {
         simpleBlockWithItem(block.get(), cubeAll(block.get()));
+    }
+
+    private ModelFile uncheckedBlockModel(String modelName) {
+        return new ModelFile.UncheckedModelFile(
+                ResourceLocation.fromNamespaceAndPath(
+                        ReinforcedBlackHoles.MODID,
+                        "block/" + modelName
+                )
+        );
     }
 
     private String name(Block block) {
