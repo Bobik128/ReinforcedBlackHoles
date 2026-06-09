@@ -327,9 +327,10 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
                 RenderSystem.clearColor(0.0f, 0.0f, 0.0f, 0.0f);
                 RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, Minecraft.ON_OSX);
 
-                if (PostEffectRegistry.PhaseScope.current() == PostEffectRegistry.RenderPhase.AFTER_LEVEL) {
-                    finalTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
-                }
+                /*
+                 * Copy depth for all phases, including AFTER_ARM.
+                 */
+                finalTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
 
                 finalTarget.bindWrite(false);
 
