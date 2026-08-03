@@ -3,6 +3,7 @@ package com.mod.rbh.entity;
 import com.ibm.icu.impl.Pair;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -69,13 +70,14 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
 
     public BlackHoleProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        if (this.level().isClientSide) clientInit();
         this.setNoGravity(true);
     }
 
     @OnlyIn(Dist.CLIENT)
-    private void clientInit() {
-        effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
+    private void initEffectInstance() {
+        if (effectInstance == null && Minecraft.getInstance().isSameThread()) {
+            effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
+        }
     }
 
     @Override
@@ -125,6 +127,7 @@ public class BlackHoleProjectile extends Projectile implements IBlackHole {
     private Vec3 lastDeltaDir = new Vec3(1.0, 0.0, 0.0);
     public void tick() {
         super.tick();
+        if (level().isClientSide) initEffectInstance();
 
         Vec3 vec33 = this.getDeltaMovement();
         this.move(MoverType.SELF, vec33);

@@ -2,6 +2,7 @@ package com.mod.rbh.entity;
 
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -51,13 +52,21 @@ public abstract class BlackHole extends Entity implements IBlackHole {
 
     public BlackHole(EntityType<? extends BlackHole> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        if (this.level().isClientSide) clientInit();
         this.setNoGravity(true);
     }
 
     @OnlyIn(Dist.CLIENT)
-    void clientInit() {
-        effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
+    private void initEffectInstance() {
+        if (effectInstance == null && Minecraft.getInstance().isSameThread()) {
+            effectInstance = PostEffectRegistry.HoleEffectInstance.createEffectInstance();
+        }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (level().isClientSide) initEffectInstance();
     }
 
     @Override

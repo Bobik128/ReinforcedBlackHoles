@@ -41,19 +41,4 @@ public class RifleHoleEffectInstanceHolder {
     public static void resetEffectCounter(RenderFrameEvent.Post event) {
         effectCounter = 0;
     }
-
-    public static @Nullable PostEffectRegistry.HoleEffectInstance getUniqueEffect() {
-        if (effects.size() < 40) {
-            effectCounter++;
-            timers.put(effectCounter, 30);
-
-            return effects.computeIfAbsent(
-                    effectCounter,
-                    id -> PostEffectRegistry.HoleEffectInstance.createEffectInstance()
-            );
-        }
-
-        ReinforcedBlackHoles.LOGGER.warn("Too many rifle effects registered, skipping!");
-        return null;
-    }
 }
