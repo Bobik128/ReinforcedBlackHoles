@@ -88,18 +88,19 @@ public class ReinforcedBlackHoles {
         public static void onRenderPlayer(
                 RenderLivingEvent.Pre<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> event
         ) {
-            AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
-            ItemStack main = player.getMainHandItem();
+            if (event.getEntity() instanceof AbstractClientPlayer player) {
+                ItemStack main = player.getMainHandItem();
 
-            if (main.getItem() instanceof SingularityRifle) {
-                PlayerModel<AbstractClientPlayer> model =
-                        event.getRenderer().getModel();
+                if (main.getItem() instanceof SingularityRifle) {
+                    PlayerModel<AbstractClientPlayer> model =
+                            event.getRenderer().getModel();
 
-                model.rightArm.xRot = -(float) Math.PI / 2.0F;
-                model.leftArm.xRot  = -(float) Math.PI / 2.0F;
+                    model.rightArm.xRot = -(float) Math.PI / 2.0F;
+                    model.leftArm.xRot = -(float) Math.PI / 2.0F;
 
-                model.rightArm.yRot = -(float) Math.toRadians(20.0);
-                model.leftArm.yRot  =  (float) Math.toRadians(20.0);
+                    model.rightArm.yRot = -(float) Math.toRadians(20.0);
+                    model.leftArm.yRot = (float) Math.toRadians(20.0);
+                }
             }
         }
     }
