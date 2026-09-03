@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL30;
  *
  * READ and DRAW framebuffer bindings are intentionally restored separately.
  * GL_FRAMEBUFFER targets both at once, so binding it after the separate restores
- * would destroy the state we just restored.
+ * would destroy the state it just restored.
  */
 public final class FboGuard {
 
