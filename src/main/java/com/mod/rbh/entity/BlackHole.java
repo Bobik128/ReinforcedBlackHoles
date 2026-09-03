@@ -36,16 +36,30 @@ public abstract class BlackHole extends Entity implements IBlackHole {
     public static final int RENDER_DISTANCE = 120;
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    @OnlyIn(Dist.CLIENT) public PostEffectRegistry.HoleEffectInstance effectInstance;
+    @OnlyIn(Dist.CLIENT)
+    public PostEffectRegistry.HoleEffectInstance effectInstance;
 
-    public BlackHole(Vec3 pos, Level level, float size, float effectSize, EntityType<? extends BlackHole> pEntityType) {
+    public BlackHole(
+            Vec3 pos,
+            Level level,
+            float size,
+            float effectSize,
+            EntityType<? extends BlackHole> pEntityType
+    ) {
         this(pEntityType, level);
         this.setPos(pos);
         this.setSize(size);
         this.setEffectSize(effectSize);
     }
 
-    public BlackHole(Vec3 pos, Level level, float size, float effectSize, boolean rainbow, EntityType<? extends BlackHole> pEntityType) {
+    public BlackHole(
+            Vec3 pos,
+            Level level,
+            float size,
+            float effectSize,
+            boolean rainbow,
+            EntityType<? extends BlackHole> pEntityType
+    ) {
         this(pos, level, size, effectSize, pEntityType);
         this.setRainbow(rainbow);
     }
@@ -62,11 +76,35 @@ public abstract class BlackHole extends Entity implements IBlackHole {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
+    private void releaseEffectInstance() {
+        if (effectInstance != null) {
+            PostEffectRegistry.releaseHole(effectInstance);
+            effectInstance = null;
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
 
-        if (level().isClientSide) initEffectInstance();
+        if (level().isClientSide) {
+            initEffectInstance();
+        }
+    }
+
+    /**
+     * Forge calls this after the entity leaves the world's tracked/ticking
+     * lists (including chunk unload/removal). That is the correct point to
+     * release the private GPU targets owned by the client-side effect.
+     */
+    @Override
+    public void onRemovedFromWorld() {
+        if (level().isClientSide) {
+            releaseEffectInstance();
+        }
+
+        super.onRemovedFromWorld();
     }
 
     @Override
@@ -106,6 +144,7 @@ public abstract class BlackHole extends Entity implements IBlackHole {
         if (tag.contains("Size")) {
             setSize(tag.getFloat("Size"));
         }
+
         if (tag.contains("EffectSize")) {
             setEffectSize(tag.getFloat("EffectSize"));
         }
