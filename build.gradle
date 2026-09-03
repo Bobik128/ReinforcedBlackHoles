@@ -129,7 +129,8 @@ dependencies {
      * Do not use implementation for optional Create, otherwise it becomes
      * part of normal runtime/datagen classpath.
      */
-    compileOnly "curse.maven:create-328085:7963363"
+    implementation "curse.maven:create-328085:7963363"
+    implementation "curse.maven:spark-361579:6225208"
 //    localRuntime "curse.maven:create-328085:7963363"
 
     /*

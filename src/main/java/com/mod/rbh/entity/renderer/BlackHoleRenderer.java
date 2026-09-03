@@ -228,17 +228,9 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
 
         PostPass holePostPass = effectInstance.passes.get(0);
         RenderTarget finalTarget = holePostPass.inTarget;
-        RenderTarget swapTarget = holePostPass.outTarget;
 
         Minecraft minecraft = Minecraft.getInstance();
         RenderTarget mainTarget = minecraft.getMainRenderTarget();
-
-        Window window = minecraft.getWindow();
-
-        if (finalTarget.width != window.getWidth() || finalTarget.height != window.getHeight()) {
-            finalTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-            swapTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
-        }
 
         /*
          * Critical: capture the current render matrices now.

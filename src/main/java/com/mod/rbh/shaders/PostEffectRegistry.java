@@ -4,9 +4,9 @@ import com.google.gson.JsonSyntaxException;
 import com.mod.rbh.ReinforcedBlackHoles;
 import com.mod.rbh.api.IPostChain;
 import com.mod.rbh.api.IPostPass;
-import com.mod.rbh.compat.ShaderCompat;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -19,11 +19,15 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class PostEffectRegistry {
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final List<ResourceLocation> registry = new ArrayList<>();
@@ -34,6 +38,9 @@ public class PostEffectRegistry {
 
     private static double lastFrameTime = 0.0;
 
+    /**
+     * Called once when the Minecraft frame changes.
+     */
     protected static void changeFrame() {
         Minecraft minecraft = Minecraft.getInstance();
 
@@ -54,9 +61,16 @@ public class PostEffectRegistry {
     }
 
     public static void clear() {
-        for (PostEffect postEffect : postEffects.values())
+        for (PostEffect postEffect : postEffects.values()) {
             postEffect.close();
+        }
+
+        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
+            postEffect.close();
+        }
+
         postEffects.clear();
+        mutablePostEffects.clear();
     }
 
     public static void registerEffect(ResourceLocation resourceLocation) {
@@ -69,53 +83,85 @@ public class PostEffectRegistry {
 
     public static void onInitializeOutline() {
         clear();
+
         Minecraft minecraft = Minecraft.getInstance();
+
+        int width = minecraft.getWindow().getWidth();
+        int height = minecraft.getWindow().getHeight();
+
         for (ResourceLocation resourceLocation : registry) {
-            PostChain postChain;
-            RenderTarget renderTarget;
+            PostChain postChain = null;
+            RenderTarget renderTarget = null;
+
             try {
-                postChain = new PostChain(minecraft.getTextureManager(), minecraft.getResourceManager(), minecraft.getMainRenderTarget(), resourceLocation);
-                postChain.resize(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+                postChain = new PostChain(
+                        minecraft.getTextureManager(),
+                        minecraft.getResourceManager(),
+                        minecraft.getMainRenderTarget(),
+                        resourceLocation
+                );
+
+                postChain.resize(width, height);
+
                 renderTarget = postChain.getTempTarget("final");
-            } catch (IOException ioexception) {
-                LOGGER.warn("Failed to load shader: {}", resourceLocation, ioexception);
-                postChain = null;
-                renderTarget = null;
-            } catch (JsonSyntaxException jsonsyntaxexception) {
-                LOGGER.warn("Failed to parse shader: {}", resourceLocation, jsonsyntaxexception);
-                postChain = null;
-                renderTarget = null;
-            }
-            postEffects.put(resourceLocation, new PostEffect(postChain, renderTarget, false));
 
+            } catch (IOException e) {
+                LOGGER.warn("Failed to load shader: {}", resourceLocation, e);
+            } catch (JsonSyntaxException e) {
+                LOGGER.warn("Failed to parse shader: {}", resourceLocation, e);
+            }
+
+            postEffects.put(
+                    resourceLocation,
+                    new PostEffect(postChain, renderTarget, false)
+            );
         }
-        for (ResourceLocation resourceLocation : mutableRegistry) {
-            PostChain postChain;
-            try {
-                postChain = new PostChain(minecraft.getTextureManager(), minecraft.getResourceManager(), minecraft.getMainRenderTarget(), resourceLocation);
-                postChain.resize(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
-            } catch (IOException ioexception) {
-                LOGGER.warn("Failed to load shader: {}", resourceLocation, ioexception);
-                postChain = null;
-            } catch (JsonSyntaxException jsonsyntaxexception) {
-                LOGGER.warn("Failed to parse shader: {}", resourceLocation, jsonsyntaxexception);
-                postChain = null;
-            }
-            mutablePostEffects.put(resourceLocation, new MutablePostEffect(postChain, false));
 
+        for (ResourceLocation resourceLocation : mutableRegistry) {
+            PostChain postChain = null;
+
+            try {
+                postChain = new PostChain(
+                        minecraft.getTextureManager(),
+                        minecraft.getResourceManager(),
+                        minecraft.getMainRenderTarget(),
+                        resourceLocation
+                );
+
+                postChain.resize(width, height);
+
+            } catch (IOException e) {
+                LOGGER.warn("Failed to load shader: {}", resourceLocation, e);
+            } catch (JsonSyntaxException e) {
+                LOGGER.warn("Failed to parse shader: {}", resourceLocation, e);
+            }
+
+            mutablePostEffects.put(
+                    resourceLocation,
+                    new MutablePostEffect(postChain, false)
+            );
         }
     }
 
-    public static void resize(int x, int y) {
-        for (PostEffect postEffect : postEffects.values())
-            postEffect.resize(x, y);
-        for (PostEffect postEffect : mutablePostEffects.values())
-            postEffect.resize(x, y);
+    /**
+     * Called when the Minecraft framebuffer/window size actually changes.
+     *
+     * IMPORTANT:
+     * Do not call this every frame.
+     */
+    public static void resize(int width, int height) {
+        for (PostEffect postEffect : postEffects.values()) {
+            postEffect.resize(width, height);
+        }
+
+        for (MutablePostEffect postEffect : mutablePostEffects.values()) {
+            postEffect.resize(width, height);
+        }
     }
 
     public static RenderTarget getRenderTargetFor(ResourceLocation resourceLocation) {
         PostEffect effect = postEffects.get(resourceLocation);
-        return (effect == null) ? null : effect.getRenderTarget();
+        return effect == null ? null : effect.getRenderTarget();
     }
 
     public static MutablePostEffect getMutableEffect(ResourceLocation resourceLocation) {
@@ -124,43 +170,42 @@ public class PostEffectRegistry {
 
     public static PostChain getPostChainFor(ResourceLocation resourceLocation) {
         PostEffect effect = postEffects.get(resourceLocation);
-        return (effect == null) ? null : effect.getPostChain();
+        return effect == null ? null : effect.getPostChain();
     }
 
-    public static PostChain getMutablePostChainFor(ResourceLocation blackHolePostShader) {
-        MutablePostEffect effect = mutablePostEffects.get(blackHolePostShader);
-        return (effect == null) ? null : effect.getPostChain();
+    public static PostChain getMutablePostChainFor(ResourceLocation resourceLocation) {
+        MutablePostEffect effect = mutablePostEffects.get(resourceLocation);
+        return effect == null ? null : effect.getPostChain();
     }
 
     public static void renderEffectForNextTick(ResourceLocation resourceLocation) {
         PostEffect effect = postEffects.get(resourceLocation);
-        if (effect != null)
+
+        if (effect != null) {
             effect.setEnabled(true);
+        }
     }
 
     public static void renderMutableEffectForNextTick(ResourceLocation resourceLocation) {
         MutablePostEffect effect = mutablePostEffects.get(resourceLocation);
-        if (effect != null)
+
+        if (effect != null) {
             effect.setEnabled(true);
+        }
     }
 
     public static void blitEffects() {
         for (PostEffect fx : postEffects.values()) {
             if (fx.postChain != null && fx.isEnabled()) {
-//                fx.getRenderTarget().blitToScreen(Minecraft.getInstance().getWindow().getWidth(),
-//                        Minecraft.getInstance().getWindow().getHeight(), false);
                 fx.getRenderTarget().clear(Minecraft.ON_OSX);
-                // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
                 fx.setEnabled(false);
             }
         }
+
         for (MutablePostEffect fx : mutablePostEffects.values()) {
             if (fx.postChain != null && fx.isEnabled()) {
-//                fx.blitAll();
                 fx.wipe();
-                // REMOVE: Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
                 fx.setEnabled(false);
-//                fx.passedOnce = false;
             }
         }
     }
@@ -169,35 +214,60 @@ public class PostEffectRegistry {
         for (PostEffect fx : postEffects.values()) {
             if (fx.isEnabled() && fx.postChain != null) {
                 fx.getRenderTarget().clear(Minecraft.ON_OSX);
-                // REMOVE: mainTarget.bindWrite(false);
             }
         }
+
         changeFrame();
     }
 
-    public static void processEffects(RenderTarget mainTarget, float f, RenderPhase phase) {
+    public static void processEffects(
+            RenderTarget mainTarget,
+            float partialTick,
+            RenderPhase phase
+    ) {
         PhaseScope.with(phase, () -> {
+
             if (phase == RenderPhase.AFTER_LEVEL) {
                 for (PostEffect fx : postEffects.values()) {
                     if (fx.isEnabled() && fx.postChain != null) {
-                        fx.postChain.process(f);
+                        fx.postChain.process(partialTick);
                     }
                 }
             }
+
             for (MutablePostEffect fx : mutablePostEffects.values()) {
-                if (fx.isEnabled() && fx.postChain != null) {
-                    fx.process(phase);
-                    if (!IPostChain.fromPostChain(fx.postChain).getPostPasses().isEmpty())
-                        fx.postChain.process(f);
+                if (!fx.isEnabled() || fx.postChain == null) {
+                    continue;
+                }
+
+                fx.process(phase);
+
+                if (!IPostChain.fromPostChain(fx.postChain)
+                        .getPostPasses()
+                        .isEmpty()) {
+                    fx.postChain.process(partialTick);
                 }
             }
         });
     }
 
+    // ========================================================================
+    // Mutable post effect
+    // ========================================================================
+
     public static class MutablePostEffect extends PostEffect {
+
         protected final Map<HoleEffectInstance, Integer> holes = new HashMap<>();
+
         public int ranTimeAfterLevel = 0;
         public int ranTimeAfterArm = 0;
+
+        private final List<HoleEffectInstance> toRemove = new ArrayList<>();
+
+        /**
+         * Reused every frame to avoid creating a new list for sorting.
+         */
+        private final List<HoleEffectInstance> sortedHoles = new ArrayList<>();
 
         public MutablePostEffect(PostChain postChain, boolean enabled) {
             super(postChain, null, enabled);
@@ -209,71 +279,171 @@ public class PostEffectRegistry {
         }
 
         @Override
-        public void resize(int x, int y) {
-            super.resize(x, y);
+        public void resize(int width, int height) {
+            super.resize(width, height);
+
+            /*
+             * This is only called when the actual window/framebuffer
+             * size changes.
+             */
             for (HoleEffectInstance hole : holes.keySet()) {
-                hole.resize(x, y);
+                hole.resize(width, height);
             }
         }
 
-        private final List<HoleEffectInstance> toRemove = new ArrayList<>();
+//        /**
+//         * Adds/updates a black hole for the next few frames.
+//         *
+//         * IMPORTANT:
+//         * This method intentionally does NOT resize the framebuffer.
+//         */
+//        public void updateHole(HoleEffectInstance hole) {
+//            if (!holes.containsKey(hole) && holes.size() >= 80) {
+//                ReinforcedBlackHoles.LOGGER.warn(
+//                        "Too many black hole effects registered, skipping!"
+//                );
+//                return;
+//            }
+//
+//            if (hole.passes.isEmpty()) {
+//                return;
+//            }
+//
+//            PostPass pass = hole.passes.get(0);
+//
+//            if (pass instanceof IPostPass pp) {
+//                pp.toRunOnProcess(hole.uniformSetter);
+//            } else {
+//                IPostPass.fromPostPass(pass)
+//                        .toRunOnProcess(hole.uniformSetter);
+//            }
+//
+//            /*
+//             * Keep the effect alive for four frames.
+//             */
+//            holes.put(hole, 4);
+//        }
+
         public void process(RenderPhase phase) {
             switch (phase) {
                 case AFTER_LEVEL -> ranTimeAfterLevel++;
                 case AFTER_ARM -> ranTimeAfterArm++;
             }
 
-            Map<HoleEffectInstance, Integer> resolvedPasses = new WeakHashMap<>();
-            List<PostPass> passes = IPostChain.fromPostChain(this.postChain).getPostPasses();
+            if (holes.isEmpty()) {
+                return;
+            }
+
+            List<PostPass> passes =
+                    IPostChain.fromPostChain(this.postChain).getPostPasses();
+
+            /*
+             * Remove the old passes from the PostChain.
+             */
             passes.clear();
-            AtomicInteger counter = new AtomicInteger();
-            holes.keySet().stream()
-                    .sorted((a, b) -> Float.compare(b.dist, a.dist)) // furthest first
-                    .forEach(entry -> {
-                        if (entry.renderPhase == phase) {
-                            int position = counter.getAndIncrement();
 
-                            entry.render();
+            /*
+             * Build the list once and sort it.
+             *
+             * Furthest first is preserved from your original implementation,
+             * which is important for overlapping black holes.
+             */
+            sortedHoles.clear();
 
-                            passes.addAll(entry.passes);
-                            resolvedPasses.put(entry, entry.passes.size() * position);
-                        }
-                    });
+            for (HoleEffectInstance hole : holes.keySet()) {
+                if (hole.renderPhase == phase) {
+                    sortedHoles.add(hole);
+                }
+            }
 
+            sortedHoles.sort(
+                    Comparator.comparingDouble((HoleEffectInstance hole) -> hole.dist)
+                            .reversed()
+            );
+
+            /*
+             * Execute the render callback and append this hole's post pass.
+             *
+             * Because the passes are ordered by distance, overlapping holes
+             * continue to be processed in the same order as before.
+             */
+            for (HoleEffectInstance hole : sortedHoles) {
+                hole.render();
+                passes.addAll(hole.passes);
+            }
+
+            /*
+             * Decrease lifetimes and remove expired effects.
+             */
+            toRemove.clear();
 
             for (Map.Entry<HoleEffectInstance, Integer> entry : holes.entrySet()) {
-                if (entry.getValue() <= 0) {
+                int lifetime = entry.getValue();
+
+                if (lifetime <= 0) {
                     toRemove.add(entry.getKey());
                 }
             }
+
             for (HoleEffectInstance hole : toRemove) {
                 holes.remove(hole);
+//                hole.close();
             }
-            toRemove.clear();
 
-            holes.replaceAll((key, value) -> value - 1);
+            for (Map.Entry<HoleEffectInstance, Integer> entry : holes.entrySet()) {
+                entry.setValue(entry.getValue() - 1);
+            }
         }
 
         public void wipe() {
             for (HoleEffectInstance hole : holes.keySet()) {
+                if (hole.passes.isEmpty()) {
+                    continue;
+                }
+
                 hole.passes.get(0).inTarget.clear(Minecraft.ON_OSX);
                 hole.passes.get(0).outTarget.clear(Minecraft.ON_OSX);
             }
         }
 
         public void updateHole(HoleEffectInstance hole) {
-            if (holes.size() > 80) {
-                ReinforcedBlackHoles.LOGGER.warn("Too many black hole effects registered, skipping!");
+            if (!holes.containsKey(hole) && holes.size() >= 80) {
+                ReinforcedBlackHoles.LOGGER.warn(
+                        "Too many black hole effects registered, skipping!"
+                );
                 return;
             }
-            Window window = Minecraft.getInstance().getWindow();
+
+            if (hole.passes.isEmpty()) {
+                return;
+            }
+
+            Minecraft minecraft = Minecraft.getInstance();
+            Window window = minecraft.getWindow();
+
+            // Synchronize the hole's private framebuffers with the current window.
+            // HoleEffectInstance.resize() has a dimension guard, so this does
+            // nothing during normal frames.
             hole.resize(window.getWidth(), window.getHeight());
-            if (hole.passes.get(0) instanceof IPostPass pp) {
+
+            PostPass pass = hole.passes.get(0);
+
+            if (pass instanceof IPostPass pp) {
                 pp.toRunOnProcess(hole.uniformSetter);
             } else {
-                IPostPass.fromPostPass(hole.passes.get(0)).toRunOnProcess(hole.uniformSetter);
+                IPostPass.fromPostPass(pass)
+                        .toRunOnProcess(hole.uniformSetter);
             }
-            holes.put(hole, 4);
+
+            holes.put(hole, 2);
+
+            LOGGER.info(
+                    "Hole resize: {}x{} -> {}x{}",
+                    hole.getWidth(),
+                    hole.getHeight(),
+                    window.getWidth(),
+                    window.getHeight()
+            );
         }
 
         public void resetFrame() {
@@ -282,28 +452,59 @@ public class PostEffectRegistry {
         }
     }
 
+    // ========================================================================
+    // Hole effect instance
+    // ========================================================================
+
     public static class HoleEffectInstance {
-        public List<PostPass> passes;
+
+        public final List<PostPass> passes;
         public Consumer<PostPass> uniformSetter;
-        public RenderTarget main;
+        public final RenderTarget main;
         public float dist;
         public RenderPhase renderPhase;
+
         private @Nullable Runnable renderFunc = () -> {};
 
         private Matrix4f shaderOrthoMatrix;
+
+        /*
+         * These are initialized when the targets are created.
+         */
         private int screenWidth;
         private int screenHeight;
 
-        public HoleEffectInstance(List<PostPass> passes, Consumer<PostPass> uniformSetter, RenderTarget main, float dist) {
+        public HoleEffectInstance(
+                List<PostPass> passes,
+                Consumer<PostPass> uniformSetter,
+                RenderTarget main,
+                float dist
+        ) {
             this.passes = passes;
             this.uniformSetter = uniformSetter;
             this.main = main;
             this.dist = dist;
             this.renderPhase = RenderPhase.AFTER_LEVEL;
+
+            /*
+             * The constructor/createEffectInstance path initializes these.
+             */
+            if (main != null) {
+                this.screenWidth = main.width;
+                this.screenHeight = main.height;
+            }
         }
 
         public void setRenderFunc(Runnable func) {
             renderFunc = func;
+        }
+
+        public int getWidth() {
+            return this.screenWidth;
+        }
+
+        public int getHeight() {
+            return this.screenHeight;
         }
 
         public void render() {
@@ -314,19 +515,65 @@ public class PostEffectRegistry {
         }
 
         private void updateOrthoMatrix() {
-            this.shaderOrthoMatrix = (new Matrix4f()).setOrtho(0.0F, (float)this.main.width, 0.0F, (float)this.main.height, 0.1F, 1000.0F);
+            this.shaderOrthoMatrix = new Matrix4f()
+                    .setOrtho(
+                            0.0F,
+                            (float) this.main.width,
+                            0.0F,
+                            (float) this.main.height,
+                            0.1F,
+                            1000.0F
+                    );
         }
 
+        /**
+         * Resize ONLY when the framebuffer dimensions actually changed.
+         */
         public void resize(int pWidth, int pHeight) {
+            if (this.screenWidth == pWidth && this.screenHeight == pHeight) {
+                return;
+            }
+
             this.screenWidth = pWidth;
             this.screenHeight = pHeight;
+
             this.updateOrthoMatrix();
 
-            for(PostPass postpass : this.passes) {
+            for (PostPass postpass : this.passes) {
                 postpass.setOrthoMatrix(this.shaderOrthoMatrix);
             }
 
-            passes.get(0).outTarget.resize(pWidth, pHeight, Minecraft.ON_OSX);
+            passes.get(0).outTarget.resize(
+                    pWidth,
+                    pHeight,
+                    Minecraft.ON_OSX
+            );
+
+            passes.get(0).inTarget.resize(
+                    pWidth,
+                    pHeight,
+                    Minecraft.ON_OSX
+            );
+        }
+
+        /**
+         * Frees the framebuffer resources owned by this hole.
+         */
+        public void close() {
+            for (PostPass pass : passes) {
+                /*
+                 * Each hole owns its output/input targets.
+                 *
+                 * Avoid closing shared Minecraft targets here.
+                 */
+                if (pass.inTarget != null) {
+                    pass.inTarget.destroyBuffers();
+                }
+
+                if (pass.outTarget != null) {
+                    pass.outTarget.destroyBuffers();
+                }
+            }
         }
 
         public static HoleEffectInstance createEffectInstance() {
@@ -334,52 +581,127 @@ public class PostEffectRegistry {
             FboGuard guard = new FboGuard();
             guard.save();
 
-            Window window = Minecraft.getInstance().getWindow();
-            RenderTarget finalTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
-            RenderTarget swapTarget = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
+            Minecraft minecraft = Minecraft.getInstance();
+            Window window = minecraft.getWindow();
+
+            int width = window.getWidth();
+            int height = window.getHeight();
+
+            RenderTarget finalTarget =
+                    new TextureTarget(
+                            width,
+                            height,
+                            true,
+                            Minecraft.ON_OSX
+                    );
+
+            RenderTarget swapTarget =
+                    new TextureTarget(
+                            width,
+                            height,
+                            true,
+                            Minecraft.ON_OSX
+                    );
+
             BlitPostPass holePass = null;
+
             try {
                 finalTarget.setFilterMode(GL11.GL_NEAREST);
                 swapTarget.setFilterMode(GL11.GL_NEAREST);
-                holePass = new BlitPostPass(Minecraft.getInstance().getResourceManager(), "rbh:black_hole", finalTarget, swapTarget);
+
+                holePass = new BlitPostPass(
+                        minecraft.getResourceManager(),
+                        "rbh:black_hole",
+                        finalTarget,
+                        swapTarget
+                );
+
             } catch (IOException e) {
-                LOGGER.warn(e.toString());
+                LOGGER.warn("Failed to create black hole post pass", e);
             }
 
             if (holePass != null) {
-                holePass.addAuxAsset("MainSampler", Minecraft.getInstance().getMainRenderTarget()::getColorTextureId, window.getWidth(), window.getHeight());
+                holePass.addAuxAsset(
+                        "MainSampler",
+                        minecraft.getMainRenderTarget()::getColorTextureId,
+                        width,
+                        height
+                );
             }
-            List<PostPass> passes = new ArrayList<>();
-            if (holePass != null)
+
+            List<PostPass> passes = new ArrayList<>(1);
+
+            if (holePass != null) {
                 passes.add(holePass);
 
+                /*
+                 * Initialize the projection matrix immediately.
+                 * This avoids a resize being required on the first frame.
+                 */
+                Matrix4f ortho = new Matrix4f()
+                        .setOrtho(
+                                0.0F,
+                                (float) finalTarget.width,
+                                0.0F,
+                                (float) finalTarget.height,
+                                0.1F,
+                                1000.0F
+                        );
+
+                holePass.setOrthoMatrix(ortho);
+            }
+
             guard.restore();
-            return new PostEffectRegistry.HoleEffectInstance(passes, null, finalTarget, 0.0f);
+
+            HoleEffectInstance instance =
+                    new HoleEffectInstance(
+                            passes,
+                            null,
+                            finalTarget,
+                            0.0f
+                    );
+
+            /*
+             * Explicitly tell the instance that its targets already have
+             * the current dimensions.
+             */
+            instance.screenWidth = width;
+            instance.screenHeight = height;
+
+            return instance;
         }
     }
+
+    // ========================================================================
+    // Normal post effect
+    // ========================================================================
+
     private static class PostEffect {
+
         protected final PostChain postChain;
-
         protected final RenderTarget renderTarget;
-
         protected boolean enabled;
 
-        public PostEffect(PostChain postChain, RenderTarget renderTarget, boolean enabled) {
+        public PostEffect(
+                PostChain postChain,
+                RenderTarget renderTarget,
+                boolean enabled
+        ) {
             this.postChain = postChain;
             this.renderTarget = renderTarget;
             this.enabled = enabled;
         }
 
         public PostChain getPostChain() {
-            return this.postChain;
+            return postChain;
         }
 
         public RenderTarget getRenderTarget() {
-            return this.renderTarget;
+            return renderTarget;
         }
 
         public boolean isEnabled() {
-            return this.enabled;
+            return enabled;
         }
 
         public void setEnabled(boolean enabled) {
@@ -387,26 +709,45 @@ public class PostEffectRegistry {
         }
 
         public void close() {
-            if (this.postChain != null)
-                this.postChain.close();
+            if (postChain != null) {
+                postChain.close();
+            }
         }
 
-        public void resize(int x, int y) {
-            if (this.postChain != null)
-                this.postChain.resize(x, y);
+        public void resize(int width, int height) {
+            if (postChain != null) {
+                postChain.resize(width, height);
+            }
         }
     }
 
+    // ========================================================================
+    // Render phase
+    // ========================================================================
+
     public static final class PhaseScope {
-        private static final ThreadLocal<PostEffectRegistry.RenderPhase> CURRENT = new ThreadLocal<>();
-        public static void with(PostEffectRegistry.RenderPhase phase, Runnable r) {
-            PostEffectRegistry.RenderPhase old = CURRENT.get();
+
+        private static final ThreadLocal<RenderPhase> CURRENT =
+                new ThreadLocal<>();
+
+        public static void with(RenderPhase phase, Runnable runnable) {
+            RenderPhase old = CURRENT.get();
+
             CURRENT.set(phase);
-            try { r.run(); } finally { CURRENT.set(old); }
+
+            try {
+                runnable.run();
+            } finally {
+                CURRENT.set(old);
+            }
         }
-        public static PostEffectRegistry.RenderPhase current() {
-            PostEffectRegistry.RenderPhase p = CURRENT.get();
-            return p != null ? p : PostEffectRegistry.RenderPhase.AFTER_LEVEL;
+
+        public static RenderPhase current() {
+            RenderPhase phase = CURRENT.get();
+
+            return phase != null
+                    ? phase
+                    : RenderPhase.AFTER_LEVEL;
         }
     }
 
