@@ -6,7 +6,6 @@ import com.mod.rbh.api.IPostChain;
 import com.mod.rbh.api.IPostPass;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -330,17 +329,20 @@ public class PostEffectRegistry {
                 case AFTER_ARM -> ranTimeAfterArm++;
             }
 
-            if (holes.isEmpty()) {
-                return;
-            }
-
             List<PostPass> passes =
                     IPostChain.fromPostChain(this.postChain).getPostPasses();
 
             /*
-             * Remove the old passes from the PostChain.
+             * ALWAYS remove passes from the previous phase/frame first.
+             *
+             * If this is done after the holes.isEmpty() check, the PostChain can
+             * retain stale passes and process an old black-hole effect again.
              */
             passes.clear();
+
+            if (holes.isEmpty()) {
+                return;
+            }
 
             /*
              * Build the list once and sort it.
@@ -435,15 +437,12 @@ public class PostEffectRegistry {
                         .toRunOnProcess(hole.uniformSetter);
             }
 
-            holes.put(hole, 2);
-
-            LOGGER.info(
-                    "Hole resize: {}x{} -> {}x{}",
-                    hole.getWidth(),
-                    hole.getHeight(),
-                    window.getWidth(),
-                    window.getHeight()
-            );
+            /*
+             * Preserve the original lifetime tolerance. process() can run in
+             * multiple render phases during one visual frame, so a lifetime of
+             * two is too aggressive and can make effects disappear/flicker.
+             */
+            holes.put(hole, 4);
         }
 
         public void resetFrame() {
@@ -514,13 +513,13 @@ public class PostEffectRegistry {
             }
         }
 
-        private void updateOrthoMatrix() {
+        private void updateOrthoMatrix(int width, int height) {
             this.shaderOrthoMatrix = new Matrix4f()
                     .setOrtho(
                             0.0F,
-                            (float) this.main.width,
+                            (float) width,
                             0.0F,
-                            (float) this.main.height,
+                            (float) height,
                             0.1F,
                             1000.0F
                     );
@@ -528,32 +527,66 @@ public class PostEffectRegistry {
 
         /**
          * Resize ONLY when the framebuffer dimensions actually changed.
+         *
+         * RenderTarget.resize() reallocates GPU framebuffer storage, so it must
+         * not be called every frame. At the same time, the projection matrix must
+         * be rebuilt from the NEW dimensions, not from the old target size.
          */
         public void resize(int pWidth, int pHeight) {
-            if (this.screenWidth == pWidth && this.screenHeight == pHeight) {
+            if (this.passes.isEmpty()) {
+                this.screenWidth = pWidth;
+                this.screenHeight = pHeight;
                 return;
+            }
+
+            PostPass pass = this.passes.get(0);
+
+            boolean cachedSizeMatches =
+                    this.screenWidth == pWidth && this.screenHeight == pHeight;
+
+            boolean inputSizeMatches =
+                    pass.inTarget.width == pWidth && pass.inTarget.height == pHeight;
+
+            boolean outputSizeMatches =
+                    pass.outTarget.width == pWidth && pass.outTarget.height == pHeight;
+
+            if (cachedSizeMatches && inputSizeMatches && outputSizeMatches) {
+                return;
+            }
+
+            /*
+             * Expensive GPU reallocations happen only for targets whose actual
+             * dimensions changed.
+             */
+            if (!inputSizeMatches) {
+                pass.inTarget.resize(
+                        pWidth,
+                        pHeight,
+                        Minecraft.ON_OSX
+                );
+            }
+
+            if (!outputSizeMatches) {
+                pass.outTarget.resize(
+                        pWidth,
+                        pHeight,
+                        Minecraft.ON_OSX
+                );
             }
 
             this.screenWidth = pWidth;
             this.screenHeight = pHeight;
 
-            this.updateOrthoMatrix();
+            /*
+             * Build the ortho matrix after the resize and directly from the new
+             * dimensions. The old implementation read main.width/main.height
+             * before those targets had been resized.
+             */
+            this.updateOrthoMatrix(pWidth, pHeight);
 
-            for (PostPass postpass : this.passes) {
-                postpass.setOrthoMatrix(this.shaderOrthoMatrix);
+            for (PostPass postPass : this.passes) {
+                postPass.setOrthoMatrix(this.shaderOrthoMatrix);
             }
-
-            passes.get(0).outTarget.resize(
-                    pWidth,
-                    pHeight,
-                    Minecraft.ON_OSX
-            );
-
-            passes.get(0).inTarget.resize(
-                    pWidth,
-                    pHeight,
-                    Minecraft.ON_OSX
-            );
         }
 
         /**

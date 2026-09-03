@@ -6,13 +6,11 @@ import com.mod.rbh.shaders.FboGuard;
 import com.mod.rbh.shaders.PostEffectRegistry;
 import com.mod.rbh.shaders.RBHRenderTypes;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexSorting;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
@@ -30,7 +28,6 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import org.slf4j.Logger;
 import org.joml.Matrix4fStack;
 
 import java.awt.Color;
@@ -38,8 +35,6 @@ import java.awt.Color;
 public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
     public static final ResourceLocation NETHERITE =
             ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/netherite_block.png");
-
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Vector3f NEUTRAL_STRETCH_VEC = new Vector3f(1.0f, 0.0f, 0.0f);
 
@@ -256,6 +251,12 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         Vector2f screenPos = getScreenSpace(cameraRelativePos, projectionForShader);
         float distFromCamera = cameraRelativePos.length();
 
+        /*
+         * process() sorts holes before executing renderFunc, so the distance must
+         * already be current when the sort happens.
+         */
+        effectInstance.dist = distFromCamera;
+
         Matrix4f objectToView = new Matrix4f(capturedModelView)
                 .mul(poseStack.last().pose());
 
@@ -271,11 +272,8 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         float finalStretchStrength = stretchStrength;
 
         effectInstance.setRenderFunc(() -> {
-            effectInstance.dist = distFromCamera;
-
             int prevDrawFbo = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
             int prevReadFbo = GL30.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
-            int prevFbo = GL30.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
 
             int[] viewport = new int[4];
             GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
@@ -322,7 +320,7 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
                 /*
                  * Copy depth for all phases, including AFTER_ARM.
                  */
-                finalTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                finalTarget.copyDepthFrom(mainTarget);
 
                 finalTarget.bindWrite(false);
 
@@ -377,9 +375,12 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
 
                 RenderSystem.setProjectionMatrix(previousProjection, previousVertexSorting);
 
+                /*
+                 * Restore DRAW and READ independently. Binding GL_FRAMEBUFFER
+                 * afterwards would overwrite both bindings again.
+                 */
                 GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, prevDrawFbo);
                 GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, prevReadFbo);
-                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, prevFbo);
 
                 GL11.glViewport(
                         viewport[0],
@@ -440,7 +441,6 @@ public class BlackHoleRenderer<T extends BlackHole> extends EntityRenderer<T> {
         PostEffectRegistry.renderMutableEffectForNextTick(RBHRenderTypes.BLACK_HOLE_POST_SHADER);
         PostEffectRegistry.getMutableEffect(RBHRenderTypes.BLACK_HOLE_POST_SHADER).updateHole(effectInstance);
 
-        mainTarget.bindWrite(true);
         mainGuard.restore();
     }
 

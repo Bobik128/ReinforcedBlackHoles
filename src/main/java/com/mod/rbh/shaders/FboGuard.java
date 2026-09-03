@@ -1,31 +1,58 @@
 package com.mod.rbh.shaders;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
+
+/**
+ * Saves/restores framebuffer, viewport and scissor state around custom renders.
+ *
+ * READ and DRAW framebuffer bindings are intentionally restored separately.
+ * GL_FRAMEBUFFER targets both at once, so binding it after the separate restores
+ * would destroy the state we just restored.
+ */
 public final class FboGuard {
-    int draw, read, fb;
-    final int[] vp = new int[4];
-    final int[] sc = new int[4];
-    boolean hadScissor;
+
+    private int drawFramebuffer;
+    private int readFramebuffer;
+
+    private final int[] viewport = new int[4];
+    private final int[] scissor = new int[4];
+
+    private boolean hadScissor;
 
     public void save() {
-        draw = org.lwjgl.opengl.GL30.glGetInteger(org.lwjgl.opengl.GL30.GL_DRAW_FRAMEBUFFER_BINDING);
-        read = org.lwjgl.opengl.GL30.glGetInteger(org.lwjgl.opengl.GL30.GL_READ_FRAMEBUFFER_BINDING);
-        fb   = org.lwjgl.opengl.GL30.glGetInteger(org.lwjgl.opengl.GL30.GL_FRAMEBUFFER_BINDING);
-        org.lwjgl.opengl.GL11.glGetIntegerv(org.lwjgl.opengl.GL11.GL_VIEWPORT, vp);
-        hadScissor = org.lwjgl.opengl.GL11.glIsEnabled(org.lwjgl.opengl.GL11.GL_SCISSOR_TEST);
-        if (hadScissor) org.lwjgl.opengl.GL11.glGetIntegerv(org.lwjgl.opengl.GL11.GL_SCISSOR_BOX, sc);
+        drawFramebuffer = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
+        readFramebuffer = GL30.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
+
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
+
+        hadScissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
+        if (hadScissor) {
+            GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, scissor);
+        }
     }
 
     public void restore() {
-        org.lwjgl.opengl.GL30.glBindFramebuffer(org.lwjgl.opengl.GL30.GL_DRAW_FRAMEBUFFER, draw);
-        org.lwjgl.opengl.GL30.glBindFramebuffer(org.lwjgl.opengl.GL30.GL_READ_FRAMEBUFFER, read);
-        org.lwjgl.opengl.GL30.glBindFramebuffer(org.lwjgl.opengl.GL30.GL_FRAMEBUFFER, fb);
-        org.lwjgl.opengl.GL11.glViewport(vp[0], vp[1], vp[2], vp[3]);
+        GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, readFramebuffer);
+
+        GL11.glViewport(
+                viewport[0],
+                viewport[1],
+                viewport[2],
+                viewport[3]
+        );
+
         if (hadScissor) {
-            org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_SCISSOR_TEST);
-            org.lwjgl.opengl.GL11.glScissor(sc[0], sc[1], sc[2], sc[3]);
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            GL11.glScissor(
+                    scissor[0],
+                    scissor[1],
+                    scissor[2],
+                    scissor[3]
+            );
         } else {
-            org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_SCISSOR_TEST);
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
         }
     }
 }
-
